@@ -1,0 +1,8 @@
+@import "../../index.scss";
+.navbar {
+	background-color: $base !important;
+
+	#logo {
+		color: $sub;
+	}
+}
