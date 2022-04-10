@@ -1,8 +1,22 @@
 @import "../../index.scss";
 .navbar {
-	background-color: $base !important;
+	background-color: $sub!important;
+	top: 0;
+	position: sticky;
+	white-space: nowrap;
+	overflow: hidden;
+
+	.navbar-brand {
+		img#site-brand {
+			max-height: 25px;
+		}
+	}
+
+
+	border-bottom: solid 1px $background-gray-dark;
+	box-shadow: 10px red;
 
 	#logo {
-		color: $sub;
+		color: $base;
 	}
 }
