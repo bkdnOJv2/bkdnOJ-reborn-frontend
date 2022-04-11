@@ -6,7 +6,7 @@ export default class Content extends React.Component {
 	render() {
 		return (
 			<Container className="content">
-				Hello, World!
+				Content goes here.
 			</Container>
 		)
 	}

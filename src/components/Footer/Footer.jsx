@@ -23,7 +23,7 @@ export default class Footer extends React.Component {
 					<Row className="upper-row">
 						<Col xs={12} md={4} className="col school-info-section">
 							<p className="bkdn-uni-container">
-								<img className='bkdn-uni-flag' src={uniFlag}/>
+								<img className='bkdn-uni-flag' src={uniFlag} alt="Flag of Danang University of Science and Technology"/>
 							</p>
 						</Col>
 
@@ -63,7 +63,8 @@ export default class Footer extends React.Component {
 					<Row className="lower-row">
 						<Col xs={12} className="col">
 							<pre id="footer-note">
-								bkdnOJ reborn - By @nvatuan, 2022{"\n"}
+								Bach Khoa Da Nang Online Judge - bkdnOJ v2.0 © 2022{"\n"}
+								Built by BKDN's Informatics Olympic and ICPC Team{"\n"}
 								University of Science and Technology - University of Danang{"\n"}
 							</pre>
 						</Col>
