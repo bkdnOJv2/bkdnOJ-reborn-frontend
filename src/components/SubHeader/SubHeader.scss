@@ -1,21 +1,23 @@
 @import "../../index.scss";
 
 .subheader {
+	// Top Border Line
+	border-top: solid 1px $background-gray-dark;
+
 	height: 20px;
-	line-height: 20px;
+	line-height: 18px;
 
 	text-align: left;
 	font-size: xx-small;
 
-	border-bottom: dashed 1px $background-gray-dark;
-
-
 	.float-left {
+		.left-padder {
+			padding-left: 20px;
+			padding-right: 38px;
+			text-align: center;
+		}
 		span {
-			margin: 0 5px;
-			&:first-child {
-				margin-left: 0;
-			}
+			margin-right: 10px;
 		}
 	}
 	.float-right {
@@ -26,4 +28,7 @@
 			}
 		}
 	}
+
+	// Bottom Border Line
+	border-bottom: dashed 1px $background-gray-dark;
 }

@@ -1,9 +1,14 @@
 @import "../../index.scss";
 
 .footer {
-	height: 300px;
+	min-height: 300px;
 	border: solid 2px red;
-	margin-top: 30px;
+	background-color: $base;
+
+	padding-top: 30px;
+	padding-bottom: 30px;
+
+	color: $sub;
 
 	.container {
 		width: 100%;
@@ -11,5 +16,10 @@
 			max-height: 150px;
 		}
 	}
+
+	.col {
+		border: solid 2px blue;
+	}
+
 
 }

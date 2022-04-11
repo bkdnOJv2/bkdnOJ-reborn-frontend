@@ -7,7 +7,7 @@ export default class Header extends React.Component {
 		return (
 			<div className='header'>
 				<Container>
-					<div className='site-logo d-none d-sm-block'>
+					<div className='site-logo d-none d-md-block'>
 						<img src='https://judge.u-aizu.ac.jp/onlinejudge/image/common/logo.png'/>
 					</div>
 					<span>English</span>

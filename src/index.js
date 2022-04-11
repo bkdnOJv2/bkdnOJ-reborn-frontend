@@ -10,7 +10,7 @@ ReactDOM.render(
     <Navbar/>
     <SubHeader/>
 
-    <Container style={{marginTop: "40px", border: "solid", height: "1200px"}}>
+    <Container style={{marginTop: "30px", marginBottom: "30px", border: "solid", height: "1200px"}}>
       Hello!
     </Container>
 

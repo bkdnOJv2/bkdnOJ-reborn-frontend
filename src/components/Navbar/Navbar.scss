@@ -4,19 +4,32 @@
 	top: 0;
 	position: sticky;
 	white-space: nowrap;
-	overflow: hidden;
 
 	.navbar-brand {
 		img#site-brand {
 			max-height: 25px;
 		}
+		margin-right: 20px;
 	}
 
-
-	border-bottom: solid 1px $background-gray-dark;
-	box-shadow: 10px red;
-
-	#logo {
+	// Site Brand
+	#brand {
 		color: $base;
+	}
+
+	// Nav items
+	.nav-item, .nav-link {
+		font-family: sans-serif;
+		// text-decoration: underline;
+		text-transform: capitalize;
+		font-size: 14px;
+
+		.dropdown-item {
+			font-size: 12px;
+		}
+
+		&:focus{
+			font-weight: 600;
+		}
 	}
 }

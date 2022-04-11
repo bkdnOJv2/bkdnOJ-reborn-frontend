@@ -8,7 +8,10 @@ export default class SubHeader extends React.Component {
 			<div className='subheader expand-sm'>
 				<Container>
 					<div className='float-left'>
-						<span>This Is</span>
+						<span className='left-padder d-none d-md-inline'>
+							{'▶▶'}
+						</span>
+						<span className=''>This Is</span>
 						<span>Float Left</span>
 						<span>Components</span>
 					</div>
