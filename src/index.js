@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import {Navbar, Header, SubHeader, Footer} from './components/index.js';
+import {Navbar, Header, SubHeader, Footer, Content} from './components/index.js';
 import {Container} from 'react-bootstrap';
 
 ReactDOM.render(
@@ -10,9 +10,10 @@ ReactDOM.render(
     <Navbar/>
     <SubHeader/>
 
-    <Container style={{marginTop: "30px", marginBottom: "30px", border: "solid", height: "1200px"}}>
+    {/* <Container style={{marginTop: "30px", marginBottom: "30px", border: "solid", height: "1200px"}}>
       Hello!
-    </Container>
+    </Container> */}
+    <Content/>
 
     <Footer/>
   </React.StrictMode>,

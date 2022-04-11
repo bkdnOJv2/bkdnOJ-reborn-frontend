@@ -15,7 +15,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background-color: $background-gray;
+  // background-color: $background-gray;
+	background: linear-gradient(to bottom, 
+    $background-gray 0%, $background-gray 10%,
+    white 60%, white 100%
+  );
   // background-color: rgb(245, 245, 245);
   min-width: 350px;
 }

@@ -1,22 +1,71 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import './Footer.scss';
-import unilogo from 'assets/images/bkdn-uni-logo.jpg';
+import uniFlag from 'assets/images/bkdn-uni-flag.png';
+
+/*
+	FOOTER
+	------- | ------------------------
+	School  |   Link Categories
+	Info    |   Cate 1 ------
+	        |    > link  > link
+	------- | ------------------------
+		Thankyou, creator,
+		  inspiration...
+
+*/
 
 export default class Footer extends React.Component {
 	render() {
 		return (
 			<footer className='footer'>
 				<Container>
-					<Row>
-						<Col xs={12} md={4} className="col">
-							<p>Trang chu: ...</p>
-							<p>Khoa CNTT: ...</p>
-							<p style={{textAlign: "center"}}><img className='bkdn-uni-icon' src={unilogo}/></p>
-							<p>Đại học Bách khoa - Đại học Đà Nẵng</p>
+					<Row className="upper-row">
+						<Col xs={12} md={4} className="col school-info-section">
+							<p className="bkdn-uni-container">
+								<img className='bkdn-uni-flag' src={uniFlag}/>
+							</p>
 						</Col>
-						<Col xs={12} md={8} className="col">
-							Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+						<Col xs={12} md={8} className="col link-section">
+							<div className="subcategory">
+								<h4>Title 1</h4>
+								<p>
+									<a href="#">Link 1</a>
+									<a href="#">Link 2</a>
+									<a href="#">Link 3</a>
+								</p>
+							</div>
+
+							<div className="subcategory">
+								<h4>Title 2</h4>
+								<p>
+									<a href="#">Link 1</a>
+									<a href="#">Link 2</a>
+									<a href="#">Link 3</a>
+									<a href="#">Link 3</a>
+									<a href="#">Link 3</a>
+									<a href="#">Link 3</a>
+								</p>
+							</div>
+
+							<div className="subcategory">
+								<h4>Title 3</h4>
+								<p>
+									<a href="#">Link 1</a>
+									<a href="#">Link 2</a>
+									<a href="#">Link 3</a>
+								</p>
+							</div>
+						</Col>
+					</Row>
+
+					<Row className="lower-row">
+						<Col xs={12} className="col">
+							<pre id="footer-note">
+								bkdnOJ reborn - By @nvatuan, 2022{"\n"}
+								University of Science and Technology - University of Danang{"\n"}
+							</pre>
 						</Col>
 					</Row>
 				</Container>
