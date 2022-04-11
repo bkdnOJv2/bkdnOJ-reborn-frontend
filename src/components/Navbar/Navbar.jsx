@@ -1,7 +1,7 @@
 import React from 'react';
 import BTNavbar from 'react-bootstrap/Navbar';
 import { Container, Nav, NavDropdown, Item, Image } from 'react-bootstrap';
-import brand from '../../assets/images/bkdnoj-brand.png'
+import brand from 'assets/images/bkdnoj-brand.png'
 import './Navbar.scss'
 
 export default class Navbar extends React.Component {

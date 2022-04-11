@@ -1,0 +1,15 @@
+@import "../../index.scss";
+
+.footer {
+	height: 300px;
+	border: solid 2px red;
+	margin-top: 30px;
+
+	.container {
+		width: 100%;
+		img.bkdn-uni-icon {
+			max-height: 150px;
+		}
+	}
+
+}
