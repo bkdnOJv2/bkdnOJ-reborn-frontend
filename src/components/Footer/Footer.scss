@@ -1,12 +1,33 @@
 @import "../../index.scss";
 
+$spike-percent: 5%;
+
 .footer {
 	min-height: 200px;
 	background-color: $base;
 
-	background-image: url('/assets/patterns/footer-bg.png');
-	background-position: left top;
-	background-repeat: repeat-x;
+	/* Using Pattern Image */
+	// background-image: url('/assets/patterns/footer-bg.png');
+	// background-position: left top;
+	// background-repeat: repeat-x;
+
+	/* Using raw CSS */
+	background-image:
+	   /* Top jagged */
+    linear-gradient(135deg, $sub $spike-percent, transparent $spike-percent),
+    linear-gradient(225deg, $sub $spike-percent, transparent $spike-percent),
+    /* Bottom jagged */
+    linear-gradient(45deg, $base $spike-percent, transparent $spike-percent),
+    linear-gradient(-45deg, $base $spike-percent, transparent $spike-percent);
+
+  background-position:
+    /* Top jagged */
+    top left, top left,
+    /* Bottom jagged */
+    bottom left, bottom left;
+
+  background-size: 20px;
+  background-repeat: repeat-x;
 
 	padding-top: 30px;
 
@@ -29,7 +50,7 @@
 	.link-section {
 		div.subcategory {
 			margin-top: 18px;
-			border-top: 2px solid $background-gray-dark; 
+			border-top: 2px solid $background-gray-dark;
 			position: relative;
 		}
 
@@ -63,7 +84,7 @@
 			flex-wrap: wrap;
 			column-gap: 16px;
 			row-gap: 4px;
-			
+
 			a {
 				font-size: smaller;
 

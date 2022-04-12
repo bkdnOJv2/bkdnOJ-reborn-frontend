@@ -16,10 +16,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   // background-color: $background-gray;
-	background: linear-gradient(to bottom, 
+	background: linear-gradient(to bottom,
     $background-gray 0%, $background-gray 10%,
-    white 60%, white 100%
+    $sub 60%, $sub 100%
   );
+  background-repeat:space;
   // background-color: rgb(245, 245, 245);
   min-width: 350px;
 }
