@@ -1,8 +1,7 @@
 import React from 'react';
 import BTNavbar from 'react-bootstrap/Navbar';
 import { Container, Nav, NavDropdown, Item, Image } from 'react-bootstrap';
-import brand from 'assets/images/bkdnoj-brand.png'
-import icon from 'assets/images/bkdn-uni-icon.png';
+import icon from 'assets/images/bkdnoj-favicon-noring.png';
 
 import './Navbar.scss'
 
