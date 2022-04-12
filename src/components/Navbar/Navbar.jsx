@@ -2,6 +2,8 @@ import React from 'react';
 import BTNavbar from 'react-bootstrap/Navbar';
 import { Container, Nav, NavDropdown, Item, Image } from 'react-bootstrap';
 import brand from 'assets/images/bkdnoj-brand.png'
+import icon from 'assets/images/bkdn-uni-icon.png';
+
 import './Navbar.scss'
 
 export default class Navbar extends React.Component {
@@ -11,8 +13,8 @@ export default class Navbar extends React.Component {
 			<BTNavbar bg="light" expand="md" className="navbar py-0" id="navbar" fixed="top">
 				<Container>
 					<BTNavbar.Brand id="brand" href="#home">
-						{/* <Image src={brand} id="site-brand" /> */}
-						Home
+						<Image src={icon} id="site-brand"/>
+						<span>bkdnOJ</span>
 					</BTNavbar.Brand>
 
 					<BTNavbar.Toggle aria-controls="basic-navbar-nav"/>

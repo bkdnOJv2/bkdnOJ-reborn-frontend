@@ -1,15 +1,32 @@
-@import "../../index.scss";
+@import "index.scss";
+
 .navbar {
 	background-color: $sub!important;
 	top: 0;
 	position: sticky;
 	white-space: nowrap;
 
-	.navbar-brand {
-		img#site-brand {
-			max-height: 25px;
+	.container {
+		height: 100%;
+
+		.navbar-brand {
+			font-family: $font-brand;
+			font-weight: bold;
+
+			display: flex;
+			align-items: center;
+
+			height: 45px;
+			width: 100px;
+
+			img {
+				height: 60%;
+				width: auto;
+
+				margin-left: 5px;
+				margin-right: 5px;
+			}
 		}
-		margin-right: 20px;
 	}
 
 	// Site Brand
@@ -19,7 +36,7 @@
 
 	// Nav items
 	.nav-item, .nav-link {
-		font-family: sans-serif;
+		font-family: $font-brand;
 		// text-decoration: underline;
 		text-transform: capitalize;
 		font-size: 14px;

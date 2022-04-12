@@ -5,6 +5,22 @@ $background-gray: #d6d6d6;
 $background-gray-dark: #c5c5c5;
 $background-gray-darker: #505050;
 
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300&family=Roboto+Mono:wght@300&display=swap');
+// font-family: 'Roboto', sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+// font-family: 'Roboto Mono', monospace;
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&display=swap');
+// font-family: 'Open Sans', sans-serif;
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300&display=swap');
+// font-family: 'Oswald', sans-serif;
+
+$font-brand: 'Open Sans', sans-serif;
+$font-monospace: 'Roboto Mono', monospace;
+$font-section-headline: 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-base: apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+
 // ======== Styles
 
 body {

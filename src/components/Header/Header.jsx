@@ -9,11 +9,11 @@ export default class Header extends React.Component {
 			<div className='header'>
 				<Container>
 					<div className='site-logo d-none d-md-block'>
-						<img src={flag}/>
+						<img src={flag} alt="Drop down Flag with BKDN icon and Online Judge text"/>
 					</div>
-					<span>English</span>
-					<span>Japanese</span>
-					<span>Other Languages</span>
+					<span>🇻🇳 Tiếng Việt</span>
+					<span>🇬🇧 English</span>
+					<span>?</span>
 				</Container>
 			</div>
 		)
