@@ -5,9 +5,7 @@ import "./Content.scss";
 export default class Content extends React.Component {
     render() {
         return (
-            <Container className="content">
-                Content goes here.
-            </Container>
+            <div className="content-div">Content goes here.</div>
         )
     }
 }
