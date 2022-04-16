@@ -37,7 +37,6 @@ export default class ErrorBox extends React.Component {
 
     render() {
         const { errors } = this.state;
-        log(errors);
         return (
             <div className="error-box">
                 {
