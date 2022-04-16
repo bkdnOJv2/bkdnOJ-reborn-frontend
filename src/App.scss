@@ -62,3 +62,8 @@ h1, h2, h3, h4, h5 {
   // vertical-align: middle;
   margin-right: 5px;
 }
+
+label.required::after {
+  content: "*";
+  color: red;
+}

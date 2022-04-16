@@ -1,0 +1,2 @@
+export const LS_ACCESS_TOKEN = "LS_ACCESS_TOKEN";
+export const LS_REFRESH_TOKEN = "LS_REFRESH_TOKEN";

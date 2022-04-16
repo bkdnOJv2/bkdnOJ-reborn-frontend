@@ -1,15 +1,23 @@
+// Lib Imports
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Helpers
+import ScrollToTop from 'helpers/ReactRouter/ScrollToTop';
+
+// Components
 import { Navbar, Header, SubHeader, Footer, Content } from './components/index.js';
 import { SignIn } from 'pages/index.js';
 
-import ScrollToTop from 'helpers/ReactRouter/ScrollToTop';
-
+// Styles
 import 'App.scss';
 
 export default class App extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         return (
             <BrowserRouter>
