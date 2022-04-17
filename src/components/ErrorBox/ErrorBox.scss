@@ -4,10 +4,12 @@
     width: 80%;
     margin: auto;
 
-    padding-top: 2px;
+    padding: 2px 8px;
 
     border: solid 1px $red;
     background-color: $red-lighter;
+    
+    text-align: left;
 
     * {
         margin: 0;
@@ -16,5 +18,9 @@
     }
     p {
         font-family: $font-subscript;
+    }
+    h5 {
+        font-family: $font-subscript;
+        font-weight: bold;
     }
 }

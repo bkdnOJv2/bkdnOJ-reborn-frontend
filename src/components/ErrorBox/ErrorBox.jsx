@@ -12,16 +12,37 @@ class ErrorList extends React.Component {
         }
     }
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.errTitle !== prevState.errTitle ||
+            nextProps.errData !== prevState.errData
+        )
+            return {
+                errTitle: nextProps.errTitle, 
+                errData: nextProps.errData,
+            };
+        return null; 
+    }
+
     render() {
         const { errTitle, errData } = this.state;
         if (errData instanceof Array) 
             return (
-                <>{
-                    errData.map((err, idx) => <p key={`${errTitle}-${idx}`}>{err}</p>)
-                }</>
+                <>
+                    <h5 key={errTitle} className="error-sub-title">{errTitle}</h5>
+                    <ul>{
+                        errData.map((err, idx) => <li key={`${errTitle}-${idx}`}><p>{err}</p></li>)
+                    }</ul>
+                </>
             )
         else 
-            return <p>{errData}</p>
+            return (
+                <>
+                    <h5 className="error-sub-title">error</h5>
+                    <ul>
+                        <li key={`error-msg`}><p>{errData}</p></li>
+                    </ul>
+                </>
+            )
     }
 }
 
@@ -46,7 +67,6 @@ export default class ErrorBox extends React.Component {
                         Object.keys(errors).map((key, idx) => {
                             return (
                                 <div key={idx} className="error-sub">
-                                    <h5 key={idx} className="error-sub-title">{key}</h5>
                                     <ErrorList errTitle={key} errData={errors[key]}/>
                                 </div>
                             )
