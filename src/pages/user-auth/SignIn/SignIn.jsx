@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 import authClient from 'api/auth/auth';
 import SpinLoader from 'components/SpinLoader/SpinLoader';
@@ -18,7 +19,7 @@ export default class SignIn extends React.Component {
             username: "",
             password: "",
             submitted: false,
-            errors: [],
+            errors: null,
             redirect: false,
         }
     }
@@ -45,23 +46,34 @@ export default class SignIn extends React.Component {
         this.updateSubmitted(true);
 
         const data = this.state;
-        authClient.signIn(data)
-            .then((res) => {
-                localStorage.setItem(LS_ACCESS_TOKEN, res.data.access);
-                localStorage.setItem(LS_REFRESH_TOKEN, res.data.refresh);
-                this.setState({ redirect: true });
-            })
-            .catch((err) => {
-                error(err);
-                this.updateErrors(err.response.data);
-                this.updateSubmitted(false);
-            })
-        // .finally(() => {
-        // })
+        const parent = this;
+        toast.promise(
+            authClient.signIn(data)
+            ,{
+                pending: {
+                    render(){ return 'Signing in...' },
+                },
+                success: {
+                    render({data}){ 
+                        localStorage.setItem(LS_ACCESS_TOKEN, data.data.access);
+                        localStorage.setItem(LS_REFRESH_TOKEN, data.data.refresh);
+                        parent.setState({ redirect: true });
+                        return 'Signed In. Now redirecting...';
+                    },
+                },
+                error: {
+                    render({data}){ 
+                        parent.updateErrors(data.response.data);
+                        return 'Sign-in Failed!';
+                    }
+                }
+            }
+        ).finally(() => this.updateSubmitted(false))
     }
 
     render() {
         const { errors, redirect } = this.state;
+
         if (redirect)
             return <Navigate to='/profile' />
 

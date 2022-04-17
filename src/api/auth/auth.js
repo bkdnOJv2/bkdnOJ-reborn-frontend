@@ -1,15 +1,14 @@
 import axiosClient from "api/axiosClient";
 
-function signIn(data){
-    console.log("Signing In with data:", data);
+const signIn = (data) => {
     return axiosClient.post('/sign-in/', JSON.stringify(data));
 }
 
-function signOut(data){
+const signOut = (data) => {
     return axiosClient.post('/sign-out/');
 }
 
-function signUp(data){
+const signUp = (data) => {
     return axiosClient.post('/sign-up/', JSON.stringify(data));
 }
 

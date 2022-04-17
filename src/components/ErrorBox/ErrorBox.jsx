@@ -1,6 +1,8 @@
 import React from 'react';
 import { log } from 'helpers/logger';
 
+import './ErrorBox.scss';
+
 class ErrorList extends React.Component {
     constructor(props) {
         super(props);
@@ -37,19 +39,22 @@ export default class ErrorBox extends React.Component {
 
     render() {
         const { errors } = this.state;
-        return (
-            <div className="error-box">
-                {
-                    Object.keys(errors).map((key, idx) => {
-                        return (
-                            <div key={idx} className="error-sub">
-                                <h5 key={idx} className="error-sub-title">{key}</h5>
-                                <ErrorList errTitle={key} errData={errors[key]}/>
-                            </div>
-                        )
-                    })
-                }
-            </div>
-        )
+        if (errors)
+            return (
+                <div className="error-box">
+                    {
+                        Object.keys(errors).map((key, idx) => {
+                            return (
+                                <div key={idx} className="error-sub">
+                                    <h5 key={idx} className="error-sub-title">{key}</h5>
+                                    <ErrorList errTitle={key} errData={errors[key]}/>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            )
+        else
+            return <></>
     }
 }
