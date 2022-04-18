@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
-import authClient from 'api/auth/auth';
+import authClient from 'api/auth';
 import SpinLoader from 'components/SpinLoader/SpinLoader';
 import ErrorBox from 'components/ErrorBox/ErrorBox';
 
@@ -50,7 +50,7 @@ export default class SignUp extends React.Component {
                 success: {
                     render({data}){ 
                         parent.setState({ redirect: true });
-                        return 'Account Signed Up. Redirecting to Sign In page...';
+                        return 'Account Signed Up.';
                     },
                 },
                 error: {

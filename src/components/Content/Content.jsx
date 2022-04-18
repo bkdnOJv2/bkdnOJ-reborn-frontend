@@ -10,14 +10,13 @@ class Content extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            num: 0
+          num: 0
         }
     }
 
     render() {
         const props = this.props;
         const {num} = this.state;
-        console.log(num);
 
         return (
             <div className="content-div">

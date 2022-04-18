@@ -1,15 +1,16 @@
 import React from 'react';
+
 import { Navigate } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
-import authClient from 'api/auth/auth';
+import authClient from 'api/auth';
 import SpinLoader from 'components/SpinLoader/SpinLoader';
 import ErrorBox from 'components/ErrorBox/ErrorBox';
 
 import './SignIn.scss';
 
-import { LS_ACCESS_TOKEN, LS_REFRESH_TOKEN } from 'constants/localStorageKeys';
+import { __ls_set_access_token, __ls_set_refresh_token } from 'helpers/localStorageHelpers';
 import { log, error } from 'helpers/logger';
 
 export default class SignIn extends React.Component {
@@ -55,10 +56,10 @@ export default class SignIn extends React.Component {
                 },
                 success: {
                     render({data}){ 
-                        localStorage.setItem(LS_ACCESS_TOKEN, data.data.access);
-                        localStorage.setItem(LS_REFRESH_TOKEN, data.data.refresh);
+                        __ls_set_access_token(data.data.access)
+                        __ls_set_refresh_token(data.data.refresh)
                         parent.setState({ redirect: true });
-                        return 'Signed In. Now redirecting...';
+                        return 'Welcome back.'; 
                     },
                 },
                 error: {

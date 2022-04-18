@@ -8,7 +8,7 @@ import ScrollToTop from 'helpers/ReactRouter/ScrollToTop';
 
 // Components
 import { Navbar, Header, SubHeader, Footer, Content } from './components/index.js';
-import { SignIn, SignUp } from 'pages/index.js';
+import { SignIn, SignUp, SignOut, UserProfile } from 'pages/index.js';
 
 // Styles
 import 'App.scss';
@@ -34,6 +34,8 @@ export default class App extends React.Component {
                             <Route path="/" element={<Content />} />
                             <Route path="/sign-in" element={<SignIn />} />
                             <Route path="/sign-up" element={<SignUp />} />
+                            <Route path="/sign-out" element={<SignOut />} />
+                            <Route path="/profile" element={<UserProfile />} />
                         </Routes>
                     </Container>
                 </div>

@@ -47,6 +47,12 @@
 
                 padding-left: 5px;
                 padding-right: 5px;
+
+                &#fake {
+                    margin-right: 5px;
+                    border: solid 1px $sub;
+                    background: $sub !important;
+                }
             }
         }
     }
@@ -58,7 +64,8 @@
 
     // Nav items
     .nav-item,
-    .nav-link {
+    .nav-link,
+    .nav-link-fake {
         font-family: $font-brand;
         // text-decoration: underline;
         text-transform: capitalize;
