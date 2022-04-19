@@ -1,5 +1,10 @@
 {
   "name": "bkdnoj",
+  
+  "homepage": "https://bkdn-university.github.io/bkdnOJ-reborn-frontend/",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d build",
+  
   "version": "0.1.0",
   "private": true,
   "dependencies": {
