@@ -14,18 +14,12 @@ import { SignIn, SignUp, SignOut, UserProfile } from 'pages/index.js';
 import 'App.scss';
 
 export default class App extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <BrowserRouter>
-                <div className="header-wrapper">
-                    <Header />
-                    <Navbar />
-                    <SubHeader />
-                </div>
+                <Header />
+                <Navbar />
+                <SubHeader />
 
                 <div className="content-wrapper">
                     <ScrollToTop />

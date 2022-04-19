@@ -80,6 +80,11 @@
         }
     }
 
+    .navbar-nav .dropdown-menu {
+        position: absolute;
+        left: -450%;
+    }
+
     // Bottom Separate Line
     border-top: solid 1px $sub;
     border-bottom: solid 1px $background-gray-dark;

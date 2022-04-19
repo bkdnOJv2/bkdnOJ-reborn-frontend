@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
 
-import { __ls_get_access_token } from 'helpers/localStorageHelpers';
+import { __ls_get_access_token, __ls_remove_credentials } from 'helpers/localStorageHelpers';
 import { log } from 'helpers/logger';
 
 const axiosClient = axios.create({
@@ -52,10 +51,19 @@ axiosClient.interceptors.response.use(
 
         // let res = JSON.stringify(error)
         let res = error.response;
-        if (res.status === 403) {
-            // window.location.href = "/sign-in"
-            toast.error("You need to Sign-in first.");
-            // window.location.href = “https://example.com/login”;
+        switch (res.status) {
+            case 401:
+                break;
+            case 403:
+                if (res.data) {
+                    if (res.data.code === "token_not_valid") {
+                        __ls_remove_credentials();
+                    }
+                }
+                window.location.href = "/sign-in"
+                break;
+            default:
+                break;
         }
         log("Interceptors@Status Code: " + res.status);
         return Promise.reject(error);

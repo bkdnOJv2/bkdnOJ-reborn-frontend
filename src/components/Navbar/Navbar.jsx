@@ -1,115 +1,16 @@
 import React from 'react';
-import { connect } from "react-redux"
-import { toast } from 'react-toastify';
 
-import { Container, Nav, NavDropdown, Item, Image } from 'react-bootstrap';
-import { Link, Navigate } from 'react-router-dom';
-
-import { AiOutlineForm, AiOutlineLogin, AiOutlineLogout, AiOutlineProfile } from 'react-icons/ai';
-import { GrUserAdmin } from 'react-icons/gr';
+import { Container, Nav, NavDropdown, Image } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 import BTNavbar from 'react-bootstrap/Navbar';
-import authClient from 'api/auth';
-import { updateUser, clearUser } from 'redux/User/actions'
 
-import {log} from 'helpers/logger';
-
-import { __ls_get_auth_user, __ls_remove_credentials } from 'helpers/localStorageHelpers';
 import icon from 'assets/images/bkdnoj-favicon-noring.png';
 import './Navbar.scss'
 
-class UserAuthSection extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            redirect: false,
-        }
-    }
-
-    signOutHandler() {
-        authClient.signOut()
-        .then((res) => {
-            __ls_remove_credentials();
-            toast.success("Signed Out! You are now anonymous.");
-        })
-        .catch((err) => {
-            toast.error("You are already logged out!");
-        })
-        .finally(() => {
-            this.setState({redirect: true})
-            // window.location.href = "/";
-        })
-    }
-
-    render() {
-        if (this.state.redirect) {
-            this.setState({redirect: false})
-            return <Navigate to="/" />
-        }
-
-        const user = __ls_get_auth_user();
-
-        if (!user)  
-            return (
-                <>
-                    <Nav.Link as={Link} to="/sign-up">
-                        <AiOutlineForm className='react-icons' size={10} />
-                        Sign Up
-                    </Nav.Link>
-                    <Nav.Link as={Link} to="/sign-in">
-                        <AiOutlineLogin className='react-icons' size={10} />
-                        Sign In
-                    </Nav.Link>
-                </>
-            )
-        else
-            return (
-                <>
-                    <div className="nav-link" id="fake">
-                        {`Hello, ${user.username}!`}
-                    </div>
-                    <NavDropdown id="basic-nav-dropdown">
-                        {
-                            user.is_staff &&
-                            <NavDropdown.Item href="/admin">
-                                <GrUserAdmin className='react-icons' size={10} />
-                                Admin
-                            </NavDropdown.Item>
-                        }
-                        <NavDropdown.Item href="/profile">
-                            <AiOutlineProfile className='react-icons' size={10} />
-                            Profile
-                        </NavDropdown.Item>
-                        <NavDropdown.Divider />
-                        <NavDropdown.Item href="#" style={{color: 'red'}}
-                            onClick={() => this.signOutHandler()}
-                        >
-                            <AiOutlineLogout className='react-icons' size={10} />
-                            Sign Out
-                        </NavDropdown.Item>
-                    </NavDropdown>
-                </>
-            )
-    }
-}
-const mapStateToProps = state => {
-  return {
-    user: state.user.user,
-  }
-}
-const mapDispatchToProps = dispatch => {
-  return {
-    updateUser: (user) => dispatch(updateUser({user: user})),
-    clearUser: () => dispatch(clearUser()),
-  }
-}
-const RDUserAuthSection = connect(mapStateToProps, undefined)(UserAuthSection);
-// --------------------------------
+import RDUserAuthSection from './UserAuthSection';
 
 export default class Navbar extends React.Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <BTNavbar bg="light" expand="md" className="navbar py-0" id="navbar" fixed="top">

@@ -14,6 +14,7 @@ export default class Header extends React.Component {
                             <img src={flag} alt="Drop down Flag with BKDN icon and Online Judge text" />
                         </Link>
                     </div>
+                    <span>version ALPHA</span>
                     <span>🇻🇳 Tiếng Việt</span>
                     <span>🇬🇧 English</span>
                     <span>?</span>
