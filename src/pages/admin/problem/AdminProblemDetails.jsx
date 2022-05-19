@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-import { Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Tabs, Tab } from 'react-bootstrap';
 
-import PDFViewer from 'components/PDFViewer/PDFViewer';
 import { FaPaperPlane, FaSignInAlt, FaExternalLinkAlt } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
@@ -11,52 +10,127 @@ import { SpinLoader } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
-import { SubmitModal } from 'pages/submit';
+import './AdminProblemDetails.scss';
 
-import './ProblemDetails.scss';
+class GeneralDetails extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      data: this.props.data,
+      options: this.props.options.actions.PUT || this.props.options.actions.PATCH
+    }
+  }
 
-class ProblemDetails extends React.Component {
+  inputChangeHandler(event) {
+    let newData = this.state.data;
+    newData[event.target.id] = event.target.value
+    this.setState({ data : newData })
+  }
+
+  render() {
+    const {data} = this.state;
+    console.log(data);
+    return (
+      <Form id="problem-general">
+        <sub>Thiết lập chung</sub>
+        <Row>
+          <Form.Label column="sm" lg={2}> URL </Form.Label>
+          <Col> <Form.Control size="sm" type="text" placeholder="Problem URL" id="url"
+                  value={data.url} disabled
+          /></Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2}> Shortname </Form.Label>
+          <Col> <Form.Control size="sm" type="text" placeholder="Problem Shortname" id="shortname"
+                  value={data.shortname} onChange={(e) => this.inputChangeHandler(e)}
+          /></Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2}> Title </Form.Label>
+          <Col> <Form.Control size="sm" type="text" placeholder="Problem Title" id="title"
+                  value={data.title} onChange={(e) => this.inputChangeHandler(e)}
+          /></Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2}> Time Limit </Form.Label>
+          <Col> <Form.Control size="sm" type="text" placeholder="1.0" id="time_limit"
+                  value={data.time_limit} onChange={(e) => this.inputChangeHandler(e)}
+          /></Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2}> Memory Limit</Form.Label>
+          <Col> 
+          <Form.Control size="sm" type="text" placeholder="256000" id="memory_limit"
+                  value={data.memory_limit} onChange={(e) => this.inputChangeHandler(e)}
+          /></Col>
+        </Row>
+        <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở bên ngoài contest (nộp ở trang Problem)</sub>
+        <Row>
+          <Form.Label column="sm" lg={2}> Điểm </Form.Label>
+          <Col > 
+            <Form.Control size="sm" type="number" id="points"
+              value={data.points} onChange={(e) => this.inputChangeHandler(e)}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2}> Dừng chấm nếu có test sai </Form.Label>
+          <Col > 
+            <Form.Control size="sm" type="checkbox" id="short_circuit"
+              value={data.short_circuit} onChange={(e) => this.inputChangeHandler(e)}
+            />
+            <sub>Dừng chấm bài nếu có một test cho kết quả không được chấp nhận.</sub>
+          </Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2}> Cho phép ăn điểm từng test </Form.Label>
+          <Col > 
+            <Form.Control size="sm" type="checkbox" id="partial"
+              value={data.partial} onChange={(e) => this.inputChangeHandler(e)}
+            />
+            <sub>Cho phép ăn điểm theo từng test đúng. Nếu không tick thì người dùng chỉ có thể được 0đ hoặc full điểm.</sub>
+          </Col>
+        </Row>
+
+        <sub>Các thiết lập khác sẽ được thêm sau.</sub>
+      </Form>      
+    )
+  }
+}
+
+class AdminProblemDetails extends React.Component {
   constructor(props) {
     super(props);
     const { shortname } = this.props.params;
     this.shortname = shortname;
     this.state = { 
-      data: undefined, loaded: false, errors: null, shortname: shortname,
-      redirectUrl: null,
-      submitFormShow: false,
+      loaded: false, errors: null, 
+      options: undefined,
+      general: undefined,
+      testData: undefined,
     };
-    this.user = (this.props.user.user);
   }
 
-  handleSubmitFormOpen() { this.setState({ submitFormShow: true })}
-  handleSubmitFormClose() { this.setState({ submitFormShow: false })}
-
-  onDocumentLoadSuccess({ numPages }) {
-    this.setState({ numPages })
-  }
-
-  componentDidMount() {
-    problemAPI.getProblemDetails({shortname: this.shortname})
-      .then((res) => {
-        this.setState({
-          data: res.data,
-          loaded: true,
-        })
-        setTitle(`Prob. ${res.data.title}`)
+  async componentDidMount() {
+    Promise.all([
+      problemAPI.adminProblemDetailsOptions({shortname: this.shortname}),
+      problemAPI.getProblemDetails({shortname: this.shortname})
+    ]).then((res) => {
+      const [optionsRes, generalRes] = res;
+      console.log(optionsRes.data)
+      console.log(generalRes.data)
+      this.setState({
+        options: optionsRes.data,
+        general: generalRes.data,
+        loaded: true,
       })
-      .catch((err) => {
-        this.setState({
-          loaded: true,
-          errors: err,
-        })
+      setTitle(`Admin | Problem ${generalRes.data.title}`)
+    }).catch((err) => {
+      this.setState({
+        loaded: true,
+        errors: err,
       })
-  }
-
-  parseMemoryLimit() {
-    return `${(this.state.data.memory_limit)} KB(s)`
-  }
-  parseTimeLimit() {
-    return `${(this.state.data.time_limit).toFixed(1)} second(s)`
+    })
   }
 
   render() {
@@ -65,73 +139,27 @@ class ProblemDetails extends React.Component {
         <Navigate to={`${this.state.redirectUrl}`} />
       )
     }
-    const {loaded, data} = this.state;
+    const {loaded, general, options} = this.state;
     
     return (
-      <div className="problem-info">
+      <div className="admin problem-panel">
         <h4 className="problem-title"> 
-          { !loaded ? <span><SpinLoader/> Loading...</span> : `Problem. ${data.title}` }
+          { !loaded ? <span><SpinLoader/> Loading...</span> : `Editing problem ${general.title}` }
         </h4>
         <hr/>
-          <div className="problem-details">
-            { 
-            !loaded ? <span><SpinLoader/> Loading...</span> 
-            : <>
-              <Row style={{margin: "unset"}}>
-                <Col sm={9}>
-                  <ul>
-                    <li>
-                      <strong>Problem Code:</strong>
-                      { data.shortname }
-                    </li>
-                    <li>
-                      <strong>Time Limit per test:</strong>
-                      { this.parseTimeLimit() }
-                    </li>
-                    <li>
-                      <strong>Memory Limit per test:</strong>
-                      { this.parseMemoryLimit() }
-                    </li>
-                  </ul>
-                </Col>
-                <Col sm={3} className="options">
-                  {
-                    this.user === null && (
-                    <Link to="#" className="btn" 
-                      onClick={() => this.setState({redirectUrl: '/sign-in'})}>
-                      Sign In To Submit <FaSignInAlt size={12}/>
-                    </Link>)
-                  }{
-                    this.user !== null && (<Link to="#" className="btn" 
-                      onClick={() => this.handleSubmitFormOpen()}>
-                      Submit <FaPaperPlane size={12}/>
-                    </Link>)
-                  }{
-                    (this.user !== null && this.user.is_staff) && (
-                    <Link to="#" className="btn" style={{color: "red"}}
-                      onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
-                      Edit <FaExternalLinkAlt size={12}/>
-                    </Link>)
-                  }
-
-                  <SubmitModal show={this.state.submitFormShow} 
-                    onHide={() => this.handleSubmitFormClose()}
-                    prob={data.shortname}
-                    lang={data.allowed_languages}
-                  />
-
-                  {/* <Link to="/submit" className="btn">Test</Link> */}
-                </Col>
-              </Row>
-              <div className="problem-pdf shadow">
-                {/* <object data={`${this.state.data.pdf}`} type="application/pdf">
-                  <iframe title="problem-pdf-iframe" 
-                    src={`https://docs.google.com/viewer?url=${this.state.data.pdf}&embedded=true`}>
-                  </iframe>
-                </object> */}
-                <PDFViewer pdf={data.pdf} />
-              </div>
-            </>
+        <div className="problem-details">
+          { 
+          !loaded ? <span><SpinLoader/> Loading...</span> 
+          : <>
+          <Tabs defaultActiveKey="general" id="uncontrolled-tab-example" className="pl-2">
+            <Tab eventKey="general" title="General">
+              <GeneralDetails data={general} options={options}/>
+            </Tab>
+            <Tab eventKey="data" title="Test Data">
+              <p>123</p>
+            </Tab>
+          </Tabs>
+          </>
           }
         </div>
       </div>
@@ -139,7 +167,7 @@ class ProblemDetails extends React.Component {
   }
 }
 
-let wrappedPD = ProblemDetails;
+let wrappedPD = AdminProblemDetails;
 wrappedPD = withParams(wrappedPD);
 const mapStateToProps = state => {
     return { user : state.user.user }

@@ -23,7 +23,7 @@ class Content extends React.Component {
         const {num} = this.state;
 
         return (
-            <div className="content-div shadow rounded" style={{minWidth: "500px"}}>
+            <div className="content-div shadow rounded">
                 {/* <div className="row d-block">
                     Content goes here.
                 </div>

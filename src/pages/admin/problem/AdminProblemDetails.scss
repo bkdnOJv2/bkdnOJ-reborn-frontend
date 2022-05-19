@@ -1,0 +1,32 @@
+@import 'global.scss';
+@import 'global.scss';
+
+div.admin.problem-panel {
+  h1, h2, h3, h4, h5, hr{
+    margin: unset;
+  }
+
+  h3, h4, h5 {
+    margin: 4px;
+  }
+
+  form#problem-general {
+    text-align: left;
+    margin: 4px;
+
+    .row {
+      border: solid 1px $background-gray;
+      margin: 2px;
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: flex-start;
+    }
+    input[type=checkbox] {
+      height: 40%;
+      margin-bottom: 5px;
+    }
+  }
+}

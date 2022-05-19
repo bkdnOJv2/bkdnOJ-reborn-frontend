@@ -35,6 +35,7 @@ export default class SubmitForm extends React.Component {
       lang : props.lang,
       id2LangMap,
       redirect: false,
+      error: undefined,
     }
   }
 
@@ -53,6 +54,7 @@ export default class SubmitForm extends React.Component {
         })
         .catch((err) => {
           console.log(err)
+          this.setState({error : err})
           // alert('Cannot submit')
         })
     }
@@ -86,11 +88,6 @@ export default class SubmitForm extends React.Component {
   }
 
   render() {
-    // if (!!this.state.redirect) {
-    //   // this.setState({redirect: false})
-    //   return <Navigate to={`${this.state.redirect}`} />
-    // }
-    
     return (
       <Form className="submit-form">
         <Form.Group className="select-div" >

@@ -10,7 +10,7 @@ import { createBrowserHistory } from "history";
 import ScrollToTop from 'helpers/react-router/ScrollToTop';
 
 // Components
-import { ListSidebar } from 'layout';
+import { ListSidebar, OneColumn } from 'layout';
 import { Navbar, Header, SubHeader, Footer, Content } from './components';
 
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
@@ -21,6 +21,8 @@ import { Submit } from 'pages/submit';
 import { setTitle } from 'helpers/setTitle';
 
 import PDFViewer from 'components/PDFViewer/PDFViewer';
+
+import AdminProblemDetails from 'pages/admin/problem/AdminProblemDetails';
 
 // Styles
 import 'App.scss';
@@ -93,7 +95,9 @@ class App extends React.Component {
                 <>
                   <Route path="/admin" element={<p>Admin</p>}/>
                   <Route path="/admin/problem" element={<p>Admin Problem</p>}/>
-                  <Route path="/admin/problem/:shortname" element={<p>Admin Problem Detail</p>}/>
+                  <Route path="/admin/problem/:shortname" element={
+                    <OneColumn mainContent={<AdminProblemDetails />} />
+                  }/>
                 </>
               }
 

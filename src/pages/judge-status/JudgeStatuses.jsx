@@ -37,10 +37,10 @@ class JudgeStatus extends React.Component {
     diffM %= 60;
     let diffD = Math.floor(diffH / 24);
     diffH %= 24;
-    const msg = (diffD > 0 ? `${diffD} day(s), ` : "") +
-      (diffH > 0 ? `${diffH} hour(s), ` : "") +
-      (diffM > 0 ? `${diffM} min(s), ` : "") +
-      (diffS > 0 ? `${diffS} sec(s), ` : "");
+    const msg = (diffD > 0 ? `${diffD}d, ` : "") +
+      (diffH > 0 ? `${diffH}h, ` : "") +
+      (diffM > 0 ? `${diffM}m, ` : "") +
+      (diffS > 0 ? `${diffS}s, ` : "");
     if (msg.length > 2) {
       this.setState({upTime: msg.substring(0, msg.length - 2)})
     }
@@ -58,9 +58,9 @@ class JudgeStatus extends React.Component {
         </td>
         <td>{online ? "✔️" : "❌"}</td>
         <td>{is_blocked ? "✔️" : "❌"}</td>
-        <td>{this.state.upTime}</td>
+        <td style={{minWidth: "100px"}}>{this.state.upTime}</td>
         <td>{load}</td>
-        <td>{description}</td>
+        <td>{`${ping ? ping.toFixed(2) : "N/A"}`}</td>
       </tr>
     )
   }
@@ -76,7 +76,7 @@ class JudgeStatuses extends React.Component {
       loaded: false,
       errors: null,
     }
-    setTitle('Judges')
+    setTitle('Judge Status')
   }
 
   callApi(params) {
@@ -126,9 +126,9 @@ class JudgeStatuses extends React.Component {
               <th >Name</th>
               <th >Online?</th>
               <th >Blocked?</th>
-              <th >Up Time</th>
+              <th style={{minWidth: "100px"}}>Up Time</th>
               <th >Load</th>
-              <th >Description</th>
+              <th >Ping</th>
             </tr>
           </thead>
           <tbody>

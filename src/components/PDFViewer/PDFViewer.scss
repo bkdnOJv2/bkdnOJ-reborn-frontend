@@ -1,0 +1,43 @@
+div.problem-detail-pdf-container {
+    height: 600px;
+
+    * { 
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        scrollbar-width: none;  /* Firefox */
+        &::-webkit-scrollbar  {
+            display: none;  /* Safari and Chrome */
+        }
+    }
+    .rpv-toolbar__label {
+        display: inline;
+        white-space: pre;
+    }
+
+    // .rpv-default-layout__sidebar, .rpv-default-layout__sidebar-ltr {
+    //     overflow-x: scroll;
+    // }
+    // .rpv-default-layout__toolbar {
+    //     overflow-x: scroll;
+    //     overflow-y:initial;
+    // }
+    div[aria-describedby='rpv-core__tooltip-body-default-layout-sidebar-tab-1'],
+    div[aria-describedby='rpv-core__tooltip-body-default-layout-sidebar-tab-2'],
+    div[aria-describedby='rpv-core__tooltip-body-search-popover'],
+    div[aria-describedby='rpv-core__tooltip-body-print'],
+    div[aria-describedby='rpv-core__tooltip-body-open'],
+    div[aria-describedby='rpv-core__tooltip-body-toolbar-more-actions']
+    {
+        display: none
+    }
+
+    .rpv-thumbnail__list {
+        align-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        flex-flow: column wrap;
+        height: 100%;
+        justify-content: center;
+        overflow: auto;
+    }
+}

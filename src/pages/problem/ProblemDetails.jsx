@@ -42,7 +42,7 @@ class ProblemDetails extends React.Component {
           data: res.data,
           loaded: true,
         })
-        setTitle(`Prob. ${res.data.title}`)
+        setTitle(`Problem ${res.data.title}`)
       })
       .catch((err) => {
         this.setState({

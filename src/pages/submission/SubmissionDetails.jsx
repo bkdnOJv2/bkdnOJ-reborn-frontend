@@ -54,7 +54,7 @@ class SubmissionDetails extends React.Component {
   fetch() {
     submissionAPI.getSubmissionDetails({id : this.state.id})
       .then((res) => {
-        setTitle(`Sub#${res.data.id}`)
+        setTitle(`Submission ${res.data.id}`)
         this.setState({ data: res.data, })
       })
       .catch((err) => {
