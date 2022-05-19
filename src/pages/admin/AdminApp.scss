@@ -1,0 +1,34 @@
+@import 'global.scss';
+
+nav.admin-nav {
+    background-color: $base;
+    height: 600px;
+    padding-top: 20px;
+    // border-radius: 4px;
+    // color: $sub;
+
+    h3 {
+        margin: auto;
+        text-align: center;
+        color: $sub !important;
+        margin: 15px
+    }
+    ul {
+        list-style-type: none;
+        text-align: left;
+        li {
+            margin-left: -15px;
+            height: 50px;
+            line-height: 50px;
+            a {
+                color: $sub;
+            }
+            @media (max-width:767px) {
+                margin-left: -30px;
+                a {
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}

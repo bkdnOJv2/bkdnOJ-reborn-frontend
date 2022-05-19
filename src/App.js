@@ -22,7 +22,7 @@ import { setTitle } from 'helpers/setTitle';
 
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
-import AdminProblemDetails from 'pages/admin/problem/AdminProblemDetails';
+import { AdminProblemDetails, AdminProblemList } from 'pages/admin/problem';
 import { AdminApp } from 'pages/admin';
 
 // Styles
@@ -95,15 +95,34 @@ class App extends React.Component {
                 this.isAdmin() && 
                 <>
                   <Route path="/admin" element={<AdminApp />}>
+                    <Route index path="" element={
+                      <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                        style={{minHeight: "400px"}}>
+                          <h4>Admin Home Page</h4>
+                      </div>
+                    }/>
+                    <Route path="problem" element={
+                      <OneColumn mainContent={<AdminProblemList />} />
+                    }/>
                     <Route path="problem/:shortname" element={
                       <OneColumn mainContent={<AdminProblemDetails />} />
                     }/>
-                    <Route path="*" element={<p>Not found</p>}/>
+                    <Route path="*" element={
+                      <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                        style={{minHeight: "400px"}}>
+                          <h4>Not Implemented</h4>
+                      </div>
+                    }/>
                   </Route>
                 </>
               }
 
-              <Route path="*" element={<p>Not Found</p>} />
+              <Route path="*" element={
+                <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                  style={{minHeight: "200px", minWidth: "400px"}}>
+                    <h4>404 | Page Not Found</h4>
+                </div>
+              } />
             </Routes>
           </Container>
         </div>

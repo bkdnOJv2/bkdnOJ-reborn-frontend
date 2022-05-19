@@ -10,15 +10,23 @@ const submitToProblem = ({name, data}) => {
     return axiosClient.post(`/problem/${name}/submit/`, JSON.stringify(data));
 }
 
-const adminProblemDetailsOptions = ({shortname}) => {
+const adminOptionsProblemDetails = ({shortname}) => {
     return axiosClient.options(`/problem/${shortname}`);
+}
+const adminGetProblemDetailsData = ({shortname}) => {
+    return axiosClient.get(`/problem/${shortname}/data`);
+}
+const adminGetProblemDetailsTest = ({shortname, params}) => {
+    return axiosClient.get(`/problem/${shortname}/data/test`, (params && { params: {...params} }));
 }
 
 const problemAPI = {
     getProblems,
     getProblemDetails,
     submitToProblem,
-    adminProblemDetailsOptions,
+    adminOptionsProblemDetails,
+    adminGetProblemDetailsData,
+    adminGetProblemDetailsTest,
 }
 
 export default problemAPI;
