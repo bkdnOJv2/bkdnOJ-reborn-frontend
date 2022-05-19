@@ -79,7 +79,7 @@ class GeneralDetails extends React.Component {
             <Form.Control size="sm" type="checkbox" id="short_circuit"
               value={data.short_circuit} onChange={(e) => this.inputChangeHandler(e)}
             />
-            <sub>Dừng chấm bài nếu có một test cho kết quả không được chấp nhận.</sub>
+            {/* <sub>Dừng chấm bài nếu có một test cho kết quả không được chấp nhận.</sub> */}
           </Col>
         </Row>
         <Row>
@@ -88,7 +88,7 @@ class GeneralDetails extends React.Component {
             <Form.Control size="sm" type="checkbox" id="partial"
               value={data.partial} onChange={(e) => this.inputChangeHandler(e)}
             />
-            <sub>Cho phép ăn điểm theo từng test đúng. Nếu không tick thì người dùng chỉ có thể được 0đ hoặc full điểm.</sub>
+            {/* <sub>Cho phép ăn điểm theo từng test đúng. Nếu không tick thì người dùng chỉ có thể được 0đ hoặc full điểm.</sub> */}
           </Col>
         </Row>
 

@@ -23,6 +23,7 @@ import { setTitle } from 'helpers/setTitle';
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import AdminProblemDetails from 'pages/admin/problem/AdminProblemDetails';
+import { AdminApp } from 'pages/admin';
 
 // Styles
 import 'App.scss';
@@ -93,11 +94,12 @@ class App extends React.Component {
               {
                 this.isAdmin() && 
                 <>
-                  <Route path="/admin" element={<p>Admin</p>}/>
-                  <Route path="/admin/problem" element={<p>Admin Problem</p>}/>
-                  <Route path="/admin/problem/:shortname" element={
-                    <OneColumn mainContent={<AdminProblemDetails />} />
-                  }/>
+                  <Route path="/admin" element={<AdminApp />}>
+                    <Route path="problem/:shortname" element={
+                      <OneColumn mainContent={<AdminProblemDetails />} />
+                    }/>
+                    <Route path="*" element={<p>Not found</p>}/>
+                  </Route>
                 </>
               }
 
