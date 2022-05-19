@@ -5,7 +5,9 @@ import { Modal, Button } from 'react-bootstrap';
 import { BsExclamationCircle, BsFillLightningChargeFill } from 'react-icons/bs';
 import { FaPaperPlane, FaExternalLinkAlt } from 'react-icons/fa';
 
-import { STOP_POLL_STATUSES, NO_DETAIL_STATUSES } from 'constants/statusFilter';
+import { shouldStopPolling, isNoTestcaseStatus } from 'constants/statusFilter';
+import { getPollDelay } from 'helpers/polling';
+
 import submissionApi from 'api/submission';
 import SubmitForm from './SubmitForm';
 import './SubmitModal.scss'
@@ -20,7 +22,7 @@ class SubmitModalResult extends React.Component {
   }
 
   pollResult() { 
-    if (STOP_POLL_STATUSES.includes(this.state.data.status)) {
+    if (shouldStopPolling(this.state.data.status)) {
       clearInterval(this.timer)
       return;
     }
@@ -43,7 +45,7 @@ class SubmitModalResult extends React.Component {
     if (prevProps.subId !== this.props.subId) {
       this.setState({subId : this.props.subId},
         () => {
-          this.timer = setInterval(() => this.pollResult(), 2000);
+          this.timer = setInterval(() => this.pollResult(), getPollDelay());
         }
       )
     }
@@ -65,7 +67,7 @@ class SubmitModalResult extends React.Component {
     }
     const verdict = (data.status === "D" ? data.result : data.status);
 
-    if (! NO_DETAIL_STATUSES.includes(verdict)) {
+    if (! isNoTestcaseStatus(verdict)) {
       for (let i=0; i < data.test_cases.length; i++) {
         if (data.test_cases[i].status !== 'AC') {
           return (

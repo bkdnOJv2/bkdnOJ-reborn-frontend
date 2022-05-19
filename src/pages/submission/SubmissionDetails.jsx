@@ -10,7 +10,7 @@ import { withParams } from 'helpers/react-router'
 import { parseTime, parseMem } from 'helpers/textFormatter';
 import { setTitle } from 'helpers/setTitle'
 
-import { STOP_POLL_STATUSES, NO_DETAIL_STATUSES } from 'constants/statusFilter';
+import { shouldStopPolling } from 'constants/statusFilter';
 
 import './SubmissionDetails.scss';
 
@@ -66,17 +66,19 @@ class SubmissionDetails extends React.Component {
       })
   }
   pollResult() { 
-    if (STOP_POLL_STATUSES.includes(this.state.data.status)) {
+    if (shouldStopPolling(this.state.data.status)) {
       clearInterval(this.timer)
       return;
     }
     this.fetch();
   }
+
   componentDidMount() {
     this.fetch();
-    if (! STOP_POLL_STATUSES.includes(this.state.data.status))
+    if (! shouldStopPolling(this.state.data.status))
       this.timer = setInterval(() => this.pollResult(), 2000);
   }
+
   componentWillUnmount() {
     clearInterval(this.timer)
   }
@@ -86,7 +88,7 @@ class SubmissionDetails extends React.Component {
     let verdict = 'QU';
     if (loaded)
       verdict = (data.status === "D" ? data.result : data.status);
-    const polling = (loaded && data.status !== 'D');
+    const polling = (loaded && !shouldStopPolling(data.status));
 
     return (
       <div className="submission-info">
