@@ -9,14 +9,18 @@ import './PDFViewer.scss';
 
 function PDFViewer({pdf}) {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
-  const pdfUrl = (pdf || "http://localhost:8000/problem/problem_pdf/hello/problem.pdf")
+  const pdfUrl = (pdf)
 
   return (
     <div className="problem-detail-pdf-container">
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.13.216/build/pdf.worker.min.js">
-        <Viewer fileUrl={pdfUrl} defaultScale={SpecialZoomLevel.PageWidth}
-          plugins={[defaultLayoutPluginInstance]}/>
-      </Worker>
+      {
+        pdf ?
+        <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.13.216/build/pdf.worker.min.js">
+          <Viewer fileUrl={pdfUrl} defaultScale={SpecialZoomLevel.PageWidth}
+            plugins={[defaultLayoutPluginInstance]}/>
+        </Worker>
+        : <h4>PDF Not Available</h4>
+      }
     </div>
   )
 }

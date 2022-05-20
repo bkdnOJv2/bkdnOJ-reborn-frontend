@@ -12,6 +12,7 @@ import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
 import { SubmitModal } from 'pages/submit';
+import { getAdminPageUrl } from 'api/urls';
 
 import './ProblemDetails.scss';
 
@@ -65,18 +66,19 @@ class ProblemDetails extends React.Component {
         <Navigate to={`${this.state.redirectUrl}`} />
       )
     }
-    const {loaded, data} = this.state;
+    const {loaded, errors, data} = this.state;
     
     return (
       <div className="problem-info">
         <h4 className="problem-title"> 
-          { !loaded ? <span><SpinLoader/> Loading...</span> : `Problem. ${data.title}` }
+          { !loaded && <span><SpinLoader/> Loading...</span>}
+          { loaded && !!errors && <span>Problem Not Found</span>}
+          { loaded && !errors && `Problem. ${data.title}` }
         </h4>
         <hr/>
           <div className="problem-details">
-            { 
-            !loaded ? <span><SpinLoader/> Loading...</span> 
-            : <>
+          { !loaded && <span><SpinLoader/> Loading...</span> }
+          { loaded && !errors && <>
               <Row style={{margin: "unset"}}>
                 <Col sm={9}>
                   <ul>
@@ -91,6 +93,12 @@ class ProblemDetails extends React.Component {
                     <li>
                       <strong>Memory Limit per test:</strong>
                       { this.parseMemoryLimit() }
+                    </li>
+                    <li>
+                      <strong>Allowed Languages:</strong>
+                        {
+                          data.allowed_languages.map((lang) => lang.name).join(', ')
+                        }
                     </li>
                   </ul>
                 </Col>
@@ -108,10 +116,14 @@ class ProblemDetails extends React.Component {
                     </Link>)
                   }{
                     (this.user !== null && this.user.is_staff) && (
-                    <Link to="#" className="btn" style={{color: "red"}}
-                      onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
+                    // <Link to="#" className="btn" style={{color: "red"}}
+                    //   onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
+                    //   Edit <FaExternalLinkAlt size={12}/>
+                    // </Link>
+                    <a href={`${getAdminPageUrl()}`} className="btn" style={{color: "red"}}>
                       Edit <FaExternalLinkAlt size={12}/>
-                    </Link>)
+                    </a>
+                    )
                   }
 
                   <SubmitModal show={this.state.submitFormShow} 

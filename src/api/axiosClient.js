@@ -4,14 +4,10 @@ import { toast } from 'react-toastify';
 import { __ls_get_access_token, __ls_remove_credentials } from 'helpers/localStorageHelpers';
 import { log } from 'helpers/logger';
 
-const test_env = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
-const test_connection_url = 
-    `${process.env.REACT_APP_DEV_BACKEND_URL}:${process.env.REACT_APP_DEV_BACKEND_PORT}/`
-const prod_connection_url = 
-    `${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/`
+import {getConnectionUrl} from './urls';
 
 const axiosClient = axios.create({
-    baseURL: (test_env ? test_connection_url : prod_connection_url),
+    baseURL: getConnectionUrl(),
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

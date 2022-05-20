@@ -9,6 +9,7 @@ import { AiOutlineForm, AiOutlineLogin, AiOutlineLogout, AiOutlineProfile } from
 import { GrUserAdmin } from 'react-icons/gr';
 
 import authClient from 'api/auth';
+import { getAdminPageUrl } from 'api/urls';
 import { updateUser, clearUser } from 'redux/User/actions'
 
 import { __ls_get_auth_user, __ls_remove_credentials } from 'helpers/localStorageHelpers';
@@ -70,9 +71,19 @@ class UserAuthSection extends React.Component {
                     </div>
                     <NavDropdown id="basic-nav-dropdown-userauth"
                     >
-                        {
+                        {/* {
                             user.is_staff &&
                             <NavDropdown.Item as={Link} to="/admin" >
+                                <GrUserAdmin className='react-icons' size={10} />
+                                Admin
+                            </NavDropdown.Item>
+                        } */}
+                        {
+                            user.is_staff &&
+                            <NavDropdown.Item onClick={() => {
+                                console.log(getAdminPageUrl())
+                                window.location = getAdminPageUrl()
+                            }}>
                                 <GrUserAdmin className='react-icons' size={10} />
                                 Admin
                             </NavDropdown.Item>

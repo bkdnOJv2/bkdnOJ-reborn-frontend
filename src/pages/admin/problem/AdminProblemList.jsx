@@ -13,20 +13,27 @@ import 'styles/ClassicPagination.scss';
 
 class ProblemListItem extends React.Component {
   render() {
-    const {shortname, title, solved_count, attempted_count, points} = this.props;
+    const {shortname, title, points, is_published, is_privated_to_orgs} = this.props;
+    const {rowidx, selectChk, onSelectChkChange} = this.props;
+
     return (
       <tr>
-        <td className="text-truncate" style={{maxWidth: "100px"}}>
+        <td className="text-truncate" style={{maxWidth: "80px"}}>
           {shortname}
         </td>
-        <td className="text-truncate" style={{maxWidth: "300px"}}>
+        <td className="text-truncate" style={{maxWidth: "200px"}}>
           {title}
         </td>
         <td>{points}</td>
-        <td>{solved_count}</td>
-        <td>{attempted_count === 0 ? '?' : `${(solved_count*100.0/attempted_count).toFixed(2)}%`}</td>
+        <td>{is_published ? "Yes" : "No"}</td>
+        <td>{is_privated_to_orgs ? "Yes" : "No"}</td>
         <td>
-          <Link to={`/admin/problem/${shortname}`}>Edit</Link>
+            <Link to={`/admin/problem/${shortname}`}>Edit</Link>
+        </td>
+        <td>
+            <input type="checkbox" value={selectChk[rowidx]}
+              onChange={(e) => onSelectChkChange(rowidx)}
+            />
         </td>
       </tr>
     )
@@ -38,12 +45,25 @@ class AdminProblemList extends React.Component {
     super(props);
     this.state = {
       problems: [],
+      selectChk: [],
       currPage: 0,
       pageCount: 1,
       loaded: false,
       errors: null,
     }
     setTitle('Admin | Problems')
+  }
+
+  selectChkChangeHandler(idx) {
+    const {selectChk} = this.state;
+    if (idx >= selectChk.length)
+      console.log('Invalid delete tick position');
+    else {
+      const val = selectChk[idx];
+      this.setState({
+        selectChk: selectChk.slice(0, idx).concat(!val, selectChk.slice(idx+1))
+      })
+    }
   }
 
   callApi(params) {
@@ -57,6 +77,7 @@ class AdminProblemList extends React.Component {
           pageCount: res.data.total_pages,
           currPage: params.page,
           loaded: true,
+          selectChk: Array(res.data.results.length).fill(false),
         })
       })
       .catch((err) => {
@@ -74,6 +95,34 @@ class AdminProblemList extends React.Component {
   handlePageClick = (event) => {
     this.callApi({page: event.selected});
   }
+  handleDeleteSelect(e) {
+    e.preventDefault();
+
+    let names = [];
+    this.state.selectChk.forEach((v, i) => {
+      if (v) names.push(this.state.problems[i].shortname)
+    })
+    const conf = window.confirm('Xóa các bài tập ' + JSON.stringify(names) + ' ?');
+    if (conf) {
+      let reqs = []
+      names.forEach((shortname) => {
+        reqs.push( problemApi.adminDeleteProblem({shortname}) )
+      })
+      Promise.all(reqs).then((res) => {
+        console.log(res)
+        this.callApi({page: this.state.currPage});
+      }).catch((err) => {
+        let msg = 'Cannot delete selected problems. Maybe someone else has done it for you?';
+        if (err.response) {
+          if (err.response.status === 404)
+            msg = 'Cannot find such problems. Maybe it has been removed?.';
+          if ([403, 401].includes(err.response.status))
+            msg = 'Not authorized.';
+        }  
+        this.setState({ errors: [msg] })
+      })
+    }
+  }
 
   render() {
     return (
@@ -84,25 +133,30 @@ class AdminProblemList extends React.Component {
           <thead>
             <tr>
               <th style={{width: "20%"}}>#</th>
-              <th style={{minWidth: "30%", maxWidth: "50%"}}>Title</th>
+              <th style={{minWidth: "30%", maxWidth: "30%"}}>Title</th>
               <th style={{width: "12%"}}>Points</th>
-              <th style={{width: "10%"}}>Solved</th>
-              <th style={{width: "10%"}}>AC%</th>
-              <th style={{width: "5%"}}></th>
+              <th style={{width: "10%"}}>Public?</th>
+              <th style={{width: "10%"}}>Orgs Limited?</th>
+              <th style={{width: "5%"}}>Edit</th>
+              <th style={{width: "8%"}}>
+                <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
+              </th>
             </tr>
           </thead>
           <tbody>
             {
               this.state.loaded === false
-                ? <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr>
+                ? <tr><td colSpan="7"><SpinLoader margin="10px" /></td></tr>
                 : this.state.problems.map((prob, idx) => <ProblemListItem
                     key={`prob-${prob.shortname}`}
-                    rowid={idx} {...prob}
+                    rowidx={idx} {...prob}
+                    selectChk={this.state.selectChk}
+                    onSelectChkChange={(i) => this.selectChkChangeHandler(i)}
                   />)
             }
           </tbody>
           <tfoot className="problem-table-footer">
-            <tr><td colSpan="6">
+            <tr><td colSpan="7">
             {
               this.state.loaded === false
                 ? <SpinLoader margin="0" />

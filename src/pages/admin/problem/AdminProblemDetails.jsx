@@ -56,21 +56,23 @@ class AdminProblemDetails extends React.Component {
         <Navigate to={`${this.state.redirectUrl}`} />
       )
     }
-    const {loaded, general, options} = this.state;
-    
+    const {loaded, errors, general, options} = this.state;
+
     return (
       <div className="admin problem-panel">
         <h4 className="problem-title"> 
-          { !loaded ? <span><SpinLoader/> Loading...</span> : `Editing problem ${general.title}` }
+          { !loaded && <span><SpinLoader/> Loading...</span>}
+          { loaded && !!errors && <span>Something went wrong</span>}
+          { loaded && !errors && `Editing Problem. ${general.title}` }
         </h4>
         <hr/>
         <div className="problem-details">
-          { 
-          !loaded ? <span><SpinLoader/> Loading...</span> 
-          : <>
+          { !loaded && <span><SpinLoader/> Loading...</span> }
+          
+          { loaded && !errors && <>
           <Tabs defaultActiveKey="general" id="uncontrolled-tab-example" className="pl-2">
             <Tab eventKey="general" title="General">
-              <GeneralDetails data={general} options={options}/>
+              <GeneralDetails shortname={this.shortname} data={general} options={options}/>
             </Tab>
             <Tab eventKey="data" title="Test Data">
               <p>123</p>
