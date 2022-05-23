@@ -118,7 +118,7 @@ class AdminProblemList extends React.Component {
             msg = 'Cannot find such problems. Maybe it has been removed?.';
           if ([403, 401].includes(err.response.status))
             msg = 'Not authorized.';
-        }  
+        }
         this.setState({ errors: [msg] })
       })
     }
@@ -155,26 +155,22 @@ class AdminProblemList extends React.Component {
                   />)
             }
           </tbody>
-          <tfoot className="problem-table-footer">
-            <tr><td colSpan="7">
-            {
-              this.state.loaded === false
-                ? <SpinLoader margin="0" />
-                : <span className="classic-pagination">Page: <ReactPaginate 
-                    breakLabel="..."
-                    onPageChange={this.handlePageClick}
-                    forcePage={this.state.currPage}
-                    pageLabelBuilder={(page) => `[${page}]`}
-                    pageRangeDisplayed={3}
-                    pageCount={this.state.pageCount}
-                    renderOnZeroPageCount={null}
-                    previousLabel={null}
-                    nextLabel={null}
-                    /></span>
-            }
-            </td></tr>
-          </tfoot>
         </Table>
+        {
+          this.state.loaded === false
+            ? <SpinLoader margin="0" />
+            : <span className="classic-pagination">Page: <ReactPaginate
+                breakLabel="..."
+                onPageChange={this.handlePageClick}
+                forcePage={this.state.currPage}
+                pageLabelBuilder={(page) => `[${page}]`}
+                pageRangeDisplayed={3}
+                pageCount={this.state.pageCount}
+                renderOnZeroPageCount={null}
+                previousLabel={null}
+                nextLabel={null}
+                /></span>
+        }
       </div>
     )
   }

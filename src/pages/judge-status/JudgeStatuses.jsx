@@ -2,6 +2,7 @@ import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
+import { FcOk, FcHighPriority } from 'react-icons/fc';
 
 import { SpinLoader, ErrorBox } from 'components';
 import judgeAPI from 'api/judge';
@@ -56,8 +57,11 @@ class JudgeStatus extends React.Component {
         <td className="text-truncate" style={{maxWidth: "300px"}}>
           {name}
         </td>
-        <td>{online ? "✔️" : "❌"}</td>
-        <td>{is_blocked ? "✔️" : "❌"}</td>
+        <td>
+          <div className='icons'>
+            {(online && !is_blocked)? <FcOk size={18}/> : <FcHighPriority size={18} /> }
+          </div>
+        </td>
         <td style={{minWidth: "100px"}}>{this.state.upTime}</td>
         <td>{load}</td>
         <td>{`${ping ? ping.toFixed(2) : "N/A"}`}</td>
@@ -110,10 +114,12 @@ class JudgeStatuses extends React.Component {
 
   render() {
     let avaiRuntime = []
-    this.state.judges.map((item, idx) => {
+    this.state.judges.map((item) => {
       avaiRuntime = avaiRuntime.concat(item.runtimes)
+      return null
     })
     avaiRuntime = avaiRuntime.filter((val, ind, self) => self.indexOf(val) === ind)
+
     return (
       <>
       <div className="judge-table">
@@ -124,8 +130,7 @@ class JudgeStatuses extends React.Component {
             <tr>
               <th >#</th>
               <th >Name</th>
-              <th >Online?</th>
-              <th >Blocked?</th>
+              <th >Available?</th>
               <th style={{minWidth: "100px"}}>Up Time</th>
               <th >Load</th>
               <th >Ping</th>
@@ -141,26 +146,22 @@ class JudgeStatuses extends React.Component {
                   />)
             }
           </tbody>
-          <tfoot className="judge-table-footer">
-            <tr><td colSpan="7">
-            {
-              this.state.loaded === false
-                ? <SpinLoader margin="0" />
-                : <span className="classic-pagination">Page: <ReactPaginate 
-                    breakLabel="..."
-                    onPageChange={this.handlePageClick}
-                    forcePage={this.state.currPage}
-                    pageLabelBuilder={(page) => `[${page}]`}
-                    pageRangeDisplayed={3}
-                    pageCount={this.state.pageCount}
-                    renderOnZeroPageCount={null}
-                    previousLabel={null}
-                    nextLabel={null}
-                    /></span>
-            }
-            </td></tr>
-          </tfoot>
         </Table>
+        {
+          this.state.loaded === false
+            ? <SpinLoader margin="0" />
+            : <span className="classic-pagination">Page: <ReactPaginate
+                breakLabel="..."
+                onPageChange={this.handlePageClick}
+                forcePage={this.state.currPage}
+                pageLabelBuilder={(page) => `[${page}]`}
+                pageRangeDisplayed={3}
+                pageCount={this.state.pageCount}
+                renderOnZeroPageCount={null}
+                previousLabel={null}
+                nextLabel={null}
+                /></span>
+        }
       </div>
 
       <div className="judge-table text-left">

@@ -11,6 +11,7 @@ import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
 import GeneralDetails from './_/GeneralDetails';
+import TestDataDetails from './_/TestDataDetails';
 
 import './AdminProblemDetails.scss';
 
@@ -20,9 +21,10 @@ class AdminProblemDetails extends React.Component {
     super(props);
     const { shortname } = this.props.params;
     this.shortname = shortname;
-    this.state = { 
-      loaded: false, errors: null, 
+    this.state = {
+      loaded: false, errors: null,
       options: undefined,
+      problemTitle: undefined,
       general: undefined,
       testData: undefined,
     };
@@ -37,6 +39,7 @@ class AdminProblemDetails extends React.Component {
       // console.log(optionsRes.data)
       // console.log(generalRes.data)
       this.setState({
+        problemTitle: generalRes.data.title,
         options: optionsRes.data,
         general: generalRes.data,
         loaded: true,
@@ -60,22 +63,24 @@ class AdminProblemDetails extends React.Component {
 
     return (
       <div className="admin problem-panel">
-        <h4 className="problem-title"> 
+        <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong</span>}
-          { loaded && !errors && `Editing Problem. ${general.title}` }
+          { loaded && !errors && `Editing Problem. ${this.state.problemTitle}` }
         </h4>
         <hr/>
         <div className="problem-details">
           { !loaded && <span><SpinLoader/> Loading...</span> }
-          
+
           { loaded && !errors && <>
           <Tabs defaultActiveKey="general" id="uncontrolled-tab-example" className="pl-2">
             <Tab eventKey="general" title="General">
-              <GeneralDetails shortname={this.shortname} data={general} options={options}/>
+              <GeneralDetails shortname={this.shortname} data={general} options={options}
+                setProblemTitle={((title) => this.setState({problemTitle : title}))}
+              />
             </Tab>
             <Tab eventKey="data" title="Test Data">
-              <p>123</p>
+              <TestDataDetails shortname={this.shortname} />
             </Tab>
           </Tabs>
           </>

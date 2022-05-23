@@ -1,5 +1,4 @@
-@import 'global.scss';
-@import 'global.scss';
+@import 'pages/admin/AdminApp.scss';
 
 div.admin.problem-panel {
   h1, h2, h3, h4, h5, hr{
@@ -9,23 +8,31 @@ div.admin.problem-panel {
   h3, h4, h5 {
     margin: 4px;
   }
-
-  form#problem-general {
+  .col {
     text-align: left;
-    margin: 4px;
+  }
 
-    .row {
-      border: solid 1px $background-gray;
-      margin: 2px;
+  .accordion-item {
+    border: solid 1px $background-gray;
+    margin: 2px 0;
+
+    h2 {
+      color: $base !important;
+      font-size: 14px;
     }
-    .col {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-content: flex-start;
+    button {
+      width: 100%;
+      text-align: left;
+      border: unset;
+      background-color: $background-gray;
     }
-    input[type=checkbox] {
-      margin-bottom: 5px;
-    }
+  }
+  .accordion-button::after {
+    content: '+';
+    float: right;
+  }
+  .accordion-button:not(.collapsed)::after {
+    content: 'x';
+    float: right;
   }
 }

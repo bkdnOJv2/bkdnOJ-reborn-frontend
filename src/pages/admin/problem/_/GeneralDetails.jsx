@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { Form, Row, Col, Tabs, Tab, Button } from 'react-bootstrap';
+import { Accordion, Form, Row, Col, Tabs, Tab, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
 import problemAPI from 'api/problem';
@@ -9,7 +9,7 @@ import { FileUploader } from 'components';
 export default class GeneralDetails extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       shortname: this.props.shortname,
       data: this.props.data,
       options: this.props.options.actions.PUT || this.props.options.actions.PATCH,
@@ -22,7 +22,7 @@ export default class GeneralDetails extends React.Component {
 
   inputChangeHandler(event, params={isCheckbox: null}) {
     const isCheckbox = params.isCheckbox || false;
-    
+
     let newData = this.state.data;
     if (!isCheckbox) newData[event.target.id] = event.target.value
     else {
@@ -30,33 +30,37 @@ export default class GeneralDetails extends React.Component {
     }
     this.setState({ data : newData })
   }
+
   formSubmitHandler(e) {
     e.preventDefault();
     let {pdf, ...sendData} = this.state.data;
+    delete sendData.allowed_languages
+    console.log(sendData)
     let reqs = [];
 
+    reqs.push(
+      problemAPI.adminEditProblemDetails({
+        shortname: this.state.shortname,
+        data: sendData,
+      })
+    )
     if (this.state.selectedPdf) {
       const formData = new FormData();
       formData.append("pdf", this.state.selectedPdf);
       reqs.push(
-        problemAPI.adminEditProblemPDF({
+        problemAPI.adminEditProblemDetailsForm({
           shortname: this.state.shortname, formData
         })
       )
     }
-    reqs.push(
-      problemAPI.adminEditProblemDetails({
-        shortname: this.state.shortname, 
-        data: sendData.data
-      })
-    )
 
     Promise.all(
       reqs
-    ).then((res) => {
+    ).then((results) => {
       toast.success("Saved.")
-      // window.location = `/admin/problem/${res.data.shortname}`
-      console.log(res);
+      this.setState({ data: results[0].data });
+      this.props.setProblemTitle && this.props.setProblemTitle(results[0].data.title)
+      // console.log(results);
     }).catch((err) => {
       console.log(err);
     })
@@ -67,88 +71,175 @@ export default class GeneralDetails extends React.Component {
     // console.log(data);
     return (
       <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
-        <sub>Thiết lập chung</sub>
-        <Row>
-          <Form.Label column="sm" lg={2}> URL </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Problem URL" id="url"
-                  value={data.url} disabled
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Shortname </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Problem Shortname" id="shortname"
-                  value={data.shortname} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Title </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Problem Title" id="title"
-                  value={data.title} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Time Limit </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="1.0" id="time_limit"
-                  value={data.time_limit} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Memory Limit</Form.Label>
-          <Col> 
-          <Form.Control size="sm" type="text" placeholder="256000" id="memory_limit"
-                  value={data.memory_limit} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> PDF </Form.Label>
-          <Col> 
-          {
-            data.pdf ? <a href={data.pdf} className="text-truncate">{data.pdf}</a> : "Not Available"
-          }
-           <FileUploader
-            onFileSelectSuccess={(file) => this.setSelectedPdf(file)}
-            onFileSelectError={({ error }) => alert(error)}
-          />
-          </Col>
-        </Row>
-        <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở bên ngoài contest (nộp ở trang Problem)</sub>
-        <Row>
-          <Form.Label column="sm" lg={2}> Điểm </Form.Label>
-          <Col > 
-            <Form.Control size="sm" type="number" id="points"
-              value={data.points} onChange={(e) => this.inputChangeHandler(e)}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Dừng chấm nếu có test sai </Form.Label>
-          <Col > 
-            <Form.Control size="sm" type="checkbox" id="short_circuit"
-              checked={data.short_circuit} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
-            />
-            {/* <sub>Dừng chấm bài nếu có một test cho kết quả không được chấp nhận.</sub> */}
-          </Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Cho phép ăn điểm từng test </Form.Label>
-          <Col > 
-            <Form.Control size="sm" type="checkbox" id="partial"
-              checked={data.partial} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
-            />
-            {/* <sub>Cho phép ăn điểm theo từng test đúng. Nếu không tick thì người dùng chỉ có thể được 0đ hoặc full điểm.</sub> */}
-          </Col>
-        </Row>
-        <Row>
-          <Col lg={8}>
-            <sub>Các thiết lập khác sẽ được thêm sau.</sub>
-          </Col>
-          <Col >
-            <Button variant="dark" size="sm" type="submit">
-              Submit
-            </Button>
-          </Col>
-        </Row>
-      </Form>      
+      <Accordion defaultActiveKey="0">
+        <Accordion.Item eventKey="0" className="general">
+          <Accordion.Header>Thiết lập chung</Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Form.Label column="sm" lg={2}> URL </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="Problem URL" id="url"
+                      value={data.url} disabled
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> Title </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="Problem Title" id="title"
+                      value={data.title} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> Shortname </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="Problem Shortname" id="shortname"
+                      value={data.shortname} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> Content (LateX) </Form.Label>
+              <Col> <Form.Control size="sm" type="textarea" placeholder="Problem Statement" id="content"
+                      value={data.content} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> PDF </Form.Label>
+              <Col >
+              {
+                data.pdf ? <a href={data.pdf} className="text-truncate">{data.pdf}</a>
+                  : "Not Available"
+              }
+              <FileUploader
+                onFileSelectSuccess={(file) => this.setSelectedPdf(file)}
+                onFileSelectError={({ error }) => alert(error)}
+              />
+              </Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+
+        <Accordion.Item eventKey="1" className="problem-access-control">
+          <Accordion.Header>Accessibility Settings</Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Form.Label column="sm" xs={2}> Authors </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="authors" id="authors"
+                      value={JSON.stringify(data.authors)} disabled
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> Collaborators </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="collaborators" id="collaborators"
+                      value={JSON.stringify(data.collaborators)} disabled
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> Testers </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="testers" id="testers"
+                      value={JSON.stringify(data.testers)} disabled
+              /></Col>
+            </Row>
+
+            <Row>
+              <Form.Label column="sm" xs={4}> Only public to organizations </Form.Label>
+              <Col >
+                <Form.Control size="sm" type="checkbox" id="is_privated_to_orgs"
+                  value={data.is_privated_to_orgs} onChange={(e) => this.inputChangeHandler(e)}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={2}> Organizations </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="organizations" id="organizations"
+                      value={JSON.stringify(data.organizations)} disabled
+              /></Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+
+        <Accordion.Item eventKey="2" className="problem-data-access-control">
+          <Accordion.Header>Problem-related Object Visibility Settings</Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Form.Label column="sm" xs={4}> Submission Visibility Mode </Form.Label>
+              <Col>
+                  <Form.Select aria-label={data.submission_visibility_mode}
+                    defaultValue={data.submission_visibility_mode || 'FOLLOW'}
+                    size="sm" id="submission_visibility_mode"
+                  >
+                    <option value="FOLLOW">Follow bkdnOJ's setting.</option>
+                    <option value="ALWAYS">Users can see all submissions</option>
+                    <option value="SOLVED">Users can see their own, plus see others if user has solved that problem.</option>
+                    <option value="ONLY_OWN">Users can only see their own submissions.</option>
+                    <option value="HIDDEN">Submissions will never be visible.</option>
+                  </Form.Select>
+              </Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+
+        <Accordion.Item eventKey="3" className="constraints">
+          <Accordion.Header>Constraints</Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Form.Label column="sm" xs={4}> Time Limit (s)</Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="1.0" id="time_limit"
+                      value={data.time_limit} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={4}> Memory Limit (KBs)</Form.Label>
+              <Col>
+              <Form.Control size="sm" type="number" placeholder="256000" id="memory_limit"
+                      value={data.memory_limit} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+
+
+        <Accordion.Item eventKey="4" className="scoring">
+          <Accordion.Header>Scoring</Accordion.Header>
+          <Accordion.Body>
+            <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở bên ngoài contest (nộp ở trang Problem)</sub>
+            <Row>
+              <Form.Label column="sm" xs={2}> Điểm </Form.Label>
+              <Col >
+                <Form.Control size="sm" type="number" id="points"
+                  value={data.points} onChange={(e) => this.inputChangeHandler(e)}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={6}> Dừng chấm nếu có test sai </Form.Label>
+              <Col >
+                <Form.Control size="sm" type="checkbox" id="short_circuit"
+                  checked={data.short_circuit} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
+                />
+                {/* <sub>Dừng chấm bài nếu có một test cho kết quả không được chấp nhận.</sub> */}
+              </Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" xs={6}> Cho phép ăn điểm từng test </Form.Label>
+              <Col >
+                <Form.Control size="sm" type="checkbox" id="partial"
+                  checked={data.partial} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
+                />
+                {/* <sub>Cho phép ăn điểm theo từng test đúng. Nếu không tick thì người dùng chỉ có thể được 0đ hoặc full điểm.</sub> */}
+              </Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+
+      <Row>
+        <Col lg={10}>
+          <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
+        </Col>
+        <Col >
+          <Button variant="dark" size="sm" type="submit">
+            Save
+          </Button>
+        </Col>
+      </Row>
+      </Form>
     )
   }
 }

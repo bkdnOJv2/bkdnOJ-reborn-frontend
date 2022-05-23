@@ -6,6 +6,7 @@ import Content from './Content/Content';
 import SpinLoader from './SpinLoader/SpinLoader';
 import ErrorBox from './ErrorBox/ErrorBox';
 import FileUploader from './FileUploader/FileUploader';
+import CSRFToken from './CSRFToken/CSRFToken';
 
 export {
     Header,
@@ -16,4 +17,5 @@ export {
     SpinLoader,
     ErrorBox,
     FileUploader,
+    CSRFToken,
 };

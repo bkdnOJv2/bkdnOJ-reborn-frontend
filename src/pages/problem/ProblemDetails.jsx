@@ -21,7 +21,7 @@ class ProblemDetails extends React.Component {
     super(props);
     const { shortname } = this.props.params;
     this.shortname = shortname;
-    this.state = { 
+    this.state = {
       data: undefined, loaded: false, errors: null, shortname: shortname,
       redirectUrl: null,
       submitFormShow: false,
@@ -67,10 +67,10 @@ class ProblemDetails extends React.Component {
       )
     }
     const {loaded, errors, data} = this.state;
-    
+
     return (
       <div className="problem-info">
-        <h4 className="problem-title"> 
+        <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Problem Not Found</span>}
           { loaded && !errors && `Problem. ${data.title}` }
@@ -105,28 +105,25 @@ class ProblemDetails extends React.Component {
                 <Col sm={3} className="options">
                   {
                     this.user === null && (
-                    <Link to="#" className="btn" 
+                    <Link to="#" className="btn"
                       onClick={() => this.setState({redirectUrl: '/sign-in'})}>
                       Sign In To Submit <FaSignInAlt size={12}/>
                     </Link>)
                   }{
-                    this.user !== null && (<Link to="#" className="btn" 
+                    this.user !== null && (<Link to="#" className="btn"
                       onClick={() => this.handleSubmitFormOpen()}>
                       Submit <FaPaperPlane size={12}/>
                     </Link>)
                   }{
                     (this.user !== null && this.user.is_staff) && (
-                    // <Link to="#" className="btn" style={{color: "red"}}
-                    //   onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
-                    //   Edit <FaExternalLinkAlt size={12}/>
-                    // </Link>
-                    <a href={`${getAdminPageUrl()}`} className="btn" style={{color: "red"}}>
-                      Edit <FaExternalLinkAlt size={12}/>
-                    </a>
+                      <Link to="#" className="btn" style={{color: "red"}}
+                        onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
+                        Edit <FaExternalLinkAlt size={12}/>
+                      </Link>
                     )
                   }
 
-                  <SubmitModal show={this.state.submitFormShow} 
+                  <SubmitModal show={this.state.submitFormShow}
                     onHide={() => this.handleSubmitFormClose()}
                     prob={data.shortname}
                     lang={data.allowed_languages}
@@ -137,7 +134,7 @@ class ProblemDetails extends React.Component {
               </Row>
               <div className="problem-pdf shadow">
                 {/* <object data={`${this.state.data.pdf}`} type="application/pdf">
-                  <iframe title="problem-pdf-iframe" 
+                  <iframe title="problem-pdf-iframe"
                     src={`https://docs.google.com/viewer?url=${this.state.data.pdf}&embedded=true`}>
                   </iframe>
                 </object> */}

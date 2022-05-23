@@ -19,17 +19,22 @@ const adminDeleteProblem = ({shortname}) => {
     return axiosClient.delete(`/problem/${shortname}/`);
 }
 const adminEditProblemDetails = ({shortname, data}) => {
-    return axiosClient.patch(`/problem/${shortname}/`, data);
+    return axiosClient.patch(`/problem/${shortname}/`, JSON.stringify(data));
+}
+const adminEditProblemDetailsForm = ({shortname, formData}) => {
+    return axiosFormClient.patch(`/problem/${shortname}/`, formData);
 }
 const adminGetProblemDetailsData = ({shortname}) => {
     return axiosClient.get(`/problem/${shortname}/data/`);
 }
+const adminEditProblemDetailsData = ({shortname, data}) => {
+    return axiosClient.patch(`/problem/${shortname}/data/`, JSON.stringify(data));
+}
+const adminEditProblemDataForm = ({shortname, formData}) => {
+    return axiosFormClient.patch(`/problem/${shortname}/data/`, formData);
+}
 const adminGetProblemDetailsTest = ({shortname, params}) => {
     return axiosClient.get(`/problem/${shortname}/data/test/`, (params && { params: {...params} }));
-}
-
-const adminEditProblemPDF = ({shortname, formData}) => {
-    return axiosFormClient.patch(`${getConnectionUrl()}admin/problem/${shortname}/`, formData);
 }
 
 const problemAPI = {
@@ -39,8 +44,10 @@ const problemAPI = {
     adminOptionsProblemDetails,
     adminDeleteProblem,
     adminEditProblemDetails,
-    adminEditProblemPDF,
+    adminEditProblemDetailsForm,
     adminGetProblemDetailsData,
+    adminEditProblemDataForm ,
+    adminEditProblemDetailsData,
     adminGetProblemDetailsTest,
 }
 

@@ -101,26 +101,22 @@ class ProblemList extends React.Component {
                   />)
             }
           </tbody>
-          <tfoot className="problem-table-footer">
-            <tr><td colSpan="6">
-            {
-              this.state.loaded === false
-                ? <SpinLoader margin="0" />
-                : <span className="classic-pagination">Page: <ReactPaginate 
-                    breakLabel="..."
-                    onPageChange={this.handlePageClick}
-                    forcePage={this.state.currPage}
-                    pageLabelBuilder={(page) => `[${page}]`}
-                    pageRangeDisplayed={3}
-                    pageCount={this.state.pageCount}
-                    renderOnZeroPageCount={null}
-                    previousLabel={null}
-                    nextLabel={null}
-                    /></span>
-            }
-            </td></tr>
-          </tfoot>
         </Table>
+        {
+          this.state.loaded === false
+            ? <SpinLoader margin="0" />
+            : <span className="classic-pagination">Page: <ReactPaginate
+                breakLabel="..."
+                onPageChange={this.handlePageClick}
+                forcePage={this.state.currPage}
+                pageLabelBuilder={(page) => `[${page}]`}
+                pageRangeDisplayed={3}
+                pageCount={this.state.pageCount}
+                renderOnZeroPageCount={null}
+                previousLabel={null}
+                nextLabel={null}
+                /></span>
+        }
       </div>
     )
   }

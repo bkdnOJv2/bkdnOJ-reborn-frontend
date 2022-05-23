@@ -3,19 +3,21 @@ import { toast } from 'react-toastify';
 
 import { __ls_get_access_token, __ls_remove_credentials } from 'helpers/localStorageHelpers';
 import { log } from 'helpers/logger';
+import { getCookie } from 'helpers/cookies';
 
 import {getConnectionUrl} from './urls';
 
+const csrfToken = getCookie('csrftoken');
 const axiosFormClient = axios.create({
     baseURL: getConnectionUrl(),
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'multipart/form-data',
-        // 'Access-Control-Allow-Origin': '*',
+        // 'X-CSRFTOKEN': csrfToken,
     }
 });
-axiosFormClient.defaults.xsrfCookieName = 'csrftoken'
-axiosFormClient.defaults.xsrfHeaderName = 'X-CSRFToken'
+// axiosFormClient.defaults.xsrfCookieName = 'csrftoken'
+// axiosFormClient.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 axiosFormClient.interceptors.request.use(
     config => {

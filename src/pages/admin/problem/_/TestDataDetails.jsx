@@ -1,96 +1,152 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
-import { Form, Row, Col, Tabs, Tab } from 'react-bootstrap';
+import { Accordion, Button, Form, Row, Col } from 'react-bootstrap';
+import { FileUploader } from 'components'
 
 import problemAPI from 'api/problem';
 
 export default class TestDataDetails extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       shortname: this.props.shortname,
-      data: {},
+      data: {
+        zipfile: null,
+        zipfile_remove: false,
+        generator_remove: false,
+      },
+      selectedZip: null,
     }
   }
 
   componentDidMount() {
-    // problemAPI.adminGetProblemDetailsData
+    const {shortname} = this.state;
+    problemAPI.adminGetProblemDetailsData({shortname})
+    .then((res) => {
+      this.setState({
+        data: {  ...res.data, zipfile_remove: false, generator_remove: false }
+      })
+    }).catch((err) => {
+      console.log(err)
+    })
   }
 
+  setSelectedZip(file) { this.setState({selectedZip: file}) }
 
-  inputChangeHandler(event) {
+  inputChangeHandler(event, params={isCheckbox: null}) {
+    console.log(event);
+    const isCheckbox = params.isCheckbox || false;
+
     let newData = this.state.data;
-    newData[event.target.id] = event.target.value
+    if (!isCheckbox) newData[event.target.id] = event.target.value
+    else {
+      newData[event.target.id] = !newData[event.target.id]
+    }
     this.setState({ data : newData })
+  }
+
+  formSubmitHandler(e) {
+    e.preventDefault();
+    let {zipfile, ...sendData} = this.state.data;
+    let formData = new FormData();
+
+    if (this.state.selectedZip)
+      formData.append("zipfile", this.state.selectedZip)
+    for (let key in sendData)
+      formData.append(key, sendData[key])
+
+    problemAPI.adminEditProblemDataForm({
+      shortname: this.state.shortname, formData
+    }).then((res) => {
+      toast.success("Saved.")
+      // console.log(res)
+      this.setState({
+        data: {
+          ...res.data,
+          zipfile_remove: false,
+          generator_remove: false,
+        }
+      });
+    }).catch((err) => {
+      console.log(err);
+    })
   }
 
   render() {
     const {data} = this.state;
-    // console.log(data);
     return (
-      <Form id="problem-general">
-        <sub>Thiết lập chung</sub>
-        <Row>
-          <Form.Label column="sm" lg={2}> URL </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Problem URL" id="url"
-                  value={data.url} disabled
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Shortname </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Problem Shortname" id="shortname"
-                  value={data.shortname} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Title </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Problem Title" id="title"
-                  value={data.title} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Time Limit </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="1.0" id="time_limit"
-                  value={data.time_limit} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Memory Limit</Form.Label>
-          <Col> 
-          <Form.Control size="sm" type="text" placeholder="256000" id="memory_limit"
-                  value={data.memory_limit} onChange={(e) => this.inputChangeHandler(e)}
-          /></Col>
-        </Row>
-        <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở bên ngoài contest (nộp ở trang Problem)</sub>
-        <Row>
-          <Form.Label column="sm" lg={2}> Điểm </Form.Label>
-          <Col > 
-            <Form.Control size="sm" type="number" id="points"
-              value={data.points} onChange={(e) => this.inputChangeHandler(e)}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Dừng chấm nếu có test sai </Form.Label>
-          <Col > 
-            <Form.Control size="sm" type="checkbox" id="short_circuit"
-              value={data.short_circuit} onChange={(e) => this.inputChangeHandler(e)}
-            />
-            {/* <sub>Dừng chấm bài nếu có một test cho kết quả không được chấp nhận.</sub> */}
-          </Col>
-        </Row>
-        <Row>
-          <Form.Label column="sm" lg={2}> Cho phép ăn điểm từng test </Form.Label>
-          <Col > 
-            <Form.Control size="sm" type="checkbox" id="partial"
-              value={data.partial} onChange={(e) => this.inputChangeHandler(e)}
-            />
-            {/* <sub>Cho phép ăn điểm theo từng test đúng. Nếu không tick thì người dùng chỉ có thể được 0đ hoặc full điểm.</sub> */}
-          </Col>
-        </Row>
+      <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
+      <Accordion defaultActiveKey="0">
+        <Accordion.Item eventKey="0" className="general">
+          <Accordion.Header>Thiết lập chung</Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Form.Label column="sm" lg={2}> Archive </Form.Label>
+              <Col lg={6}>
+              {
+                data.zipfile ? <a href={data.zipfile} className="text-truncate">{data.zipfile}</a>
+                : "Not Available"
+              }
+              <FileUploader
+                onFileSelectSuccess={(file) => this.setSelectedZip(file)}
+                onFileSelectError={({ error }) => alert(error)}
+              />
+              </Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" > Remove Archive? </Form.Label>
+              <Col >
+                <Form.Control size="sm" type="checkbox" id="zipfile_remove"
+                  checked={data.zipfile_remove} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" lg={4}> Checker </Form.Label>
+              <Col>
+                  <Form.Select aria-label={data.checker} size="sm" value={data.checker}
+                    id="checker" onChange={(e) => this.inputChangeHandler(e)}
+                  >
+                    <option value="standard">Standard</option>
+                    <option value="floats">Floats</option>
+                    <option value="floatsabs">Floats (Absolute)</option>
+                    <option value="floatsrel">Floats (Relative)</option>
+                    <option value="rstripped">Non-trailing spaces</option>
+                    <option value="sorted">Unordered</option>
+                    <option value="identical">Byte identical</option>
+                    <option value="linecount">Line-by-line</option>
+                  </Form.Select>
+              </Col>
+            </Row>
+            <Row>
+              <Form.Label column="sm" lg={6}> Checker Args </Form.Label>
+              <Col> <Form.Control size="sm" type="textarea" placeholder="Checker Args" id="checker_args"
+                      value={data.checker_args || ''} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
 
-        <sub>Các thiết lập khác sẽ được thêm sau.</sub>
-      </Form>      
+        <Accordion.Item eventKey="1" className="testcase">
+          <Accordion.Header>Testcases</Accordion.Header>
+          <Accordion.Body>
+
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+
+      <Row>
+        <Col lg={10}>
+          <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
+        </Col>
+        <Col >
+          <Button variant="dark" size="sm" type="submit">
+            Save
+          </Button>
+        </Col>
+      </Row>
+      </Form>
     )
   }
 }

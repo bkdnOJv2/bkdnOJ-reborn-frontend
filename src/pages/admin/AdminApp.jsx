@@ -7,7 +7,7 @@ import './AdminApp.scss';
 class AdminApp extends React.Component {
     render() {
         return (
-            <Container>
+            <Container className="admin-container">
                 <Row>
                     <Col xs={3}>
                         <nav className="admin-nav shadow">
