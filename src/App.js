@@ -59,7 +59,7 @@ class App extends React.Component {
       <HistoryRouter history={history}>
         <Routes>
           {
-            this.isAdmin() && 
+            // this.isAdmin() && 
             <>
               <Route path="/admin" element={<AdminApp />}>
                 <Route index path="" element={

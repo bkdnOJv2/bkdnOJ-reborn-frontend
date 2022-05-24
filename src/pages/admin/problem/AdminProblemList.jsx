@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
-import { Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 import { FaPaperPlane } from 'react-icons/fa';
 
 import { SpinLoader, ErrorBox } from 'components';
@@ -95,6 +95,7 @@ class AdminProblemList extends React.Component {
   handlePageClick = (event) => {
     this.callApi({page: event.selected});
   }
+
   handleDeleteSelect(e) {
     e.preventDefault();
 
@@ -102,12 +103,14 @@ class AdminProblemList extends React.Component {
     this.state.selectChk.forEach((v, i) => {
       if (v) names.push(this.state.problems[i].shortname)
     })
+
     const conf = window.confirm('Xóa các bài tập ' + JSON.stringify(names) + ' ?');
     if (conf) {
       let reqs = []
       names.forEach((shortname) => {
         reqs.push( problemApi.adminDeleteProblem({shortname}) )
       })
+
       Promise.all(reqs).then((res) => {
         console.log(res)
         this.callApi({page: this.state.currPage});
@@ -126,8 +129,14 @@ class AdminProblemList extends React.Component {
 
   render() {
     return (
-      <div className="problem-table">
-        <h4>Edit Problem</h4>
+      <>
+      <div className="admin-options">
+        <Button size="sm" onClick={(e)=>alert('Create new')}>Create (Form)</Button>
+        <Button size="sm" onClick={(e)=>alert('Upload zip')}>Create (Upload Zip)</Button>
+      </div>
+
+      <div className="admin-table problem-table">
+        <h4>Problem List</h4>
         <ErrorBox errors={this.state.errors} />
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
@@ -172,6 +181,7 @@ class AdminProblemList extends React.Component {
                 /></span>
         }
       </div>
+      </>
     )
   }
 }
