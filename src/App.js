@@ -24,6 +24,7 @@ import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import { AdminProblemDetails, AdminProblemList } from 'pages/admin/problem';
 import { AdminApp } from 'pages/admin';
+import UserApp from 'pages/user/UserApp';
 
 // Styles
 import 'App.scss';
@@ -54,82 +55,71 @@ class App extends React.Component {
   render() {
     return (
       <HistoryRouter history={history}>
-        <Header />
-        <Navbar />
-        <SubHeader />
+        <Routes>
+          {
+            this.isAdmin() && 
+            <>
+              <Route path="/admin" element={<AdminApp />}>
+                <Route index path="" element={
+                  <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                    style={{minHeight: "400px"}}>
+                      <h4>Admin Home Page</h4>
+                  </div>
+                }/>
+                <Route path="problem" element={
+                  <OneColumn mainContent={<AdminProblemList />} />
+                }/>
+                <Route path="problem/:shortname" element={
+                  <OneColumn mainContent={<AdminProblemDetails />} />
+                }/>
+                <Route path="*" element={
+                  <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                    style={{minHeight: "400px"}}>
+                      <h4>Not Implemented</h4>
+                  </div>
+                }/>
+              </Route>
+            </>
+          }
+          <Route path="" element={<UserApp />}>
+            <Route index path="/" element={<Content />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/sign-out" element={<SignOut />} />
+            <Route path="/profile" element={<UserProfile />} />
 
-        <div className="content-wrapper">
-          <ScrollToTop />
-          <Container className="content">
-            <Routes>
-              <Route index path="/" element={<Content />} />
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/sign-up" element={<SignUp />} />
-              <Route path="/sign-out" element={<SignOut />} />
-              <Route path="/profile" element={<UserProfile />} />
+            <Route path="/test/pdf" element={ <PDFViewer /> } />
 
-              <Route path="/test/pdf" element={ <PDFViewer /> } />
+            <Route path="/problem" element={
+              <ListSidebar mainContent={<ProblemList />}/>
+            } />
+            <Route path="/problem/:shortname" 
+              element={<ListSidebar mainContent={<ProblemDetails />} />}
+            />
+            <Route path="/problem/:shortname/submit" 
+              element={<ListSidebar mainContent={<Submit />} />}
+            />
 
-              <Route path="/problem" element={
-                <ListSidebar mainContent={<ProblemList />}/>
-              } />
-              <Route path="/problem/:shortname" 
-                element={<ListSidebar mainContent={<ProblemDetails />} />}
-              />
-              <Route path="/problem/:shortname/submit" 
-                element={<ListSidebar mainContent={<Submit />} />}
-              />
+            <Route path="/submission" element={
+              <ListSidebar mainContent={<SubmissionList />}/>
+            } />
+            <Route path="/submission/:id" element={
+              <ListSidebar mainContent={<SubmissionDetails />}/>
+            } />
+            <Route path="/judge-status" element={
+              <ListSidebar mainContent={<JudgeStatuses />}/>
+            } />
+          </Route>
 
-              <Route path="/submission" element={
-                <ListSidebar mainContent={<SubmissionList />}/>
-              } />
-              <Route path="/submission/:id" element={
-                <ListSidebar mainContent={<SubmissionDetails />}/>
-              } />
-
-              <Route path="/judge-status" element={
-                <ListSidebar mainContent={<JudgeStatuses />}/>
-              } />
-
-              {
-                this.isAdmin() && 
-                <>
-                  <Route path="/admin" element={<AdminApp />}>
-                    <Route index path="" element={
-                      <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
-                        style={{minHeight: "400px"}}>
-                          <h4>Admin Home Page</h4>
-                      </div>
-                    }/>
-                    <Route path="problem" element={
-                      <OneColumn mainContent={<AdminProblemList />} />
-                    }/>
-                    <Route path="problem/:shortname" element={
-                      <OneColumn mainContent={<AdminProblemDetails />} />
-                    }/>
-                    <Route path="*" element={
-                      <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
-                        style={{minHeight: "400px"}}>
-                          <h4>Not Implemented</h4>
-                      </div>
-                    }/>
-                  </Route>
-                </>
-              }
-
-              <Route path="*" element={
-                <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
-                  style={{minHeight: "200px", minWidth: "400px"}}>
-                    <h4>404 | Page Not Found</h4>
-                </div>
-              } />
-            </Routes>
-          </Container>
-        </div>
-
-        <div className='footer-wrapper'>
-          <Footer />
-        </div>
+          <Route path="*" element={
+            <Container>
+              <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                style={{minHeight: "200px", minWidth: "400px"}}>
+                  <h4 style={{color: 'white'}}>404 | Page Not Found</h4>
+              </div>
+            </Container>
+          } />
+        </Routes>
       </HistoryRouter>
     )
   }
