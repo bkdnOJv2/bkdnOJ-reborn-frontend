@@ -2,7 +2,7 @@ import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
-import { FaPaperPlane } from 'react-icons/fa';
+// import { FaPaperPlane } from 'react-icons/fa';
 
 import { SpinLoader, ErrorBox } from 'components';
 import problemApi from 'api/problem';

@@ -11,8 +11,8 @@ import { SpinLoader } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
-import { SubmitModal } from 'pages/submit';
-import { getAdminPageUrl } from 'api/urls';
+import { SubmitModal } from 'pages/user/submit';
+// import { getAdminPageUrl } from 'api/urls';
 
 import './ProblemDetails.scss';
 

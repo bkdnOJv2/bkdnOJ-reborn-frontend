@@ -2,7 +2,7 @@ import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
-import { FaPaperPlane } from 'react-icons/fa';
+// import { FaPaperPlane } from 'react-icons/fa';
 
 import { SpinLoader, ErrorBox } from 'components';
 import submissionApi from 'api/submission';
@@ -61,7 +61,7 @@ class SubListItem extends React.Component {
 
         {
           <td className={`verdict ${verdict.toLowerCase()}`}
-            // data-toggle="tooltip" data-placement="right" title={`${getVerdict(verdict)}`}
+            data-toggle="tooltip" data-placement="right" title={`${getVerdict(verdict)}`}
           >
               <span>{verdict}</span>
           </td>

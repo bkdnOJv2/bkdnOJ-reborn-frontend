@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 import './Submit.scss';
 

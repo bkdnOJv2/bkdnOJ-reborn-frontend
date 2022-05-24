@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactPaginate from 'react-paginate';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
 import { FcOk, FcHighPriority } from 'react-icons/fc';
 
@@ -48,7 +48,7 @@ class JudgeStatus extends React.Component {
   }
 
   render() {
-    const {id, name, is_blocked, online, ping, load, description} = this.props;
+    const {id, name, is_blocked, online, ping, load, /*description*/} = this.props;
     return (
       <tr>
         <td className="text-truncate" style={{maxWidth: "100px"}}>

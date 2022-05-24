@@ -12,19 +12,21 @@ import ScrollToTop from 'helpers/react-router/ScrollToTop';
 // Components
 import { ListSidebar, OneColumn } from 'layout';
 import { Navbar, Header, SubHeader, Footer, Content } from './components';
-
-import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
-import { SubmissionList, SubmissionDetails } from 'pages/submission';
-import { ProblemList, ProblemDetails } from 'pages/problem';
-import { JudgeStatuses } from 'pages/judge-status';
-import { Submit } from 'pages/submit';
-import { setTitle } from 'helpers/setTitle';
-
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
-import { AdminProblemDetails, AdminProblemList } from 'pages/admin/problem';
-import { AdminApp } from 'pages/admin';
+import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
+import {
+  SubmissionList, SubmissionDetails, ProblemList, 
+  ProblemDetails, JudgeStatuses, Submit
+} from 'pages/user';
+
+import {
+  AdminProblemDetails, AdminProblemList,
+  AdminApp
+} from 'pages/admin';
+
 import UserApp from 'pages/user/UserApp';
+import { setTitle } from 'helpers/setTitle';
 
 // Styles
 import 'App.scss';
