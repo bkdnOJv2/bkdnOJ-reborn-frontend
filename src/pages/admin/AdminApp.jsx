@@ -27,7 +27,7 @@ class AdminApp extends React.Component {
       <div className="admin-page">
         <AdminNav className="d-none"/>
         <div id="admin-content-wrapper" >
-          <div id="admin-topbar">
+          <div id="admin-topbar" className="shadow">
             <Button variant="light" onClick={() => this.hideSidebar()}
               id="sidebar-toggle-btn"
             ><VscThreeBars /></Button>

@@ -15,6 +15,9 @@ const submitToProblem = ({name, data}) => {
 const adminOptionsProblemDetails = ({shortname}) => {
     return axiosClient.options(`/problem/${shortname}/`);
 }
+const adminPostProblemFromZip = ({formData}) => {
+    return axiosFormClient.post(`/problem-from-archive`, formData);
+}
 const adminDeleteProblem = ({shortname}) => {
     return axiosClient.delete(`/problem/${shortname}/`);
 }
@@ -42,13 +45,18 @@ const problemAPI = {
     getProblemDetails,
     submitToProblem,
     adminOptionsProblemDetails,
+
+    adminPostProblemFromZip,
+
+    adminGetProblemDetailsData,
+    adminGetProblemDetailsTest,
+
     adminDeleteProblem,
+
     adminEditProblemDetails,
     adminEditProblemDetailsForm,
-    adminGetProblemDetailsData,
     adminEditProblemDataForm ,
     adminEditProblemDetailsData,
-    adminGetProblemDetailsTest,
 }
 
 export default problemAPI;

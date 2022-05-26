@@ -12,6 +12,7 @@ import { setTitle } from 'helpers/setTitle';
 
 import GeneralDetails from './_/GeneralDetails';
 import TestDataDetails from './_/TestDataDetails';
+import TestcaseDetails from './_/TestcaseDetails';
 
 import './AdminProblemDetails.scss';
 
@@ -66,7 +67,7 @@ class AdminProblemDetails extends React.Component {
         <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong</span>}
-          { loaded && !errors && `Editing Problem. ${this.state.problemTitle}` }
+          { loaded && !errors && `Editing problem. ${this.state.problemTitle}` }
         </h4>
         <hr/>
         <div className="problem-details">
@@ -81,6 +82,9 @@ class AdminProblemDetails extends React.Component {
             </Tab>
             <Tab eventKey="data" title="Test Data">
               <TestDataDetails shortname={this.shortname} />
+            </Tab>
+            <Tab eventKey="test" title="Test Cases">
+              <TestcaseDetails shortname={this.shortname} />
             </Tab>
           </Tabs>
           </>

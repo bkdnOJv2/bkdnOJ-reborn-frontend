@@ -12,7 +12,7 @@ export default class ListSidebar extends React.Component {
       <div className="one-column-wrapper">
         <Row>
           <Col >
-            <div className="offcanvas-menu main-component shadow rounded" id="offcanvas-menu">
+            <div className="main-component shadow rounded">
               { mainContent }
             </div>
           </Col>

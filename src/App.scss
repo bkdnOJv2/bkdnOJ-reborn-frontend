@@ -24,9 +24,21 @@ h1, h2, h3, h4, h5 {
   color: $base;
 }
 
-label.required::after {
-  content: "*";
-  color: red;
+button.btn-svg {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  column-gap: 5px;
+  height: 30px;
+}
+
+label.required {
+  white-space: pre;
+  font-weight: bold;
+  &::after {
+    content: "*";
+    color: red;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -75,6 +87,17 @@ label.required::after {
 .btn-outline-dark {
   @include button-outline-variant($base, #222222, lighten($base,5%), $base);
   color: $sub;
+}
+.btn-light {
+  @include button-variant($sub, darken($sub, 7.5%), darken($sub, 10%), lighten($sub,5%), lighten($sub, 10%), darken($sub,30%));
+  color: $base;
+  &:hover, &:focus {
+    color: $base;
+  }
+}
+.btn-outline-light {
+  @include button-outline-variant($sub, #222222, lighten($sub,5%), $sub);
+  color: $base;
 }
 
 @-webkit-keyframes rotating /* Safari and Chrome */ {

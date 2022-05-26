@@ -76,32 +76,33 @@ export default class GeneralDetails extends React.Component {
           <Accordion.Header>Thiết lập chung</Accordion.Header>
           <Accordion.Body>
             <Row>
-              <Form.Label column="sm" lg={2}> URL </Form.Label>
+              <Form.Label column="sm" lg={2}> Resource URL </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="Problem URL" id="url"
                       value={data.url} disabled
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> Title </Form.Label>
+              <Form.Label column="sm" xs={3} className="required" > Title </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="Problem Title" id="title"
-                      value={data.title} onChange={(e) => this.inputChangeHandler(e)}
+                      value={data.title} onChange={(e) => this.inputChangeHandler(e)} required
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> Shortname </Form.Label>
+              <Form.Label column="sm" xs={3} className="required"> Shortname </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="Problem Shortname" id="shortname"
-                      value={data.shortname} onChange={(e) => this.inputChangeHandler(e)}
+                      value={data.shortname} onChange={(e) => this.inputChangeHandler(e)} required
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> Content (LateX) </Form.Label>
-              <Col> <Form.Control size="sm" type="textarea" placeholder="Problem Statement" id="content"
+              <Form.Label column="sm" lg={2}> Content (LateX) </Form.Label>
+              <Col> <Form.Control size="sm" lg={12} type="textarea" placeholder="Problem Statement" id="content"
                       value={data.content} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> PDF </Form.Label>
+              <Form.Label column="sm" lg={2}> PDF </Form.Label>
               <Col >
+              <div className="border col-lg-12 pb-1 mb-1">
               {
                 data.pdf ? <a href={data.pdf} className="text-truncate">{data.pdf}</a>
                   : "Not Available"
@@ -110,6 +111,7 @@ export default class GeneralDetails extends React.Component {
                 onFileSelectSuccess={(file) => this.setSelectedPdf(file)}
                 onFileSelectError={({ error }) => alert(error)}
               />
+              </div>
               </Col>
             </Row>
           </Accordion.Body>
@@ -119,26 +121,26 @@ export default class GeneralDetails extends React.Component {
           <Accordion.Header>Accessibility Settings</Accordion.Header>
           <Accordion.Body>
             <Row>
-              <Form.Label column="sm" xs={2}> Authors </Form.Label>
+              <Form.Label column="sm" sm={3} className="required"> Authors </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="authors" id="authors"
                       value={JSON.stringify(data.authors)} disabled
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> Collaborators </Form.Label>
+              <Form.Label column="sm" sm={3}> Collaborators </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="collaborators" id="collaborators"
                       value={JSON.stringify(data.collaborators)} disabled
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> Testers </Form.Label>
-              <Col> <Form.Control size="sm" type="text" placeholder="testers" id="testers"
-                      value={JSON.stringify(data.testers)} disabled
+              <Form.Label column="sm" sm={3}> Reviewers </Form.Label>
+              <Col> <Form.Control size="sm" type="text" placeholder="reviewers" id="reviewers"
+                      value={JSON.stringify(data.reviewers)} disabled
               /></Col>
             </Row>
 
             <Row>
-              <Form.Label column="sm" xs={4}> Only public to organizations </Form.Label>
+              <Form.Label column="sm" sm={3}> Only public to organizations </Form.Label>
               <Col >
                 <Form.Control size="sm" type="checkbox" id="is_privated_to_orgs"
                   value={data.is_privated_to_orgs} onChange={(e) => this.inputChangeHandler(e)}
@@ -146,23 +148,18 @@ export default class GeneralDetails extends React.Component {
               </Col>
             </Row>
             <Row>
-              <Form.Label column="sm" xs={2}> Organizations </Form.Label>
+              <Form.Label column="sm" sm={3}> Organizations </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="organizations" id="organizations"
                       value={JSON.stringify(data.organizations)} disabled
               /></Col>
             </Row>
-          </Accordion.Body>
-        </Accordion.Item>
-
-        <Accordion.Item eventKey="2" className="problem-data-access-control">
-          <Accordion.Header>Problem-related Object Visibility Settings</Accordion.Header>
-          <Accordion.Body>
             <Row>
-              <Form.Label column="sm" xs={4}> Submission Visibility Mode </Form.Label>
+              <Form.Label column="sm" lg={4}> Submission Visibility Mode </Form.Label>
               <Col>
                   <Form.Select aria-label={data.submission_visibility_mode}
                     defaultValue={data.submission_visibility_mode || 'FOLLOW'}
                     size="sm" id="submission_visibility_mode"
+                    className="mb-1"
                   >
                     <option value="FOLLOW">Follow bkdnOJ's setting.</option>
                     <option value="ALWAYS">Users can see all submissions</option>
@@ -175,8 +172,8 @@ export default class GeneralDetails extends React.Component {
           </Accordion.Body>
         </Accordion.Item>
 
-        <Accordion.Item eventKey="3" className="constraints">
-          <Accordion.Header>Constraints</Accordion.Header>
+        <Accordion.Item eventKey="2" className="constraints-scoring">
+          <Accordion.Header>Constraints and Scoring</Accordion.Header>
           <Accordion.Body>
             <Row>
               <Form.Label column="sm" xs={4}> Time Limit (s)</Form.Label>
@@ -191,13 +188,7 @@ export default class GeneralDetails extends React.Component {
                       value={data.memory_limit} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
-          </Accordion.Body>
-        </Accordion.Item>
 
-
-        <Accordion.Item eventKey="4" className="scoring">
-          <Accordion.Header>Scoring</Accordion.Header>
-          <Accordion.Body>
             <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở bên ngoài contest (nộp ở trang Problem)</sub>
             <Row>
               <Form.Label column="sm" xs={2}> Điểm </Form.Label>
@@ -229,12 +220,14 @@ export default class GeneralDetails extends React.Component {
         </Accordion.Item>
       </Accordion>
 
+      <hr className="m-2" />
+
       <Row>
         <Col lg={10}>
           <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
         </Col>
         <Col >
-          <Button variant="dark" size="sm" type="submit">
+          <Button variant="dark" size="sm" type="submit" className="mb-1">
             Save
           </Button>
         </Col>

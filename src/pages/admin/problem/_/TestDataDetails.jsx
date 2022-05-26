@@ -78,24 +78,27 @@ export default class TestDataDetails extends React.Component {
     return (
       <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
       <Accordion defaultActiveKey="0">
+        {/* General Settings */}
         <Accordion.Item eventKey="0" className="general">
           <Accordion.Header>Thiết lập chung</Accordion.Header>
           <Accordion.Body>
             <Row>
-              <Form.Label column="sm" lg={2}> Archive </Form.Label>
-              <Col lg={6}>
-              {
-                data.zipfile ? <a href={data.zipfile} className="text-truncate">{data.zipfile}</a>
-                : "Not Available"
-              }
-              <FileUploader
-                onFileSelectSuccess={(file) => this.setSelectedZip(file)}
-                onFileSelectError={({ error }) => alert(error)}
-              />
+              <Form.Label column="sm" lg={3}> Archive </Form.Label>
+              <Col >
+                <div className="border mb-1 mt-1">
+                  {
+                    data.zipfile ? <a href={data.zipfile} className="text-truncate">{data.zipfile}</a>
+                    : "Not Available"
+                  }
+                  <FileUploader
+                    onFileSelectSuccess={(file) => this.setSelectedZip(file)}
+                    onFileSelectError={({ error }) => alert(error)}
+                  />
+                </div>
               </Col>
             </Row>
             <Row>
-              <Form.Label column="sm" > Remove Archive? </Form.Label>
+              <Form.Label column="sm" xs={3}> Remove Archive? </Form.Label>
               <Col >
                 <Form.Control size="sm" type="checkbox" id="zipfile_remove"
                   checked={data.zipfile_remove} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
@@ -103,10 +106,11 @@ export default class TestDataDetails extends React.Component {
               </Col>
             </Row>
             <Row>
-              <Form.Label column="sm" lg={4}> Checker </Form.Label>
+              <Form.Label column="sm" lg={3}> Checker </Form.Label>
               <Col>
                   <Form.Select aria-label={data.checker} size="sm" value={data.checker}
                     id="checker" onChange={(e) => this.inputChangeHandler(e)}
+                    className="mb-1"
                   >
                     <option value="standard">Standard</option>
                     <option value="floats">Floats</option>
@@ -120,28 +124,24 @@ export default class TestDataDetails extends React.Component {
               </Col>
             </Row>
             <Row>
-              <Form.Label column="sm" lg={6}> Checker Args </Form.Label>
-              <Col> <Form.Control size="sm" type="textarea" placeholder="Checker Args" id="checker_args"
+              <Form.Label column="sm" lg={3}> Checker Extra Arguments </Form.Label>
+              <Col lg={12}>
+                <Form.Control size="sm" type="textarea" placeholder="VD: {'precision': 6}" id="checker_args"
                       value={data.checker_args || ''} onChange={(e) => this.inputChangeHandler(e)}
-              /></Col>
+                      className="mb-1"
+                />
+              </Col>
             </Row>
-          </Accordion.Body>
-        </Accordion.Item>
-
-        <Accordion.Item eventKey="1" className="testcase">
-          <Accordion.Header>Testcases</Accordion.Header>
-          <Accordion.Body>
-
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
 
       <Row>
         <Col lg={10}>
-          <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
+          <sub></sub>
         </Col>
         <Col >
-          <Button variant="dark" size="sm" type="submit">
+          <Button variant="dark" size="sm" type="submit" className="m-1">
             Save
           </Button>
         </Col>

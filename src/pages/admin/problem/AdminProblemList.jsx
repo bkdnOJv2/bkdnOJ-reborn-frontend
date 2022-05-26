@@ -1,10 +1,12 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
-import { FaPaperPlane } from 'react-icons/fa';
+import { FaPaperPlane, FaRegFileArchive } from 'react-icons/fa';
+import { AiOutlineForm, AiOutlineUpload, AiOutlineArrowRight, AiOutlinePlusCircle } from 'react-icons/ai';
 
-import { SpinLoader, ErrorBox } from 'components';
+import { SpinLoader, ErrorBox, FileUploader } from 'components';
 import problemApi from 'api/problem';
 import { setTitle } from 'helpers/setTitle';
 
@@ -19,17 +21,18 @@ class ProblemListItem extends React.Component {
     return (
       <tr>
         <td className="text-truncate" style={{maxWidth: "80px"}}>
-          {shortname}
+          <Link to={`/admin/problem/${shortname}`}>
+            {shortname}
+          </Link>
         </td>
         <td className="text-truncate" style={{maxWidth: "200px"}}>
-          {title}
+          <Link to={`/admin/problem/${shortname}`}>
+            {title}
+          </Link>
         </td>
         <td>{points}</td>
         <td>{is_published ? "Yes" : "No"}</td>
         <td>{is_privated_to_orgs ? "Yes" : "No"}</td>
-        <td>
-            <Link to={`/admin/problem/${shortname}`}>Edit</Link>
-        </td>
         <td>
             <input type="checkbox" value={selectChk[rowidx]}
               onChange={(e) => onSelectChkChange(rowidx)}
@@ -50,9 +53,14 @@ class AdminProblemList extends React.Component {
       pageCount: 1,
       loaded: false,
       errors: null,
+
+      selectedZip: null,
+      submitting: false,
     }
     setTitle('Admin | Problems')
   }
+
+  setSelectedZip(zip) { this.setState({ selectedZip : zip }) }
 
   selectChkChangeHandler(idx) {
     const {selectChk} = this.state;
@@ -104,7 +112,13 @@ class AdminProblemList extends React.Component {
       if (v) names.push(this.state.problems[i].shortname)
     })
 
-    const conf = window.confirm('Xóa các bài tập ' + JSON.stringify(names) + ' ?');
+    if (names.length === 0) {
+      alert('Không có bài tập nào đang được chọn.');
+      return;
+    }
+
+    // TODO: Write a bulk delete API for problems
+    const conf = window.confirm('Xóa các bài tập ' + JSON.stringify(names) + '?');
     if (conf) {
       let reqs = []
       names.forEach((shortname) => {
@@ -128,13 +142,76 @@ class AdminProblemList extends React.Component {
   }
 
   render() {
+    const {selectedZip, submitting} = this.state;
+
     return (
       <>
+      {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
-        <Button size="sm" onClick={(e)=>alert('Create new')}>Create (Form)</Button>
-        <Button size="sm" onClick={(e)=>alert('Upload zip')}>Create (Upload Zip)</Button>
+        <div className="border d-inline-flex p-1" >
+        <Button size="sm" onClick={(e)=>alert('Create new')}
+          variant="dark" className="btn-svg" disabled={true || submitting}
+          onClick={(e) => {
+            this.setState({submitting: true}, () => 
+              setTimeout(() => this.setState({submitting: false}), 2000)
+            )
+          }}
+        >
+          <AiOutlinePlusCircle />
+          <span className="d-none d-md-inline-flex">Add (Form)</span>
+          <span className="d-inline-flex d-md-none">
+            <AiOutlineArrowRight/>
+            <AiOutlineForm />
+          </span>
+        </Button>
+        </div>
+
+        <div className="border d-inline-flex p-1" >
+          <FileUploader
+            onFileSelectSuccess={(file) => this.setSelectedZip(file)}
+            onFileSelectError={({ error }) => alert(error)}
+          />
+          <Button disabled={submitting}
+            onClick={(e)=>{
+              if (!selectedZip) alert("Please select a .zip file.");
+              else { 
+                this.setState({submitting: true}, () => {
+                  const formData = new FormData();
+                  formData.append("archive", selectedZip);
+                  problemApi.adminPostProblemFromZip({formData})
+                    .then((res) => {
+                      toast.success("Đã tạo Problem mới thành công.")
+                      this.callApi({page: this.state.currPage});
+                    })
+                    .catch((err) => {
+                      const data = err.response.data;
+                      let errors = {...data.errors}
+                      if (data.detail) errors.general = data.detail
+                      this.setState({ errors })
+                    })
+                    .finally(() => this.setState({submitting: false}))
+                })
+              }
+            }}
+            size="sm" variant="dark" className="btn-svg"
+          >
+            <AiOutlinePlusCircle /> 
+            <span className="d-none d-md-inline-flex">Add (upload Zip)</span>
+            <span className="d-inline-flex d-md-none">
+              <AiOutlineArrowRight/>
+              <FaRegFileArchive />
+            </span>
+          </Button>
+        </div>
+      </div>
+      {/* Place for displaying information about admin actions  */}
+      <div className="admin-note text-center mb-1">
+        {
+          submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span>
+        }
       </div>
 
+      {/* Problem List */}
       <div className="admin-table problem-table">
         <h4>Problem List</h4>
         <ErrorBox errors={this.state.errors} />
@@ -146,7 +223,6 @@ class AdminProblemList extends React.Component {
               <th style={{width: "12%"}}>Points</th>
               <th style={{width: "10%"}}>Public?</th>
               <th style={{width: "10%"}}>Orgs Limited?</th>
-              <th style={{width: "5%"}}>Edit</th>
               <th style={{width: "8%"}}>
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
               </th>

@@ -9,7 +9,7 @@ const FileUploader = ({onFileSelectError, onFileSelectSuccess}) => {
     // if (file.size > 5*1024)
     //   onFileSelectError({ error: "File size cannot exceed more than 5MB" });
     // else 
-    console.log(file.name)
+    // console.log(file.name)
     onFileSelectSuccess(file);
   }
 
