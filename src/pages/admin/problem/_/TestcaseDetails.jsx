@@ -111,10 +111,9 @@ export default class TestcaseDetails extends React.Component {
 
     return (
       <Form id="problem-testcase-form">
-        <ButtonPanel />
         <Accordion defaultActiveKey="0">
           {/* General Settings */}
-          <Accordion.Item eventKey="0" className="general">
+          <Accordion.Item eventKey="0" className="testcases">
             <Accordion.Header>Testcases</Accordion.Header>
             <Accordion.Body>
               <ErrorBox errors={this.state.errors} />
@@ -125,10 +124,10 @@ export default class TestcaseDetails extends React.Component {
                     <th style={{width: "5%"}}>#</th>
                     <th style={{width: "12%"}}>Input File</th>
                     <th style={{width: "10%"}}>Output File</th>
-                    <th style={{width: "10%"}}>Points</th>
+                    <th style={{width: "13%"}}>Trọng số</th>
                     <th style={{width: "10%"}}>Pretest?</th>
                     <th style={{width: "8%"}}>
-                      <Link to="#" onClick={(e) => alert('Delete selection.')}>Action</Link>
+                      <Link to="#" onClick={(e) => alert('Not implemented.')}>Action</Link>
                     </th>
                   </tr>
                 </thead>

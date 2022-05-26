@@ -126,15 +126,16 @@ class AdminProblemList extends React.Component {
       })
 
       Promise.all(reqs).then((res) => {
-        console.log(res)
         this.callApi({page: this.state.currPage});
       }).catch((err) => {
-        let msg = 'Cannot delete selected problems. Maybe someone else has done it for you?';
+        let msg = 'Không thể xóa các problem này.';
         if (err.response) {
+          if (err.response.status === 405)
+            msg += ' Phương thức chưa được implemented.';
           if (err.response.status === 404)
-            msg = 'Cannot find such problems. Maybe it has been removed?.';
+            msg = 'Không tìm thấy một trong số Problem được chọn. Có lẽ chúng đã bị xóa?'
           if ([403, 401].includes(err.response.status))
-            msg = 'Not authorized.';
+            msg += ' Có một vài Problem được chọn mà bạn không có quyền.';
         }
         this.setState({ errors: [msg] })
       })

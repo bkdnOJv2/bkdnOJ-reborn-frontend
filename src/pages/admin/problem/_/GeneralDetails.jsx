@@ -94,13 +94,13 @@ export default class GeneralDetails extends React.Component {
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" lg={2}> Content (LateX) </Form.Label>
+              <Form.Label column="sm" lg={12}> Content (LateX) </Form.Label>
               <Col> <Form.Control size="sm" lg={12} type="textarea" placeholder="Problem Statement" id="content"
                       value={data.content} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
             <Row>
-              <Form.Label column="sm" lg={2}> PDF </Form.Label>
+              <Form.Label column="sm" lg={12}> PDF </Form.Label>
               <Col >
               <div className="border col-lg-12 pb-1 mb-1">
               {
@@ -143,7 +143,7 @@ export default class GeneralDetails extends React.Component {
               <Form.Label column="sm" sm={3}> Only public to organizations </Form.Label>
               <Col >
                 <Form.Control size="sm" type="checkbox" id="is_privated_to_orgs"
-                  value={data.is_privated_to_orgs} onChange={(e) => this.inputChangeHandler(e)}
+                  checked={data.is_privated_to_orgs} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
                 />
               </Col>
             </Row>

@@ -35,7 +35,6 @@ export default class TestDataDetails extends React.Component {
   setSelectedZip(file) { this.setState({selectedZip: file}) }
 
   inputChangeHandler(event, params={isCheckbox: null}) {
-    console.log(event);
     const isCheckbox = params.isCheckbox || false;
 
     let newData = this.state.data;

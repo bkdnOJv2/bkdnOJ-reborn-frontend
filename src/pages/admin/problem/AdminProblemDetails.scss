@@ -27,9 +27,17 @@ div.admin.problem-panel {
       background-color: $background-gray;
     }
   }
-  .accordion-button::after {
-    content: '+';
-    float: right;
+
+  .accordion-button {
+    color: $base;
+    &::before {
+      content: "•";
+      padding-right: 1rem;
+    }
+    &::after {
+      content: '+';
+      float: right;
+    }
   }
   .accordion-button:not(.collapsed)::after {
     content: 'x';

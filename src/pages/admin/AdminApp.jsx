@@ -32,7 +32,6 @@ class AdminApp extends React.Component {
               id="sidebar-toggle-btn"
             ><VscThreeBars /></Button>
             <span>Hello</span>
-            <span>Hi</span>
 
           </div>
           <Container id="admin-panel-container">

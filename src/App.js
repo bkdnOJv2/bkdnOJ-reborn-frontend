@@ -21,7 +21,9 @@ import {
 } from 'pages/user';
 
 import {
-  AdminProblemDetails, AdminProblemList,
+  AdminProblemList, AdminProblemDetails, 
+  AdminSubmissionList, AdminSubmissionDetails,
+  AdminJudgeList, AdminJudgeDetails,
   AdminApp
 } from 'pages/admin';
 
@@ -74,6 +76,21 @@ class App extends React.Component {
                 <Route path="problem/:shortname" element={
                   <OneColumn mainContent={<AdminProblemDetails />} />
                 }/>
+
+                <Route path="submission" element={
+                  <OneColumn mainContent={<AdminSubmissionList />} />
+                }/>
+                <Route path="submission/:id" element={
+                  <OneColumn mainContent={<AdminSubmissionDetails />} />
+                }/>
+
+                <Route path="judge" element={
+                  <OneColumn mainContent={<AdminJudgeList />} />
+                }/>
+                <Route path="judge/:id" element={
+                  <OneColumn mainContent={<AdminJudgeDetails />} />
+                }/>
+
                 <Route path="*" element={
                   <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
                     style={{minHeight: "400px"}}>

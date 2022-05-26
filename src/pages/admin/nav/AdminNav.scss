@@ -18,15 +18,40 @@ ul.admin-nav {
   background-color: $base !important;
 
   .brand {
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: 800;
     padding: 1rem 0.5rem;
+
     text-align: center;
-    text-transform: uppercase;
     letter-spacing: .05rem;
+    text-decoration: none;
+
     z-index: 1;
     color: $sub !important;
+
+    position: relative;
+
+    img.site-icon {
+      max-height: 6rem;
+    }
+    p.site-icon-text {
+      background-color: #000000d6;
+      color: $sub;
+      display: inline-block;
+
+      font-weight: bold;
+
+      margin: unset;
+      padding: unset;
+      font-family: $font-monospace;
+      font-size: 1.3rem;
+
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      // transform: translate(-50%, -50%) rotate(-30deg);
+      // -webkit-transform: translate(-50%, -50%) rotate(-30deg);
+      transform: translate(-50%, -40%);
+      -webkit-transform: translate(-50%, -40%);
+    }
   }
   hr.sidebar-divider {
     border-top: 1px solid $sub;
@@ -54,6 +79,10 @@ ul.admin-nav {
         font-size: 1.3rem;
       }
 
+      &:hover {
+        text-decoration: underline;
+      }
+
       @media (max-width: 768px) {
         text-align: left;
         padding: 1rem;
@@ -67,6 +96,25 @@ ul.admin-nav {
           font-size: 1.6rem;
         }
         font-size: 0.8rem;
+      }
+    }
+  }
+  .nav-header-item {
+    .nav-link {
+      color: $sub !important;
+      padding-left: 1rem;
+      text-transform: capitalize;
+      text-align: left;
+
+      text-decoration: none;
+      background-color: transparent;
+
+      &::before {
+        content: "<<";
+        padding-right: 0.2rem;
+      }
+      &:hover {
+        text-decoration: underline;
       }
     }
   }

@@ -45,7 +45,7 @@ class AdminProblemDetails extends React.Component {
         general: generalRes.data,
         loaded: true,
       })
-      setTitle(`Admin | Problem ${generalRes.data.title}`)
+      setTitle(`Admin | Problem#${generalRes.data.title}`)
     }).catch((err) => {
       this.setState({
         loaded: true,
@@ -74,7 +74,7 @@ class AdminProblemDetails extends React.Component {
           { !loaded && <span><SpinLoader/> Loading...</span> }
 
           { loaded && !errors && <>
-          <Tabs defaultActiveKey="general" id="uncontrolled-tab-example" className="pl-2">
+          <Tabs defaultActiveKey="general" id="prob-tabs" className="pl-2">
             <Tab eventKey="general" title="General">
               <GeneralDetails shortname={this.shortname} data={general} options={options}
                 setProblemTitle={((title) => this.setState({problemTitle : title}))}
