@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.0f39f908.css",
-    "main.js": "/static/js/main.aed1d347.js",
+    "main.css": "/static/css/main.f620264d.css",
+    "main.js": "/static/js/main.75db0f49.js",
     "static/media/bkdn-uni-flag.png": "/static/media/bkdn-uni-flag.6093ea649f2018e006cf.png",
     "static/media/bkdn-uni-icon-white.png": "/static/media/bkdn-uni-icon-white.361ade9a004daed664ca.png",
     "static/media/bkdnoj-dropflag.png": "/static/media/bkdnoj-dropflag.44da85845554beb21edc.png",
@@ -9,11 +9,11 @@
     "static/media/bkdnoj-favicon-noring.png": "/static/media/bkdnoj-favicon-noring.511c5427228206a9820c.png",
     "static/media/loading.gif": "/static/media/loading.ee4bc3452e905326fc76.gif",
     "index.html": "/index.html",
-    "main.0f39f908.css.map": "/static/css/main.0f39f908.css.map",
-    "main.aed1d347.js.map": "/static/js/main.aed1d347.js.map"
+    "main.f620264d.css.map": "/static/css/main.f620264d.css.map",
+    "main.75db0f49.js.map": "/static/js/main.75db0f49.js.map"
   },
   "entrypoints": [
-    "static/css/main.0f39f908.css",
-    "static/js/main.aed1d347.js"
+    "static/css/main.f620264d.css",
+    "static/js/main.75db0f49.js"
   ]
 }

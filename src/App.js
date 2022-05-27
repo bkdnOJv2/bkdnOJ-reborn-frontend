@@ -11,9 +11,9 @@ import ScrollToTop from 'helpers/react-router/ScrollToTop';
 
 // Components
 import { ListSidebar, OneColumn } from 'layout';
-import { Navbar, Header, SubHeader, Footer, Content } from './components';
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
+import { Header, Navbar, SubHeader, Footer, Content } from 'components';
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
 import {
   SubmissionList, SubmissionDetails, ProblemList, 
@@ -61,7 +61,7 @@ class App extends React.Component {
       <HistoryRouter history={history}>
         <Routes>
           {
-            // this.isAdmin() && 
+            this.isAdmin() && 
             <>
               <Route path="/admin" element={<AdminApp />}>
                 <Route index path="" element={
@@ -128,24 +128,22 @@ class App extends React.Component {
             <Route path="/judge-status" element={
               <ListSidebar mainContent={<JudgeStatuses />}/>
             } />
-          </Route>
 
-          <Route path="*" element={
-            <Container>
+            <Route path="*" element={
               <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
                 style={{minHeight: "200px", minWidth: "400px"}}>
-                  <h4 style={{color: 'white'}}>404 | Page Not Found</h4>
+                  <h4 >404 | Page Not Found</h4>
               </div>
-            </Container>
-          } />
+            } />
+          </Route>
         </Routes>
       </HistoryRouter>
     )
   }
 } 
 const mapStateToProps = state => {
-    return {
-        user : state.user.user
-    }
+  return {
+    user : state.user.user
+  }
 }
 export default connect(mapStateToProps, null)(App);

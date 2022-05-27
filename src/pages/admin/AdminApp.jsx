@@ -5,6 +5,8 @@ import { Link, Outlet } from 'react-router-dom';
 import { VscThreeBars } from 'react-icons/vsc';
 
 import {addClass, removeClass} from 'helpers/dom_functions.js';
+import { setTitle } from 'helpers/setTitle.js'
+
 import AdminNav from './nav/AdminNav';
 import './AdminApp.scss';
 
@@ -12,6 +14,7 @@ class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {sidebarClosed: false}
+    setTitle('Admin | Dashboard')
   }
   hideSidebar() {
     let sidebar = document.getElementById('admin-sidebar')
