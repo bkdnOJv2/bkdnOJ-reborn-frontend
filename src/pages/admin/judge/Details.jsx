@@ -1,7 +1,9 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Form, Row, Col, Button } from 'react-bootstrap';
+import { FaRegTrashAlt } from 'react-icons/fa';
 
 import judgeAPI from 'api/judge';
 import { SpinLoader } from 'components';
@@ -63,6 +65,21 @@ class AdminJudgeDetails extends React.Component {
     this.setState({ data : newData })
   }
 
+  deleteObjectHandler() {
+    let conf = window.confirm("WARNING!! Block this judge for at least 1 minute before deleting!! "+
+      "Otherwise, running submissions might be deleted and affecting live participants. Do you still want to delete?");
+    if (conf) {
+      judgeAPI.adminDeleteJudge({id: this.id})
+        .then((res) => {
+          toast.success("OK Deleted.");
+          this.setState({ redirectUrl : '/admin/judge/' })
+        })
+        .catch((err) => {
+          toast.error(`Cannot delete. (${err})`);
+        })
+    }
+  }
+
   render() {
     if (this.state.redirectUrl) 
       return ( <Navigate to={`${this.state.redirectUrl}`} /> )
@@ -74,7 +91,16 @@ class AdminJudgeDetails extends React.Component {
         <h4 className="judge-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong.</span>}
-          { loaded && !errors && `Viewing Judge. ${data.name}` }
+          { loaded && !errors && <div className="panel-header">
+              <span className="title-text">{`Viewing judge. ${data.name}`}</span>
+              <span>
+                <Button className="btn-svg" size="sm" variant="danger"
+                  onClick={()=>this.deleteObjectHandler()}>
+                    <FaRegTrashAlt/><span className="d-none d-md-inline">Delete</span>
+                </Button>
+              </span>
+            </div>
+          }
         </h4>
         <hr/>
         <div className="judge-details">
@@ -85,33 +111,33 @@ class AdminJudgeDetails extends React.Component {
               <Row>
                 <Form.Label column="sm" xs={2} > ID </Form.Label>
                 <Col> <Form.Control size="sm" type="text" placeholder="Judge id" id="id"
-                        value={data.id} disabled readOnly
+                        value={data.id || ''} disabled readOnly
                 /></Col>
               </Row>
               <Row>
                 <Form.Label column="sm" lg={2}> Name </Form.Label>
                 <Col> <Form.Control size="sm" type="text" placeholder="Judge Name" id="name"
-                        value={data.name} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)}
                 /></Col>
                 <Form.Label column="sm" lg={2}> Auth Key </Form.Label>
                 <Col> <Form.Control size="sm" type="text" placeholder="Judge Authentication key" id="auth_key"
-                        value={data.auth_key} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.auth_key || ''} onChange={(e)=>this.inputChangeHandler(e)}
                 /></Col>
                 <Form.Label column="sm" xl={12}> Description </Form.Label>
                 <Col xs={12}> <Form.Control size="sm" type="textarea" placeholder="Description" id="description"
-                        value={data.description} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.description || ''} onChange={(e)=>this.inputChangeHandler(e)}
                 /></Col>
               </Row>
 
               <Row>
                 <Form.Label column="sm" > Online </Form.Label>
                 <Col > <Form.Control size="sm" type="checkbox" id="online"
-                        checked={data.online}
+                        checked={data.online || false}
                         onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
                 /></Col>
                 <Form.Label column="sm" > Is Blocked? </Form.Label>
                 <Col > <Form.Control size="sm" type="checkbox" id="is_blocked"
-                        checked={data.is_blocked}
+                        checked={data.is_blocked || false}
                         onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
                 /></Col>
               </Row>
@@ -122,31 +148,31 @@ class AdminJudgeDetails extends React.Component {
                 /></Col>
                 <Form.Label column="sm" md={2}> Last IP </Form.Label>
                 <Col> <Form.Control size="sm" type="text" id="last_ip"
-                        value={data.last_ip} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.last_ip || ''} onChange={(e)=>this.inputChangeHandler(e)}
                 /></Col>
               </Row>
 
               <Row>
                 <Form.Label column="sm" md={2}> Ping </Form.Label>
                 <Col > <Form.Control size="sm" type="text" id="ping"
-                        value={data.ping} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.ping || ''} onChange={(e)=>this.inputChangeHandler(e)}
                 /></Col>
                 <Form.Label column="sm" md={2}> Load </Form.Label>
                 <Col> <Form.Control size="sm" type="text" id="load"
-                        value={data.load} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.load || ''} onChange={(e)=>this.inputChangeHandler(e)}
                 /></Col>
               </Row>
 
               <Row>
                 <Form.Label column="sm" > Problems </Form.Label>
                 <Col xl={12}> <Form.Control size="sm" type="text" id="problems"
-                        value={JSON.stringify(data.problems)} readOnly disabled
+                        value={JSON.stringify(data.problems || '')} readOnly disabled
                 /></Col>
               </Row>
               <Row>
                 <Form.Label column="sm" > Runtimes </Form.Label>
                 <Col xl={12}> <Form.Control size="sm" type="text" id="runtimes"
-                        value={JSON.stringify(data.runtimes)} readOnly disabled
+                        value={JSON.stringify(data.runtimes || '')} readOnly disabled
                 /></Col>
               </Row>
 

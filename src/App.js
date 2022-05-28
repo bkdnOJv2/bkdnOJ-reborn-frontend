@@ -11,9 +11,10 @@ import ScrollToTop from 'helpers/react-router/ScrollToTop';
 
 // Components
 import { ListSidebar, OneColumn } from 'layout';
+
+import { Content } from 'components';
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
-import { Header, Navbar, SubHeader, Footer, Content } from 'components';
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
 import {
   SubmissionList, SubmissionDetails, ProblemList, 
@@ -23,7 +24,7 @@ import {
 import {
   AdminProblemList, AdminProblemDetails, 
   AdminSubmissionList, AdminSubmissionDetails,
-  AdminJudgeList, AdminJudgeDetails,
+  AdminJudgeList, AdminJudgeDetails, AdminJudgeNew,
   AdminApp
 } from 'pages/admin';
 
@@ -70,8 +71,12 @@ class App extends React.Component {
                       <h4>Admin Home Page</h4>
                   </div>
                 }/>
+
                 <Route path="problem" element={
                   <OneColumn mainContent={<AdminProblemList />} />
+                }/>
+                <Route path="problem/new" element={
+                  <OneColumn mainContent={<AdminJudgeNew />} />
                 }/>
                 <Route path="problem/:shortname" element={
                   <OneColumn mainContent={<AdminProblemDetails />} />
@@ -80,12 +85,18 @@ class App extends React.Component {
                 <Route path="submission" element={
                   <OneColumn mainContent={<AdminSubmissionList />} />
                 }/>
+                <Route path="submission/new" element={
+                  <OneColumn mainContent={<AdminJudgeNew />} />
+                }/>
                 <Route path="submission/:id" element={
                   <OneColumn mainContent={<AdminSubmissionDetails />} />
                 }/>
 
                 <Route path="judge" element={
                   <OneColumn mainContent={<AdminJudgeList />} />
+                }/>
+                <Route path="judge/new" element={
+                  <OneColumn mainContent={<AdminJudgeNew />} />
                 }/>
                 <Route path="judge/:id" element={
                   <OneColumn mainContent={<AdminJudgeDetails />} />

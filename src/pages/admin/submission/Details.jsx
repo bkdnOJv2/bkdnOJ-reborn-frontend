@@ -1,9 +1,10 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-import { Form, Row, Col, Tabs, Tab } from 'react-bootstrap';
+import { Button, Tabs, Tab } from 'react-bootstrap';
 
-import { FaPaperPlane, FaSignInAlt, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaRegTrashAlt } from 'react-icons/fa';
 
 import submissionAPI from 'api/submission';
 import { SpinLoader } from 'components';
@@ -41,6 +42,20 @@ class AdminSubmissionDetails extends React.Component {
     })
   }
 
+  deleteObjectHandler() {
+    let conf = window.confirm("Are you sure you want to delete this submission?")
+    if (conf) {
+      submissionAPI.adminDeleteSubmission({id: this.id})
+        .then((res) => {
+          toast.success("OK Deleted.");
+          this.setState({ redirectUrl : '/admin/submission/' })
+        })
+        .catch((err) => {
+          toast.error(`Cannot delete. (${err})`);
+        })
+    }
+  }
+
   render() {
     if (this.state.redirectUrl) {
       return (
@@ -54,7 +69,16 @@ class AdminSubmissionDetails extends React.Component {
         <h4 className="submission-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong.</span>}
-          { loaded && !errors && `Viewing submission#${this.id}` }
+          { loaded && !errors && <div className="panel-header">
+              <span className="title-text">{`Editting submission#${this.id}`}</span>
+              <span>
+                <Button className="btn-svg" size="sm" variant="danger"
+                  onClick={()=>this.deleteObjectHandler()}>
+                  <FaRegTrashAlt/><span className="d-none d-md-inline">Delete</span>
+                </Button>
+              </span>
+            </div>
+          }
         </h4>
         <hr/>
         <div className="submission-details">

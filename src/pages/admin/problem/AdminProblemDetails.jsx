@@ -1,9 +1,10 @@
 import React from 'react';
+import { toast } from 'react-toastify'
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-import { Form, Row, Col, Tabs, Tab } from 'react-bootstrap';
+import { Button, Tabs, Tab } from 'react-bootstrap';
 
-import { FaPaperPlane, FaSignInAlt, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaRegTrashAlt } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
 import { SpinLoader } from 'components';
@@ -45,13 +46,27 @@ class AdminProblemDetails extends React.Component {
         general: generalRes.data,
         loaded: true,
       })
-      setTitle(`Admin | Problem#${generalRes.data.title}`)
+      setTitle(`Admin | Problem. ${generalRes.data.title}`)
     }).catch((err) => {
       this.setState({
         loaded: true,
         errors: err,
       })
     })
+  }
+
+  deleteObjectHandler() {
+    let conf = window.confirm("Are you sure you want to delete this problem?")
+    if (conf) {
+      problemAPI.adminDeleteProblem({shortname: this.shortname})
+        .then((res) => {
+          toast.success("OK Deleted.");
+          this.setState({ redirectUrl : '/admin/problem/' })
+        })
+        .catch((err) => {
+          toast.error(`Cannot delete. (${err})`);
+        })
+    }
   }
 
   render() {
@@ -67,7 +82,17 @@ class AdminProblemDetails extends React.Component {
         <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong</span>}
-          { loaded && !errors && `Editing problem. ${this.state.problemTitle}` }
+          { loaded && !errors && (
+            <div className="panel-header">
+              <span className="title-text">{`Editing problem. ${this.state.problemTitle}`}</span>
+              <span>
+                <Button className="btn-svg" size="sm" variant="danger"
+                  onClick={()=>this.deleteObjectHandler()}>
+                    <FaRegTrashAlt/><span className="d-none d-md-inline">Delete</span>
+                </Button>
+              </span>
+            </div>
+          )}
         </h4>
         <hr/>
         <div className="problem-details">

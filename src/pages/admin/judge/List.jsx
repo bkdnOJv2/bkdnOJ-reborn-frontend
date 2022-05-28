@@ -1,9 +1,13 @@
 import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 
+/* icons */
+import { AiOutlineForm, AiOutlineUpload, AiOutlineArrowRight, AiOutlinePlusCircle } from 'react-icons/ai';
+
+/* my imports */
 import { SpinLoader, ErrorBox, FileUploader } from 'components';
 import judgeApi from 'api/judge';
 import { setTitle } from 'helpers/setTitle';
@@ -33,8 +37,8 @@ class JudgeListItem extends React.Component {
         <td className="text-truncate" >
           { (new Date(start_time)).toLocaleString() }
         </td>
-        <td>{ping}</td>
-        <td>{load}</td>
+        <td>{ping ? `${(ping*1000).toFixed(2)}ms` : "N/A"}</td>
+        <td>{load || "N/A"}</td>
         <td>
             <input type="checkbox" value={selectChk}
               onChange={() => onSelectChkChange()}/>
@@ -144,13 +148,28 @@ class AdminJudgeList extends React.Component {
   }
 
   render() {
+    if (this.state.redirectUrl) 
+      return ( <Navigate to={`${this.state.redirectUrl}`} /> )
+
     const { submitting } = this.state;
 
     return (
       <>
       {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
-        <sub>No options available yet</sub>
+        <div className="border d-inline-flex p-1" >
+        <Button size="sm" onClick={(e)=>alert('Create new')}
+          variant="dark" className="btn-svg" disabled={ submitting }
+          onClick={(e) => this.setState({ redirectUrl: 'new' })}
+        >
+          <AiOutlinePlusCircle />
+          <span className="d-none d-md-inline-flex">Add (Form)</span>
+          <span className="d-inline-flex d-md-none">
+            <AiOutlineArrowRight/>
+            <AiOutlineForm />
+          </span>
+        </Button>
+        </div>
       </div>
 
       {/* Place for displaying information about admin actions  */}

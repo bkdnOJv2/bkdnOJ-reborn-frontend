@@ -8,6 +8,23 @@ div.admin.judge-panel {
   h3, h4, h5 {
     margin: 4px;
   }
+
+  .panel-header {
+    display: inline-flex;
+    width: 100%;
+    
+    span.title-text {
+      flex-grow: 1;
+    }
+    button {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    column-gap: 10px;
+    align-items: center;
+  }
+
   .col {
     text-align: left;
   }

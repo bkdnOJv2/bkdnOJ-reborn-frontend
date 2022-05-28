@@ -6,6 +6,9 @@ const getJudges = (params) => {
 const getJudgeDetails = ({id}) => {
     return axiosClient.get(`/judge/${id}`);
 }
+const adminCreateJudge = ({data}) => {
+    return axiosClient.post(`/judge/`, data);
+}
 const adminDeleteJudge = ({id}) => {
     return axiosClient.delete(`/judge/${id}`);
 }
@@ -13,6 +16,7 @@ const adminDeleteJudge = ({id}) => {
 const judgeAPI = {
     getJudges,
     getJudgeDetails,
+    adminCreateJudge,
     adminDeleteJudge,
 }
 
