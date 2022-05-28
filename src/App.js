@@ -22,6 +22,7 @@ import {
 } from 'pages/user';
 
 import {
+  AdminUserList, 
   AdminProblemList, AdminProblemDetails, 
   AdminSubmissionList, AdminSubmissionDetails,
   AdminJudgeList, AdminJudgeDetails, AdminJudgeNew,
@@ -70,6 +71,10 @@ class App extends React.Component {
                     style={{minHeight: "400px"}}>
                       <h4>Admin Home Page</h4>
                   </div>
+                }/>
+
+                <Route path="user" element={
+                  <OneColumn mainContent={<AdminUserList />} />
                 }/>
 
                 <Route path="problem" element={
