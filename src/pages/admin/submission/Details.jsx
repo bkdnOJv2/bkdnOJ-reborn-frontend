@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, Tabs, Tab } from 'react-bootstrap';
 
-import { FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegTrashAlt, FaGlobe } from 'react-icons/fa';
 
 import submissionAPI from 'api/submission';
 import { SpinLoader } from 'components';
@@ -71,6 +71,12 @@ class AdminSubmissionDetails extends React.Component {
           { loaded && !!errors && <span>Something went wrong.</span>}
           { loaded && !errors && <div className="panel-header">
               <span className="title-text">{`Editting submission#${this.id}`}</span>
+              <span>
+                <Button className="btn-svg" size="sm" variant="dark"
+                  onClick={()=>this.setState({ redirectUrl: `/submission/${this.id}` })}>
+                  <FaGlobe/><span className="d-none d-md-inline">View on Site</span>
+                </Button>
+              </span>
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>

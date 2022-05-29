@@ -85,7 +85,7 @@ class AdminJudgeNew extends React.Component {
       <div className="admin judge-panel">
         <h4 className="judge-title">
           <div className="panel-header">
-              <span className="title-text">{`Creating new judge`}</span>
+              <span className="title-text">{`Creating Judge`}</span>
               <span></span>
             </div>
         </h4>

@@ -35,7 +35,6 @@ export default class GeneralDetails extends React.Component {
     e.preventDefault();
     let {pdf, ...sendData} = this.state.data;
     delete sendData.allowed_languages
-    console.log(sendData)
     let reqs = [];
 
     reqs.push(

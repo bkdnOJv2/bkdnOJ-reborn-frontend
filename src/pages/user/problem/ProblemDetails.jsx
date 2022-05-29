@@ -4,7 +4,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 
 import PDFViewer from 'components/PDFViewer/PDFViewer';
-import { FaPaperPlane, FaSignInAlt, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaPaperPlane, FaSignInAlt, FaExternalLinkAlt, FaWrench } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
 import { SpinLoader } from 'components';
@@ -43,7 +43,7 @@ class ProblemDetails extends React.Component {
           data: res.data,
           loaded: true,
         })
-        setTitle(`Problem ${res.data.title}`)
+        setTitle(`Problem. ${res.data.title}`)
       })
       .catch((err) => {
         this.setState({
@@ -62,9 +62,7 @@ class ProblemDetails extends React.Component {
 
   render() {
     if (this.state.redirectUrl) {
-      return (
-        <Navigate to={`${this.state.redirectUrl}`} />
-      )
+      return <Navigate to={`${this.state.redirectUrl}`} />
     }
     const {loaded, errors, data} = this.state;
 
@@ -118,7 +116,7 @@ class ProblemDetails extends React.Component {
                     (this.user !== null && this.user.is_staff) && (
                       <Link to="#" className="btn" style={{color: "red"}}
                         onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
-                        Edit <FaExternalLinkAlt size={12}/>
+                        Admin <FaWrench size={12}/>
                       </Link>
                     )
                   }

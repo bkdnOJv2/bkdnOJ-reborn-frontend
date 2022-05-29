@@ -17,13 +17,18 @@ import 'styles/ClassicPagination.scss';
 
 class UserItem extends React.Component {
   render() {
-    const { username, email, is_active, is_staff, is_superuser, date_joined, last_login } = this.props;
+    const { id, username, email, is_active, is_staff, is_superuser, date_joined, last_login } = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
 
     return (
       <tr>
+        <td className="text-truncate" style={{maxWidth: "20px"}}>
+          <Link to={`/admin/user/${id}`}>
+            {id}
+          </Link>
+        </td>
         <td className="text-truncate" style={{maxWidth: "40px"}}>
-          <Link to={`/admin/user/${username}`}>
+          <Link to={`/admin/user/${id}`}>
             {username}
           </Link>
         </td>
@@ -63,7 +68,7 @@ class AdminUserList extends React.Component {
 
       submitting: false,
     }
-    setTitle('Admin | objects')
+    setTitle('Admin | Users')
   }
 
   selectChkChangeHandler(idx) {
@@ -131,7 +136,6 @@ class AdminUserList extends React.Component {
       })
 
       Promise.all(reqs).then((res) => {
-        console.log(res)
         this.callApi({page: this.state.currPage});
       }).catch((err) => {
         let msg = 'Không thể xóa các User này.';
@@ -187,6 +191,7 @@ class AdminUserList extends React.Component {
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
             <tr>
+              <th >ID</th>
               <th >Username</th>
               <th >Email</th>
               <th >Active?</th>
@@ -202,7 +207,7 @@ class AdminUserList extends React.Component {
           <tbody>
             {
               this.state.loaded === false
-                ? <tr><td colSpan="8"><SpinLoader margin="10px" /></td></tr>
+                ? <tr><td colSpan="9"><SpinLoader margin="10px" /></td></tr>
                 : this.state.objects.map((obj, idx) => <UserItem
                     key={`user-${obj.username}`}
                     rowidx={idx} {...obj}

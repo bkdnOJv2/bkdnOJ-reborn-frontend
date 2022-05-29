@@ -58,7 +58,6 @@ export default class TestcaseDetails extends React.Component {
 
   render() {
     const { data } = this.props;
-    console.log(data)
     if (!data) return (
       <div className="center"><SpinLoader margin="10px" /></div>
     )

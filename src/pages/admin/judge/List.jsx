@@ -130,7 +130,6 @@ class AdminJudgeList extends React.Component {
       })
 
       Promise.all(reqs).then((res) => {
-        console.log(res)
         this.callApi({page: this.state.currPage});
       }).catch((err) => {
         let msg = 'Không thể xóa các Judge này.';

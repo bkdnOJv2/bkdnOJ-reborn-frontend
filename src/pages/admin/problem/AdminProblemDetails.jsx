@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, Tabs, Tab } from 'react-bootstrap';
 
-import { FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegTrashAlt, FaGlobe } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
 import { SpinLoader } from 'components';
@@ -85,6 +85,12 @@ class AdminProblemDetails extends React.Component {
           { loaded && !errors && (
             <div className="panel-header">
               <span className="title-text">{`Editing problem. ${this.state.problemTitle}`}</span>
+              <span>
+                <Button className="btn-svg" size="sm" variant="dark"
+                  onClick={()=>this.setState({ redirectUrl: `/problem/${this.shortname}` })}>
+                    <FaGlobe/><span className="d-none d-md-inline">View on Site</span>
+                </Button>
+              </span>
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>

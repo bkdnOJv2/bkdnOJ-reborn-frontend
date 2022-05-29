@@ -1,6 +1,4 @@
 div.problem-detail-pdf-container {
-    height: 600px;
-
     * { 
         -ms-overflow-style: none;  /* Internet Explorer 10+ */
         scrollbar-width: none;  /* Firefox */
@@ -8,18 +6,42 @@ div.problem-detail-pdf-container {
             display: none;  /* Safari and Chrome */
         }
     }
+
+    height: 40rem;
+    @media (max-width: 567px) {
+        height: 25rem;
+    }
+
+    .rpv-core__viewer {
+        overflow: scroll;
+    }
+
     .rpv-toolbar__label {
         display: inline;
         white-space: pre;
+    }
+    .rpv-toolbar__left {
+        display: hidden;
     }
 
     // .rpv-default-layout__sidebar, .rpv-default-layout__sidebar-ltr {
     //     overflow-x: scroll;
     // }
-    // .rpv-default-layout__toolbar {
-    //     overflow-x: scroll;
-    //     overflow-y:initial;
-    // }
+    .rpv-default-layout__toolbar {
+        overflow-x: scroll;
+    }
+    div.rpv-core__display--hidden {
+        display: inline-flex;
+    }
+    @media (max-width: 767px) {
+        div[aria-describedby='rpv-core__tooltip-body-page-navigation-previous'],
+        div[aria-describedby='rpv-core__tooltip-body-page-navigation-next'],
+        div[aria-describedby='rpv-core__tooltip-body-theme-switch'] {
+            display: none;
+        }
+    }
+    
+
     div[aria-describedby='rpv-core__tooltip-body-default-layout-sidebar-tab-1'],
     div[aria-describedby='rpv-core__tooltip-body-default-layout-sidebar-tab-2'],
     div[aria-describedby='rpv-core__tooltip-body-search-popover'],

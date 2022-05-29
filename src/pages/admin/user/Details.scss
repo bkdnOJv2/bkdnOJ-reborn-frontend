@@ -1,6 +1,6 @@
 @import 'global.scss';
 
-div.admin.judge-panel {
+div.admin.user-panel {
   h1, h2, h3, h4, h5, hr{
     margin: unset;
   }
@@ -28,6 +28,25 @@ div.admin.judge-panel {
   .col {
     text-align: left;
   }
+  .row {
+    margin-left: unset;
+    margin-right: unset;
+  }
+  p {
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  pre {
+    background-color: white !important;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+  }
+  button {
+    width: 100%;
+    text-align: center;
+    border: unset;
+  }
 
   .accordion-item {
     border: solid 1px $background-gray;
@@ -43,6 +62,9 @@ div.admin.judge-panel {
       border: unset;
       background-color: $background-gray;
     }
+  }
+  input[type="file"] {
+    width: 100%;
   }
 
   .accordion-button {

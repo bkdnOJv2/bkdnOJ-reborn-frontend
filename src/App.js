@@ -1,8 +1,7 @@
 // Lib Imports
 import React from 'react';
 import { connect } from 'react-redux';
-import { Container } from 'react-bootstrap';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { createBrowserHistory } from "history";
 
@@ -22,7 +21,7 @@ import {
 } from 'pages/user';
 
 import {
-  AdminUserList, 
+  AdminUserList, AdminUserDetails, AdminUserNew,
   AdminProblemList, AdminProblemDetails, 
   AdminSubmissionList, AdminSubmissionDetails,
   AdminJudgeList, AdminJudgeDetails, AdminJudgeNew,
@@ -75,6 +74,12 @@ class App extends React.Component {
 
                 <Route path="user" element={
                   <OneColumn mainContent={<AdminUserList />} />
+                }/>
+                <Route path="user/:id" element={
+                  <OneColumn mainContent={<AdminUserDetails />} />
+                }/>
+                <Route path="user/new" element={
+                  <OneColumn mainContent={<AdminUserNew />} />
                 }/>
 
                 <Route path="problem" element={
@@ -145,12 +150,13 @@ class App extends React.Component {
               <ListSidebar mainContent={<JudgeStatuses />}/>
             } />
 
-            <Route path="*" element={
+            <Route path="/404" exact element={
               <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
                 style={{minHeight: "200px", minWidth: "400px"}}>
                   <h4 >404 | Page Not Found</h4>
               </div>
-            } />
+            }/>
+            <Route path="*" element={<Navigate to="/404" replace />} />
           </Route>
         </Routes>
       </HistoryRouter>

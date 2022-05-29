@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { FaRegTrashAlt } from 'react-icons/fa';
+import { VscRefresh } from 'react-icons/vsc';
 
-import judgeAPI from 'api/judge';
-import { SpinLoader } from 'components';
+import userAPI from 'api/user';
+import { SpinLoader, ErrorBox } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
@@ -23,15 +24,14 @@ class AdminJudgeDetails extends React.Component {
     };
   }
 
-  componentDidMount() {
-    setTitle(`Admin | Judge#${this.id}`)
-    judgeAPI.getJudgeDetails({id: this.id})
+  fetch() {
+    userAPI.getUser({id: this.id})
       .then((res) => {
         this.setState({
           data: res.data,
           loaded: true,
         })
-        setTitle(`Admin | Judge. ${res.data.name}`)
+        setTitle(`Admin | User. ${res.data.username}`)
       }).catch((err) => {
         this.setState({
           loaded: true,
@@ -40,18 +40,9 @@ class AdminJudgeDetails extends React.Component {
       })
   }
 
-  getStartTime() {
-    if (this.state.data && this.state.data.start_time) {
-      let time = new Date(this.state.data.start_time)
-      time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
-      return time.toISOString().slice(0, 16);
-    }
-    return null;
-  }
-  setStartTime(v) {
-    let time = new Date(v)
-    const data = this.state.data;
-    this.setState({ data : { ...data, start_time: time.toISOString() } });
+  componentDidMount() {
+    setTitle(`Admin | User#${this.id}`)
+    this.fetch()
   }
 
   inputChangeHandler(event, params={isCheckbox: null}) {
@@ -66,18 +57,49 @@ class AdminJudgeDetails extends React.Component {
   }
 
   deleteObjectHandler() {
-    let conf = window.confirm("WARNING!! Block this judge for at least 1 minute before deleting!! "+
-      "Otherwise, running submissions might be deleted and affecting live participants. Do you still want to delete?");
+    let conf = window.confirm("Hãy hủy kích hoạt (De-activate) User này thay vì xóa. "+
+      "Nếu xóa, mọi tài nguyên liên quan sẽ bị ảnh hưởng. Bạn có chắc không?");
     if (conf) {
-      judgeAPI.adminDeleteJudge({id: this.id})
+      userAPI.adminDeleteUser({id: this.id})
         .then((res) => {
           toast.success("OK Deleted.");
-          this.setState({ redirectUrl : '/admin/judge/' })
+          this.setState({ redirectUrl : '/admin/user/' })
         })
         .catch((err) => {
           toast.error(`Cannot delete. (${err})`);
         })
     }
+  }
+
+  getTime(key) {
+    if (this.state.data && this.state.data[key]) {
+      let time = new Date(this.state.data[key])
+      time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+      return time.toISOString().slice(0, 16);
+    }
+    return '';
+  }
+  setTime(key, v) {
+    let time = new Date(v)
+    const data = this.state.data;
+    this.setState({ data : { ...data, [key]: time.toISOString() } });
+  }
+
+  formSubmitHandler(e) {
+    e.preventDefault();
+    let sendData = this.state.data;
+    delete sendData.url;
+    delete sendData.id;
+    userAPI.adminEditUser({id: this.id, data: sendData})
+    .then((res) => {
+      toast.success('OK Saved.')
+      this.fetch();
+    })
+    .catch((err) => {
+      const data = err.response.data;
+      toast.error('Cannot save.')
+      this.setState({errbox_errors: data})
+    })
   }
 
   render() {
@@ -87,12 +109,12 @@ class AdminJudgeDetails extends React.Component {
     const {loaded, errors, data} = this.state;
 
     return (
-      <div className="admin judge-panel">
-        <h4 className="judge-title">
+      <div className="admin user-panel">
+        <h4 className="user-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong.</span>}
           { loaded && !errors && <div className="panel-header">
-              <span className="title-text">{`Viewing judge. ${data.name}`}</span>
+              <span className="title-text">{`Viewing user. ${data.username}`}</span>
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
@@ -103,78 +125,62 @@ class AdminJudgeDetails extends React.Component {
           }
         </h4>
         <hr/>
-        <div className="judge-details">
+        <div className="user-details">
           { !loaded && <span><SpinLoader/> Loading...</span> }
 
           { loaded && !errors && <>
-            <Form id="judge-general" onSubmit={(e) => this.formSubmitHandler(e)}>
+            <ErrorBox errors={this.state.errbox_errors} />
+            <Form id="user-general" onSubmit={(e) => this.formSubmitHandler(e)}>
               <Row>
-                <Form.Label column="sm" xs={2} > ID </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="Judge id" id="id"
+                <Form.Label column="sm" > ID </Form.Label>
+                <Col> <Form.Control size="sm" type="text" placeholder="User ID" id="id"
                         value={data.id || ''} disabled readOnly
                 /></Col>
-              </Row>
-              <Row>
-                <Form.Label column="sm" lg={2}> Name </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="Judge Name" id="name"
-                        value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)}
+                <Form.Label column="sm" md={3} > Username </Form.Label>
+                <Col> <Form.Control size="sm" type="text" placeholder="Username" id="username"
+                        value={data.username || ''} disabled readOnly
                 /></Col>
-                <Form.Label column="sm" lg={2}> Auth Key </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="Judge Authentication key" id="auth_key"
-                        value={data.auth_key || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                /></Col>
-                <Form.Label column="sm" xl={12}> Description </Form.Label>
-                <Col xs={12}> <Form.Control size="sm" type="textarea" placeholder="Description" id="description"
-                        value={data.description || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                /></Col>
+                <Form.Label column="sm" md={3} > Password </Form.Label>
+                <Col>
+                  <Button size="sm" variant="warning" className="btn-svg"
+                    onClick={(e)=>{}}
+                  ><VscRefresh/><span>Re-generate</span></Button> 
+                </Col>
               </Row>
 
               <Row>
-                <Form.Label column="sm" > Online </Form.Label>
-                <Col > <Form.Control size="sm" type="checkbox" id="online"
-                        checked={data.online || false}
+                <Form.Label column="sm" > Active </Form.Label>
+                <Col > <Form.Control size="sm" type="checkbox" id="is_active"
+                        checked={data.is_active || false}
                         onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
                 /></Col>
-                <Form.Label column="sm" > Is Blocked? </Form.Label>
-                <Col > <Form.Control size="sm" type="checkbox" id="is_blocked"
-                        checked={data.is_blocked || false}
+                <Form.Label column="sm" > Staff Status </Form.Label>
+                <Col > <Form.Control size="sm" type="checkbox" id="is_staff"
+                        checked={data.is_staff || false}
+                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
+                /></Col>
+                <Form.Label column="sm" > Superuser Status </Form.Label>
+                <Col > <Form.Control size="sm" type="checkbox" id="is_superuser"
+                        checked={data.is_superuser || false}
                         onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
                 /></Col>
               </Row>
+
               <Row>
-                <Form.Label column="sm" md={2}> Start Time </Form.Label>
-                <Col> <Form.Control size="sm" type="datetime-local" id="start_time"
-                        value={this.getStartTime()} onChange={(e)=>this.setStartTime(e.target.value)}
+                <Form.Label column="sm" md={2}> Date Joined </Form.Label>
+                <Col> <Form.Control size="sm" type="datetime-local" id="date_joined"
+                        value={this.getTime('date_joined')} 
+                        onChange={(e)=>this.setTime('date_joined', e.target.value)}
                 /></Col>
-                <Form.Label column="sm" md={2}> Last IP </Form.Label>
-                <Col> <Form.Control size="sm" type="text" id="last_ip"
-                        value={data.last_ip || ''} onChange={(e)=>this.inputChangeHandler(e)}
+              </Row>
+              <Row>
+                <Form.Label column="sm" md={2}> Last Login </Form.Label>
+                <Col> <Form.Control size="sm" type="datetime-local" id="last_login"
+                        value={this.getTime('last_login')} 
+                        onChange={(e)=>this.setTime('last_login', e.target.value)}
                 /></Col>
               </Row>
 
-              <Row>
-                <Form.Label column="sm" md={2}> Ping </Form.Label>
-                <Col > <Form.Control size="sm" type="text" id="ping"
-                        value={data.ping || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                /></Col>
-                <Form.Label column="sm" md={2}> Load </Form.Label>
-                <Col> <Form.Control size="sm" type="text" id="load"
-                        value={data.load || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                /></Col>
-              </Row>
-
-              <Row>
-                <Form.Label column="sm" > Problems </Form.Label>
-                <Col xl={12}> <Form.Control size="sm" type="text" id="problems"
-                        value={JSON.stringify(data.problems || '')} readOnly disabled
-                /></Col>
-              </Row>
-              <Row>
-                <Form.Label column="sm" > Runtimes </Form.Label>
-                <Col xl={12}> <Form.Control size="sm" type="text" id="runtimes"
-                        value={JSON.stringify(data.runtimes || '')} readOnly disabled
-                /></Col>
-              </Row>
 
               <hr className="m-2" />
 

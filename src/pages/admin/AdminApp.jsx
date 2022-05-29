@@ -1,9 +1,10 @@
 import React from 'react';
 import { Container, Button, Row, Col } from 'react-bootstrap';
-import { Link, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
 import { VscThreeBars } from 'react-icons/vsc';
 
+import authAPI from 'api/auth';
 import {addClass, removeClass} from 'helpers/dom_functions.js';
 import { setTitle } from 'helpers/setTitle.js'
 
@@ -13,8 +14,13 @@ import './AdminApp.scss';
 class AdminApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {sidebarClosed: false}
-    setTitle('Admin | Dashboard')
+
+    this.state = {
+      authorized : false,
+      loaded : false,
+      sidebarClosed: false,
+      redirectUrl: null,
+    }
   }
   hideSidebar() {
     let sidebar = document.getElementById('admin-sidebar')
@@ -24,8 +30,24 @@ class AdminApp extends React.Component {
       else addClass(sidebar, 'd-none')
     })
   }
+  componentDidMount() {
+    authAPI.whoAmI()
+    .then((res) => {
+      const user = res.data && res.data.user;
+      if (user.is_staff || user.is_superuser) 
+        this.setState({authorized: true, loaded: true})
+    })
+    .catch((err) => {
+      this.setState({loaded: true})
+    })
+  }
 
   render() {
+    if (!this.state.loaded) return <></>
+    if (!this.state.authorized)
+      return <Navigate to="/404" replace />
+    setTitle('Admin | Dashboard')
+
     return (
       <div className="admin-page">
         <AdminNav className="d-none"/>
@@ -35,7 +57,6 @@ class AdminApp extends React.Component {
               id="sidebar-toggle-btn"
             ><VscThreeBars /></Button>
             <span>Hello</span>
-
           </div>
           <Container id="admin-panel-container">
             <Outlet/>

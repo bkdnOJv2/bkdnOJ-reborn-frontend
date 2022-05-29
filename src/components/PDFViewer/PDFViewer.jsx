@@ -16,7 +16,7 @@ function PDFViewer({pdf}) {
       {
         pdf ?
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.13.216/build/pdf.worker.min.js">
-          <Viewer fileUrl={pdfUrl} defaultScale={SpecialZoomLevel.PageWidth}
+          <Viewer fileUrl={pdfUrl} defaultScale={SpecialZoomLevel.PageFit}
             plugins={[defaultLayoutPluginInstance]}/>
         </Worker>
         : <h4>PDF Not Available</h4>

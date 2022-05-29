@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Link, Navigate } from 'react-router-dom';
 import { Row, Col, Table } from 'react-bootstrap';
+import { FaWrench } from 'react-icons/fa';
 
 import submissionAPI from 'api/submission';
 import { SpinLoader } from 'components';
@@ -49,12 +51,13 @@ class SubmissionDetails extends React.Component {
         status: ".",
       }, 
     };
+    this.user = (this.props.user.user);
   }
 
   fetch() {
     submissionAPI.getSubmissionDetails({id : this.state.id})
       .then((res) => {
-        setTitle(`Submission ${res.data.id}`)
+        setTitle(`Submission# ${res.data.id}`)
         this.setState({ data: res.data, })
       })
       .catch((err) => {
@@ -83,7 +86,11 @@ class SubmissionDetails extends React.Component {
     clearInterval(this.timer)
   }
 
-  render() {
+  render() { 
+    if (this.state.redirectUrl) {
+      return <Navigate to={`${this.state.redirectUrl}`} />
+    }
+
     const { data, loaded } = this.state;
     let verdict = 'QU';
     if (loaded)
@@ -97,7 +104,7 @@ class SubmissionDetails extends React.Component {
             !loaded ? 
             <span><SpinLoader/> Loading...</span> : 
             <span>
-              {`Submission # ${data.id}`}
+              {`Submission# ${data.id}`}
               {polling && <div className="loading_3dot"></div>}
             </span>
           }
@@ -108,6 +115,20 @@ class SubmissionDetails extends React.Component {
             !this.state.loaded ? <span><SpinLoader/> Loading...</span> 
             : <>
               <div className="general info-subsection">
+                {
+                  (this.user !== null && this.user.is_staff) && 
+                  <div>
+                    <h5>Admin Panel</h5>
+                    <Row>
+                    <Col >
+                      <Link to="#" className="btn" style={{color: "red"}}
+                        onClick={() => this.setState({redirectUrl: `/admin/submission/${this.state.id}`})}>
+                        Admin <FaWrench size={12}/>
+                      </Link>
+                    </Col>
+                    </Row>
+                  </div>
+                }
                 <h5>General</h5>
                 <Row>
                   <Col >
@@ -171,4 +192,10 @@ class SubmissionDetails extends React.Component {
   }
 }
 
-export default withParams(SubmissionDetails);
+let wrapped = SubmissionDetails;
+wrapped = withParams(wrapped);
+const mapStateToProps = state => {
+    return { user : state.user.user }
+}
+wrapped = connect(mapStateToProps, null)(wrapped);
+export default wrapped;
