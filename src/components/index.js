@@ -7,6 +7,7 @@ import SpinLoader from './SpinLoader/SpinLoader';
 import ErrorBox from './ErrorBox/ErrorBox';
 import FileUploader from './FileUploader/FileUploader';
 import CSRFToken from './CSRFToken/CSRFToken';
+import ContestSidebar from './ContestSidebar/ContestSidebar';
 
 export {
     Header,
@@ -18,4 +19,5 @@ export {
     ErrorBox,
     FileUploader,
     CSRFToken,
+    ContestSidebar,
 };

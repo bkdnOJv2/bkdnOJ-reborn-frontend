@@ -9,10 +9,13 @@ import { AiOutlineForm, AiOutlineLogin, AiOutlineLogout, AiOutlineProfile } from
 import { GrUserAdmin } from 'react-icons/gr';
 
 import authClient from 'api/auth';
-import { getAdminPageUrl } from 'api/urls';
-import { updateUser, clearUser } from 'redux/User/actions'
+import profileClient from 'api/profile';
 
-import { __ls_get_auth_user, __ls_remove_credentials } from 'helpers/localStorageHelpers';
+import { getAdminPageUrl } from 'api/urls';
+import { updateUser, updateProfile, clearUser } from 'redux/User/actions'
+
+import { __ls_get_auth_user, __ls_remove_credentials,
+        __ls_set_auth_user, } from 'helpers/localStorageHelpers';
 
 class UserAuthSection extends React.Component {
     constructor(props){
@@ -26,11 +29,20 @@ class UserAuthSection extends React.Component {
         }
     }
 
+    componentDidMount() {
+        profileClient.fetchProfile().then((res) => {
+            __ls_set_auth_user(res.data.owner);
+            this.props.updateUser({...res.data.owner, avatar: res.data.avatar});
+            this.props.updateProfile({...res.data});
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+
     signOutHandler() {
-        const parent = this;
         authClient.signOut()
         .then((res) => {
-            parent.props.clearUser();
+            this.props.clearUser();
             toast.success("See you later!");
         })
         .catch((err) => {
@@ -106,18 +118,18 @@ class UserAuthSection extends React.Component {
     }
 }
 const mapStateToProps = state => {
-    return {
-        user : state.user.user
-    }
-}
-const mapDispatchToProps = dispatch => {
   return {
-    updateUser: (user) => {
-        dispatch(updateUser({user: user}))
-    },
-    clearUser: () => {
-        dispatch(clearUser())
-    }
+    user: state.user.user,
+    profile: state.user.profile,
   }
 }
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateUser: (user) => dispatch(updateUser({user: user})),
+    updateProfile: (profile) => dispatch(updateProfile({profile: profile})),
+    clearUser: () => dispatch(clearUser()),
+  }
+}
+
 export default connect(mapStateToProps, mapDispatchToProps)(UserAuthSection);

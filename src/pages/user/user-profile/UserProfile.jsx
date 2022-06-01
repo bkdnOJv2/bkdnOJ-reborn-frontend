@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateUser, clearUser } from 'redux/User/actions';
+import { updateUser, updateProfile, clearUser } from 'redux/User/actions';
 
 import { Row, Col, Container } from 'react-bootstrap';
 
@@ -19,23 +19,32 @@ class UserProfile extends React.Component {
             profile: {},
             loaded: false,
         }
+        this.user = this.props.user.user;
         setTitle('Profile')
     }
 
     componentDidMount() {
-        const parent = this;
-        profileClient.fetchProfile().then((res) => {
-            parent.setState({
-                profile: res.data,
+        const profile = this.props.profile.profile;
+        if (!this.profile) {
+            profileClient.fetchProfile().then((res) => {
+                this.setState({
+                    profile: res.data,
+                    loaded: true,
+                })
+                __ls_set_auth_user(res.data.owner);
+                this.props.updateUser({...res.data.owner, avatar: res.data.avatar});
+                this.props.updateProfile({...res.data});
+            }).catch((err) => {
+                log(err);
+            })
+        } else {
+            this.setState({
+                profile: this.profile,
                 loaded: true,
             })
-            __ls_set_auth_user(res.data.owner);
-            this.props.updateUser({...res.data.owner, avatar: res.data.avatar});
-        }).catch((err) => {
-            log(err);
-        })
-
+        }
     }
+
     render() {
         const {profile, loaded} = this.state;
 
@@ -43,9 +52,19 @@ class UserProfile extends React.Component {
             <Container className='user-profile shadow rounded'>
                 <h4>User Profile</h4>
                 {
-                    !loaded
-                    ? <SpinLoader className='user-profile-loader'/>
-                    : <Row>
+                    !loaded && <SpinLoader className='user-profile-loader'/>
+                }
+                {
+                    loaded && !profile 
+                    && <Row>
+                        <Col className='center p-3'>
+                            <h5 className='pt-2'>Not logged in.</h5>
+                        </Col>
+                    </Row>
+                }
+                {
+                    loaded && !!profile 
+                    && <Row>
                         <Col md={4} className='center p-3'>
                             <img src={profile.avatar} className='avatar img-fluid'
                                 alt={`User ${profile.owner.username}'s avatar`}/>
@@ -75,12 +94,14 @@ class UserProfile extends React.Component {
 const mapStateToProps = state => {
   return {
     user: state.user.user,
+    profile: state.user.profile,
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
     updateUser: (user) => dispatch(updateUser({user: user})),
+    updateProfile: (profile) => dispatch(updateProfile({profile: profile})),
     clearUser: () => dispatch(clearUser()),
   }
 }

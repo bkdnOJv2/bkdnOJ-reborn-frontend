@@ -109,6 +109,11 @@ export default class SubmitModal extends React.Component {
     this.setState({subId : id})
   }
 
+  onHide() {
+    this.setState({ subId: null, submitting: false })
+    this.props.onHide()
+  }
+
   render() {
     if (!!this.state.redirect && !!this.state.subId) {
       return <Navigate to={`/submission/${this.state.subId}`} />
@@ -116,7 +121,7 @@ export default class SubmitModal extends React.Component {
 
     return (
       <Modal show={this.props.show} 
-          onHide={() => this.props.onHide()}
+          onHide={() => this.onHide()}
           className="submit-modal"
           backdrop="static"
           keyboard={false}
@@ -153,7 +158,7 @@ export default class SubmitModal extends React.Component {
           </div>
 
           <Button variant="secondary" 
-            onClick={() => this.props.onHide()}>Close</Button>
+            onClick={() => this.onHide()}>Close</Button>
           
           {
             this.state.subId === null

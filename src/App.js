@@ -11,7 +11,7 @@ import ScrollToTop from 'helpers/react-router/ScrollToTop';
 // Components
 import { ListSidebar, OneColumn } from 'layout';
 
-import { Content } from 'components';
+import { Content, ContestSidebar } from 'components';
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
@@ -128,26 +128,30 @@ class App extends React.Component {
             <Route path="/sign-out" element={<SignOut />} />
             <Route path="/profile" element={<UserProfile />} />
 
-            <Route path="/test/pdf" element={ <PDFViewer /> } />
+            {/* <Route path="/test/pdf" element={ <PDFViewer /> } /> */}
 
             <Route path="/problem" element={
-              <ListSidebar mainContent={<ProblemList />}/>
+              <OneColumn mainContent={<ProblemList />}
+              />
             } />
             <Route path="/problem/:shortname" 
-              element={<ListSidebar mainContent={<ProblemDetails />} />}
+              element={<OneColumn mainContent={<ProblemDetails />}
+                      />}
             />
-            <Route path="/problem/:shortname/submit" 
+            {/* <Route path="/problem/:shortname/submit" 
               element={<ListSidebar mainContent={<Submit />} />}
-            />
+            /> */}
 
             <Route path="/submission" element={
-              <ListSidebar mainContent={<SubmissionList />}/>
+              <OneColumn mainContent={<SubmissionList />}
+              />
             } />
             <Route path="/submission/:id" element={
-              <ListSidebar mainContent={<SubmissionDetails />}/>
+              <OneColumn mainContent={<SubmissionDetails />}
+              />
             } />
             <Route path="/judge-status" element={
-              <ListSidebar mainContent={<JudgeStatuses />}/>
+              <OneColumn mainContent={<JudgeStatuses />}/>
             } />
 
             <Route path="/404" exact element={

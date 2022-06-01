@@ -40,6 +40,10 @@ export default class SubmitForm extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.submitting !== this.props.submitting) {
+      // Only submit code when submitting changes from false->true
+      // Because submitting will also changes when the Modal closes
+      if (prevProps.submitting === true) return;
+
       const data = {
         language: this.state.selectedLang.id,
         source: this.state.code,

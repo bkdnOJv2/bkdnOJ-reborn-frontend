@@ -1,9 +1,16 @@
-import { UPDATE, CLEAR } from './types';
+import { UPDATE, UPDATE_PROFILE, CLEAR } from './types';
+
+export const updateProfile = (profile) => {
+    return {
+        type: UPDATE_PROFILE,
+        profile,
+    };
+};
 
 export const updateUser = (user) => {
     return {
         type: UPDATE,
-        user
+        user,
     };
 };
 
