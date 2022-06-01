@@ -68,7 +68,8 @@ axiosClient.interceptors.response.use(
             __ls_remove_credentials();
           }
         }
-        window.location.href = "/sign-in"
+        if (window.location.pathname !== "/sign-in")
+          window.location.href = "/sign-in"
         break;
       default:
         break;
