@@ -17,7 +17,8 @@ import PDFViewer from 'components/PDFViewer/PDFViewer';
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
 import {
   SubmissionList, SubmissionDetails, ProblemList, 
-  ProblemDetails, JudgeStatuses, Submit
+  ProblemDetails, JudgeStatuses, Submit,
+  ContestList,
 } from 'pages/user';
 
 import {
@@ -150,6 +151,11 @@ class App extends React.Component {
               <OneColumn mainContent={<SubmissionDetails />}
               />
             } />
+            <Route path="/contest" element={
+              <OneColumn mainContent={<ContestList />}
+              />
+            } />
+
             <Route path="/judge-status" element={
               <OneColumn mainContent={<JudgeStatuses />}/>
             } />
