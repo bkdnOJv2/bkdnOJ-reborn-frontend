@@ -74,8 +74,9 @@ export default class ListSidebar extends React.Component {
           </div>
 
           <Col md={8}>
-            <div className="offcanvas-menu main-component shadow rounded" id="offcanvas-menu">
+            <div className="offcanvas-menu main-component" id="offcanvas-menu">
               { mainContent }
+
               <div className="offcanvasOpenBtn-wrapper">
                 <Button className="offcanvasOpenBtn btn-dark d-block d-md-none" onClick={() => this.toggle()}>
                   <BiArrowFromRight />

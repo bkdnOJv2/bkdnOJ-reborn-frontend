@@ -5,10 +5,18 @@ import { Table } from 'react-bootstrap';
 // import { FaPaperPlane } from 'react-icons/fa';
 
 import { SpinLoader, ErrorBox } from 'components';
-import problemApi from 'api/problem';
-import { setTitle } from 'helpers/setTitle';
 
-import './Problem.scss'
+import problemApi from 'api/problem';
+import contestApi from 'api/contest';
+
+import { setTitle } from 'helpers/setTitle';
+import { withParams } from 'helpers/react-router'
+
+// Contexts
+import ContestContext from 'context/ContestContext';
+
+// Styles
+import './ProblemList.scss'
 import 'styles/ClassicPagination.scss';
 
 class ProblemListItem extends React.Component {
@@ -38,37 +46,61 @@ class ProblemList extends React.Component {
     super(props);
     this.state = {
       problems: [],
+
       currPage: 0,
       pageCount: 1,
+
       loaded: false,
       errors: null,
     }
-    setTitle('Problems')
   }
 
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
-    problemApi.getProblems({page: params.page+1})
-      .then((res) => {
-        this.setState({
-          problems: res.data.results,
-          count: res.data.count,
-          pageCount: res.data.total_pages,
-          currPage: params.page,
-          loaded: true,
+    if (this.state.contest) {
+      contestApi.getContestProblems({ key: this.state.contestKey, params: {page: params.page+1} })
+        .then((res) => {
+          this.setState({
+            problems: res.data,
+            count: res.data.count,
+            loaded: true,
+          })
+          console.log(res)
         })
-      })
-      .catch((err) => {
-        this.setState({
-          loaded: true,
-          errors: ["Cannot fetch problems. Please retry again."],
+        .catch((err) => {
+          this.setState({
+            loaded: true,
+            errors: ["Cannot fetch contest problems. Please retry again."],
+          })
         })
-      })
+    } else {
+      problemApi.getProblems({page: params.page+1})
+        .then((res) => {
+          this.setState({
+            problems: res.data.results,
+            count: res.data.count,
+            pageCount: res.data.total_pages,
+            currPage: params.page,
+            loaded: true,
+          })
+        })
+        .catch((err) => {
+          this.setState({
+            loaded: true,
+            errors: ["Cannot fetch problems. Please retry again."],
+          })
+        })
+    }
   }
 
   componentDidMount() {
-    this.callApi({page: this.state.currPage});
+    const contest = this.context.contest;
+    this.setState({ contest }, 
+      () => this.callApi({page: this.state.currPage})
+    )
+    if (contest) setTitle(`Contest. ${contest.name} | Problems`)
+    else setTitle('Problems')
   }
 
   handlePageClick = (event) => {
@@ -76,6 +108,8 @@ class ProblemList extends React.Component {
   }
 
   render() {
+    const contest = this.context.contest;
+
     return (
       <div className="problem-table">
         <h4>Problem Set</h4>
@@ -121,7 +155,9 @@ class ProblemList extends React.Component {
     )
   }
 }
+ProblemList.contextType = ContestContext;
 
-export {
-  ProblemList,
-}
+let wrapped = ProblemList;
+wrapped = withParams(wrapped);
+
+export default wrapped;

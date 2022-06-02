@@ -163,13 +163,13 @@ export default class SubmitModal extends React.Component {
           {
             this.state.subId === null
             ? <Button variant="dark"
-                onClick={() => this.setState({submitting: true})}
+                onClick={() => this.setState({ submitting: true })}
                 disabled={this.state.submitting}
               >
                 {"Submit "}<FaPaperPlane size={12}/>
               </Button>
             : <Button variant="dark"
-                onClick={() => this.setState({redirect: true})}
+                onClick={() => this.setState({ redirect: true })}
               >
                 {"Details "}<FaExternalLinkAlt size={12}/>
               </Button>

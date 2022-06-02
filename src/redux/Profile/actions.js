@@ -1,13 +1,14 @@
 import { UPDATE, CLEAR } from './types';
 
-export const updateUser = ({ user }) => {
+
+export const updateProfile = ({ profile }) => {
     return {
         type: UPDATE,
-        user,
+        profile,
     };
 };
 
-export const clearUser = () => {
+export const clearProfile = () => {
     return {
         type: CLEAR,
     };

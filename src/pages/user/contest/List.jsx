@@ -1,4 +1,5 @@
 import React from 'react';
+
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
@@ -57,24 +58,32 @@ class ContestListItem extends React.Component {
             <span className="d-inline-flex align-items-center">
               Participants: {this.props.data.user_count}<VscPerson size={16}/>
             </span>
-            <span className="d-inline-flex align-items-center">
-              {
-                type === 'active' && <>
+            {
+              type === 'active' && <>
+                <span className="d-inline-flex align-items-center">
                   <Link to={`/contest/${ckey}`}>{`Continue >>`}</Link>
-                </>
-              }
-              {
-                type === 'present' && <>
+                </span>
+              </>
+            }
+
+            {
+              type === 'present' && <>
+                <span className="d-inline-flex align-items-center">
                   <Link to={`/contest/${ckey}`}>{`Participate >>`}</Link>
+                </span>
+                <span className="d-inline-flex align-items-center">
                   <Link to={`/contest/${ckey}`}>{`Standing >>`}</Link>
-                </>
-              }
-              {
-                type === 'past' && <>
+                </span>
+              </>
+            }
+
+            {
+              type === 'past' && <>
+                <span className="d-inline-flex align-items-center">
                   <Link to={`/contest/${ckey}`}>{`Standing >>`}</Link>
-                </>
-              }
-            </span>
+                </span>
+              </>
+            }
           </div>
         }</td>
       </tr>

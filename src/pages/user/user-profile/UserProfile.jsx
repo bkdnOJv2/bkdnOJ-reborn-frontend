@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateUser, updateProfile, clearUser } from 'redux/User/actions';
+import { updateUser, clearUser } from 'redux/User/actions';
+import { updateProfile, clearProfile } from 'redux/Profile/actions';
 
 import { Row, Col, Container } from 'react-bootstrap';
 
@@ -8,6 +9,7 @@ import profileClient from 'api/profile';
 import { log } from 'helpers/logger';
 
 import SpinLoader from 'components/SpinLoader/SpinLoader';
+
 import './UserProfile.scss';
 import { __ls_set_auth_user } from 'helpers/localStorageHelpers';
 import { setTitle } from 'helpers/setTitle';
@@ -19,12 +21,12 @@ class UserProfile extends React.Component {
             profile: {},
             loaded: false,
         }
-        this.user = this.props.user.user;
+        this.user = this.props.user;
         setTitle('Profile')
     }
 
     componentDidMount() {
-        const profile = this.props.profile.profile;
+        const profile = this.props.profile;
         if (!this.profile) {
             profileClient.fetchProfile().then((res) => {
                 this.setState({
@@ -33,7 +35,7 @@ class UserProfile extends React.Component {
                 })
                 __ls_set_auth_user(res.data.owner);
                 this.props.updateUser({...res.data.owner, avatar: res.data.avatar});
-                this.props.updateProfile({...res.data});
+                this.props.updateProfile({ ...res.data, });
             }).catch((err) => {
                 log(err);
             })
@@ -94,7 +96,7 @@ class UserProfile extends React.Component {
 const mapStateToProps = state => {
   return {
     user: state.user.user,
-    profile: state.user.profile,
+    profile: state.profile.profile,
   }
 }
 

@@ -18,7 +18,7 @@ import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
 import {
   SubmissionList, SubmissionDetails, ProblemList, 
   ProblemDetails, JudgeStatuses, Submit,
-  ContestList,
+  ContestList, ContestApp,
 } from 'pages/user';
 
 import {
@@ -40,25 +40,25 @@ const history = createBrowserHistory({ window });
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: (this.props.user && this.props.user.user),
-    }
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.user !== this.props.user) {
-      this.setState({user: (this.props.user && this.props.user.user)})
+      this.setState({user: (this.props.user || null) })
     }
   }
 
   isAuthenticated() {
-    return (!!this.state.user)
+    return (!!this.props.user)
   }
+
   isAdmin() {
-    return this.isAuthenticated() && this.state.user.is_staff;
+    return this.isAuthenticated() && this.props.user.is_staff;
   }
 
   render() {
+    // TODO:  If you access the url directly, App won't have time to
+    //        load user => access directly /admin won't work
     return (
       <HistoryRouter history={history}>
         <Routes>
@@ -151,10 +151,35 @@ class App extends React.Component {
               <OneColumn mainContent={<SubmissionDetails />}
               />
             } />
+
             <Route path="/contest" element={
               <OneColumn mainContent={<ContestList />}
               />
             } />
+
+            <Route path="/contest/:key" element={<ContestApp />}>
+
+              <Route index path="problem" element={
+                <ProblemList />
+              }/>
+              <Route path="problem/:shortname" element={
+                <ProblemDetails />
+              }/>
+              <Route path="submission" element={
+                <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                  style={{minHeight: "400px"}}>
+                    <h4>Submission</h4>
+                </div>
+              }/>
+              <Route path="standing" element={
+                <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
+                  style={{minHeight: "400px"}}>
+                    <h4>Standing</h4>
+                </div>
+              }/>
+
+            </Route>
+
 
             <Route path="/judge-status" element={
               <OneColumn mainContent={<JudgeStatuses />}/>

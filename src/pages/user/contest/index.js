@@ -1,6 +1,6 @@
 import ContestList from './List';
-import ContestDetails from './Details';
+import ContestApp from './ContestApp';
 
 export {
-    ContestList, ContestDetails
+    ContestList, ContestApp
 };

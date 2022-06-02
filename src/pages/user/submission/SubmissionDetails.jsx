@@ -12,6 +12,7 @@ import { withParams } from 'helpers/react-router'
 import { parseTime, parseMem } from 'helpers/textFormatter';
 import { setTitle } from 'helpers/setTitle'
 
+import { getPollDelay } from 'helpers/polling';
 import { shouldStopPolling } from 'constants/statusFilter';
 
 import './SubmissionDetails.scss';
@@ -51,13 +52,13 @@ class SubmissionDetails extends React.Component {
         status: ".",
       }, 
     };
-    this.user = (this.props.user.user);
+    this.user = (this.props.user) || null;
   }
 
   fetch() {
     submissionAPI.getSubmissionDetails({id : this.state.id})
       .then((res) => {
-        setTitle(`Submission# ${res.data.id}`)
+        setTitle(`Submission#${res.data.id}`)
         this.setState({ data: res.data, })
       })
       .catch((err) => {
@@ -68,6 +69,7 @@ class SubmissionDetails extends React.Component {
         this.setState({ loaded: true })
       })
   }
+
   pollResult() { 
     if (shouldStopPolling(this.state.data.status)) {
       clearInterval(this.timer)
@@ -79,7 +81,7 @@ class SubmissionDetails extends React.Component {
   componentDidMount() {
     this.fetch();
     if (! shouldStopPolling(this.state.data.status))
-      this.timer = setInterval(() => this.pollResult(), 2000);
+      this.timer = setInterval(() => this.pollResult(), getPollDelay());
   }
 
   componentWillUnmount() {
@@ -104,7 +106,7 @@ class SubmissionDetails extends React.Component {
             !loaded ? 
             <span><SpinLoader/> Loading...</span> : 
             <span>
-              {`Submission# ${data.id}`}
+              {`Submission#${data.id}`}
               {polling && <div className="loading_3dot"></div>}
             </span>
           }
@@ -116,7 +118,7 @@ class SubmissionDetails extends React.Component {
             : <>
               <div className="general info-subsection">
                 {
-                  (this.user !== null && this.user.is_staff) && 
+                  (!!this.user && this.user.is_staff) && 
                   <div>
                     <h5>Admin Panel</h5>
                     <Row>

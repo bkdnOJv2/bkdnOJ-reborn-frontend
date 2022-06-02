@@ -34,9 +34,9 @@ class ContestSidebar extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.profile !== this.props.profile) {
-      if (this.props.profile.profile && this.props.profile.profile.current_contest && this.props.profile.profile.current_contest.contest)  {
-        this.setState({ contest: this.props.profile.profile.current_contest.contest }, () => {
+    if (prevProps.contest !== this.props.contest ) {
+      if ( this.props.contest )  {
+        this.setState({ contest: this.props.contest }, () => {
           const contest = this.state.contest;
 
           let start_time = new Date(contest.start_time);
@@ -71,7 +71,7 @@ class ContestSidebar extends React.Component {
       return (
         <>
           <h5 style={{fontSize: "16px"}}>
-            <span>{`Practice`}</span>
+            <span>{`Spectating`}</span>
           </h5>
           <div>
             <span>{`Currently not in any contest.`}</span>
@@ -81,7 +81,7 @@ class ContestSidebar extends React.Component {
 
     return (
       <>
-        <h5 style={{paddingBottom: "unset", fontSize: "16px"}}>
+        <h5 style={{paddingBottom: "unset", fontSize: "14px"}}>
           <span><Link to={`/contest/${contest.key}`}>Currently participating</Link></span>
         </h5>
         <h5 >
@@ -97,8 +97,7 @@ class ContestSidebar extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    user: state.user.user,
-    profile: state.user.profile,
+    contest: state.contest.contest,
   }
 }
 

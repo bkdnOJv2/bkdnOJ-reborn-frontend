@@ -1,8 +1,7 @@
 import { UPDATE, CLEAR } from './types';
-import { __ls_remove_credentials } from 'helpers/localStorageHelpers';
 
 const INITIAL_STATE = {
-    user: null,
+    profile: null,
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
@@ -10,13 +9,12 @@ const reducer = (state = INITIAL_STATE, action) => {
         case UPDATE:
             return {
                 ...state, 
-                user: action.user,
+                profile: action.profile,
             };
         case CLEAR:
-            __ls_remove_credentials();
             return {
                 ...state, 
-                user: null,
+                profile: null,
             };
         default: 
             return state;

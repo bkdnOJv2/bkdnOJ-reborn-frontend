@@ -4,12 +4,12 @@ import { SubmissionList, SubmissionDetails } from './submission';
 import { Submit, SubmitModal, SubmitForm } from './submit';
 import { UserProfile } from './user-profile';
 
-import { ContestList, } from './contest';
+import { ContestList, ContestApp } from './contest';
 
 export {
     JudgeStatuses, ProblemList, ProblemDetails, SubmissionList, SubmissionDetails,
     Submit, SubmitModal, SubmitForm, UserProfile,
 
-    ContestList,
+    ContestList, ContestApp
 };
 
