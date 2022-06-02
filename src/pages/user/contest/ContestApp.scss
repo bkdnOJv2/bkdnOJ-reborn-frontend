@@ -1,0 +1,33 @@
+@import 'global.scss';
+
+div#contest-app {
+    width: 100%;
+    border: 1px solid red;
+
+    #one-column-element-0 {
+        z-index: 2000;
+    }
+
+    div#contest-app-nav {
+        width: 100%; 
+        column-gap: 15px;
+        margin-left: 15px;
+
+        border: unset;
+        background-color: unset;
+
+        a {
+            font-size: 14px;
+            font-family: $font-codeforces;
+            text-transform: capitalize;
+            color: $base;
+
+            &:hover {
+                text-decoration: underline;
+            }
+            &.active {
+                font-weight: bold;
+            }
+        }
+    }
+}

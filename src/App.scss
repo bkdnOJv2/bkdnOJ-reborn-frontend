@@ -40,6 +40,14 @@ label.required {
   }
 }
 
+div.flex-center {
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
 ::-webkit-scrollbar {
   height: 12px;
   width: 12px;

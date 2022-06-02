@@ -2,11 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import profileClient from 'api/profile';
-import { log } from 'helpers/logger';
+import { SpinLoader } from 'components';
 
+import ContestContext from 'context/ContestContext';
 
 class ContestSidebar extends React.Component {
+  static contextType = ContestContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -61,26 +63,27 @@ class ContestSidebar extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.setState({ contest: this.context.contest })
+  }
   componentWillUnmount() {
     clearInterval(this.timer)
   }
 
   render() {
     const contest = this.state.contest;
-    if (!contest)
-      return (
-        <>
-          <h5 style={{fontSize: "16px"}}>
-            <span>{`Spectating`}</span>
-          </h5>
-          <div>
-            <span>{`Currently not in any contest.`}</span>
-          </div>
-        </>
-      )
+    if (!contest) // Contest not loaded
+      return (<>
+        <h5>
+          <div className="loading_3dot d-block">Loading</div>
+        </h5>
+        <div className="flex-center">
+          <SpinLoader margin="0"/>
+        </div>
+      </>)
 
-    return (
-      <>
+    if (contest) {
+      return <>
         <h5 style={{paddingBottom: "unset", fontSize: "14px"}}>
           <span><Link to={`/contest/${contest.key}`}>Currently participating</Link></span>
         </h5>
@@ -91,8 +94,10 @@ class ContestSidebar extends React.Component {
           <span>{`Time remaining: `}{this.state.label}</span>
         </div>
       </>
-    )
+    }
+
   }
+
 };
 
 const mapStateToProps = state => {

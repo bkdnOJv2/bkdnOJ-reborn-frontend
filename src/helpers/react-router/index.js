@@ -10,7 +10,7 @@ function withParams(Component) {
 }
 
 export {
-    ScrollToTop,
-    withNavigation,
-    withParams,
+  ScrollToTop,
+  withNavigation,
+  withParams,
 }

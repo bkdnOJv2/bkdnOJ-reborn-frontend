@@ -53,54 +53,47 @@ class ProblemList extends React.Component {
       loaded: false,
       errors: null,
     }
+    setTitle('Problems')
   }
 
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
+    let endpoint, data;
     if (this.state.contest) {
-      contestApi.getContestProblems({ key: this.state.contestKey, params: {page: params.page+1} })
-        .then((res) => {
-          this.setState({
-            problems: res.data,
-            count: res.data.count,
-            loaded: true,
-          })
-          console.log(res)
-        })
-        .catch((err) => {
-          this.setState({
-            loaded: true,
-            errors: ["Cannot fetch contest problems. Please retry again."],
-          })
-        })
+      endpoint = contestApi.getContestProblems
+      data = { key: this.state.contest.key }
     } else {
-      problemApi.getProblems({page: params.page+1})
-        .then((res) => {
-          this.setState({
-            problems: res.data.results,
-            count: res.data.count,
-            pageCount: res.data.total_pages,
-            currPage: params.page,
-            loaded: true,
-          })
-        })
-        .catch((err) => {
-          this.setState({
-            loaded: true,
-            errors: ["Cannot fetch problems. Please retry again."],
-          })
-        })
+      endpoint = problemApi.getProblems
+      data = {}
     }
+
+    endpoint({...data, params: {page: params.page+1,} })
+      .then((res) => {
+        this.setState({
+          problems: res.data.results,
+          count: res.data.count,
+          pageCount: res.data.total_pages,
+          currPage: params.page,
+          loaded: true,
+        })
+      })
+      .catch((err) => {
+        this.setState({
+          loaded: true,
+          errors: ["Cannot fetch problems. Please retry again."],
+        })
+      })
   }
 
   componentDidMount() {
     const contest = this.context.contest;
-    this.setState({ contest }, 
-      () => this.callApi({page: this.state.currPage})
-    )
-    if (contest) setTitle(`Contest. ${contest.name} | Problems`)
-    else setTitle('Problems')
+    if (contest) {
+      setTitle(`Contest. ${contest.name} | Problems`)
+      this.setState({ contest }, 
+        () => this.callApi({page: this.state.currPage})
+      )
+    } else this.callApi({page: this.state.currPage})
   }
 
   handlePageClick = (event) => {
@@ -114,43 +107,46 @@ class ProblemList extends React.Component {
       <div className="problem-table">
         <h4>Problem Set</h4>
         <ErrorBox errors={this.state.errors} />
-        <Table responsive hover size="sm" striped bordered className="rounded">
-          <thead>
-            <tr>
-              <th style={{width: "20%"}}>#</th>
-              <th style={{minWidth: "30%", maxWidth: "50%"}}>Title</th>
-              <th style={{width: "12%"}}>Points</th>
-              <th style={{width: "10%"}}>Solved</th>
-              <th style={{width: "10%"}}>AC%</th>
-              <th style={{width: "5%"}}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              this.state.loaded === false
-                ? <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr>
-                : this.state.problems.map((prob, idx) => <ProblemListItem
-                    key={`prob-${prob.shortname}`}
-                    rowid={idx} {...prob}
-                  />)
-            }
-          </tbody>
-        </Table>
-        {
-          this.state.loaded === false
-            ? <SpinLoader margin="0" />
-            : <span className="classic-pagination">Page: <ReactPaginate
-                breakLabel="..."
-                onPageChange={this.handlePageClick}
-                forcePage={this.state.currPage}
-                pageLabelBuilder={(page) => `[${page}]`}
-                pageRangeDisplayed={3}
-                pageCount={this.state.pageCount}
-                renderOnZeroPageCount={null}
-                previousLabel={null}
-                nextLabel={null}
-                /></span>
-        }
+          <Table responsive hover size="sm" striped bordered className="rounded">
+            <thead>
+              <tr>
+                <th style={{width: "20%"}}>#</th>
+                <th style={{minWidth: "30%", maxWidth: "50%"}}>Title</th>
+                <th style={{width: "12%"}}>Points</th>
+                <th style={{width: "10%"}}>Solved</th>
+                <th style={{width: "10%"}}>AC%</th>
+                <th style={{width: "5%"}}></th>
+              </tr>
+            </thead>
+            <tbody>
+              { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
+              { this.state.loaded === true && 
+                <>
+                  {
+                  this.state.problems.map((prob, idx) => <ProblemListItem
+                      key={`prob-${prob.shortname}`}
+                      rowid={idx} {...prob}
+                    />)
+                  }
+                </>
+              }
+            </tbody>
+          </Table>
+          {
+            this.state.loaded === false
+              ? <SpinLoader margin="0" />
+              : <span className="classic-pagination">Page: <ReactPaginate
+                  breakLabel="..."
+                  onPageChange={this.handlePageClick}
+                  forcePage={this.state.currPage}
+                  pageLabelBuilder={(page) => `[${page}]`}
+                  pageRangeDisplayed={3}
+                  pageCount={this.state.pageCount}
+                  renderOnZeroPageCount={null}
+                  previousLabel={null}
+                  nextLabel={null}
+                  /></span>
+          }
       </div>
     )
   }

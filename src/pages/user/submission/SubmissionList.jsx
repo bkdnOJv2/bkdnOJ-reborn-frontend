@@ -6,8 +6,12 @@ import { Table } from 'react-bootstrap';
 
 import { SpinLoader, ErrorBox } from 'components';
 import submissionApi from 'api/submission';
+import contestApi from 'api/contest';
 import dateFormatter from 'helpers/dateFormatter';
 import { setTitle } from 'helpers/setTitle';
+
+// Contexts
+import ContestContext from 'context/ContestContext';
 
 import './SubmissionList.scss'
 import 'styles/ClassicPagination.scss';
@@ -76,9 +80,13 @@ class SubListItem extends React.Component {
 }
 
 class SubmissionList extends React.Component {
+  static contextType = ContestContext;
+
   constructor(props) {
     super(props);
     this.state = {
+      contest: null,
+
       submissions: [],
       currPage: 0,
       pageCount: 1,
@@ -91,26 +99,53 @@ class SubmissionList extends React.Component {
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
-    submissionApi.getSubmissions({page: params.page+1})
-      .then((res) => {
-        this.setState({
-          submissions: res.data.results,
-          count: res.data.count,
-          pageCount: res.data.total_pages,
-          currPage: params.page,
-          loaded: true,
+    if (this.state.contest) {
+      contestApi.getContestSubmissions({ key: this.state.contest.key, page: params.page+1 
+      }).then((res) => {
+          this.setState({
+            submissions: res.data.results,
+            count: res.data.count,
+            pageCount: res.data.total_pages,
+            currPage: params.page,
+            loaded: true,
+          })
+          console.log(res)
         })
-      })
-      .catch((err) => {
-        this.setState({
-          loaded: true,
-          errors: ["Cannot fetch submissions at the moment. Please retry again."],
+        .catch((err) => {
+          this.setState({
+            loaded: true,
+            errors: ["Cannot fetch contest submissions. Please retry again."],
+          })
         })
-      })
+    } else {
+      submissionApi.getSubmissions({page: params.page+1})
+        .then((res) => {
+          this.setState({
+            submissions: res.data.results,
+            count: res.data.count,
+            pageCount: res.data.total_pages,
+            currPage: params.page,
+            loaded: true,
+          })
+        })
+        .catch((err) => {
+          this.setState({
+            loaded: true,
+            errors: ["Cannot fetch submissions at the moment. Please retry again."],
+          })
+        })
+    }
   }
 
   componentDidMount() {
-    this.callApi({page: this.state.currPage});
+    const contest = this.context.contest;
+    if (contest) {
+      setTitle(`Contest. ${contest.name} | Submissions`)
+      this.setState({ contest }, 
+        () => this.callApi({page: this.state.currPage})
+      )
+    } else this.callApi({page: this.state.currPage})
+    
   }
 
   handlePageClick = (event) => {
@@ -120,7 +155,7 @@ class SubmissionList extends React.Component {
   render() {
     return (
       <div className="submission-table">
-        <h4>Public Submission</h4>
+        <h4>Submissions</h4>
         <ErrorBox errors={this.state.errors} />
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
@@ -164,6 +199,7 @@ class SubmissionList extends React.Component {
     )
   }
 }
+
 
 export {
   SubmissionList,

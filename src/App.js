@@ -158,7 +158,6 @@ class App extends React.Component {
             } />
 
             <Route path="/contest/:key" element={<ContestApp />}>
-
               <Route index path="problem" element={
                 <ProblemList />
               }/>
@@ -166,10 +165,7 @@ class App extends React.Component {
                 <ProblemDetails />
               }/>
               <Route path="submission" element={
-                <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
-                  style={{minHeight: "400px"}}>
-                    <h4>Submission</h4>
-                </div>
+                <SubmissionList />
               }/>
               <Route path="standing" element={
                 <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
@@ -178,6 +174,7 @@ class App extends React.Component {
                 </div>
               }/>
 
+              <Route path="*" element={<Navigate to="problem" replace />} />
             </Route>
 
 
