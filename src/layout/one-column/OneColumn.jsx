@@ -21,10 +21,10 @@ export default class OneColumn extends React.Component {
       <div className="one-column-wrapper">
         {
           mainContent.map(
-            (Content, idx) => 
+            (Content, idx) =>
               // TODO: Would multiple OneColumn layout affects each others?
-              //       Because there would be multiple div with the same key? 
-              <div key={`one-col-${idx}`} className="main-component shadow rounded" id={`one-column-element-${idx}`}>
+              //       Because there would be multiple div with the same key?
+              <div key={`one-col-${idx}`} id={`one-column-element-${idx}`}>
                 {Content}
               </div>
           )

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateUser, clearUser } from 'redux/User/actions';
-import { updateProfile, clearProfile } from 'redux/Profile/actions';
+import { updateProfile } from 'redux/Profile/actions';
 
 import { Row, Col, Container } from 'react-bootstrap';
 
@@ -18,7 +18,7 @@ class UserProfile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            profile: {},
+            profile: this.props.profile,
             loaded: false,
         }
         this.user = this.props.user;
@@ -26,8 +26,8 @@ class UserProfile extends React.Component {
     }
 
     componentDidMount() {
-        const profile = this.props.profile;
-        if (!this.profile) {
+        const profile = this.state.profile;
+        if (!profile) {
             profileClient.fetchProfile().then((res) => {
                 this.setState({
                     profile: res.data,
@@ -38,11 +38,6 @@ class UserProfile extends React.Component {
                 this.props.updateProfile({ ...res.data, });
             }).catch((err) => {
                 log(err);
-            })
-        } else {
-            this.setState({
-                profile: this.profile,
-                loaded: true,
             })
         }
     }
@@ -57,7 +52,7 @@ class UserProfile extends React.Component {
                     !loaded && <SpinLoader className='user-profile-loader'/>
                 }
                 {
-                    loaded && !profile 
+                    loaded && !profile
                     && <Row>
                         <Col className='center p-3'>
                             <h5 className='pt-2'>Not logged in.</h5>
@@ -65,7 +60,7 @@ class UserProfile extends React.Component {
                     </Row>
                 }
                 {
-                    loaded && !!profile 
+                    loaded && !!profile
                     && <Row>
                         <Col md={4} className='center p-3'>
                             <img src={profile.avatar} className='avatar img-fluid'

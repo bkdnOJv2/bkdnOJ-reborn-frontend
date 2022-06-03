@@ -100,7 +100,7 @@ class SubmissionList extends React.Component {
     this.setState({loaded: false, errors: null})
 
     if (this.state.contest) {
-      contestApi.getContestSubmissions({ key: this.state.contest.key, page: params.page+1 
+      contestApi.getContestSubmissions({ key: this.state.contest.key, page: params.page+1
       }).then((res) => {
           this.setState({
             submissions: res.data.results,
@@ -141,11 +141,11 @@ class SubmissionList extends React.Component {
     const contest = this.context.contest;
     if (contest) {
       setTitle(`Contest. ${contest.name} | Submissions`)
-      this.setState({ contest }, 
+      this.setState({ contest },
         () => this.callApi({page: this.state.currPage})
       )
     } else this.callApi({page: this.state.currPage})
-    
+
   }
 
   handlePageClick = (event) => {
@@ -154,7 +154,7 @@ class SubmissionList extends React.Component {
 
   render() {
     return (
-      <div className="submission-table">
+      <div className="submission-table wrapper-vanilla">
         <h4>Submissions</h4>
         <ErrorBox errors={this.state.errors} />
         <Table responsive hover size="sm" striped bordered className="rounded">

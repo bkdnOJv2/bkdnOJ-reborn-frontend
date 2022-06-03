@@ -45,12 +45,12 @@ class SubmissionDetails extends React.Component {
   constructor(props) {
     super(props);
     const { id } = this.props.params;
-    this.state = { 
-      id: id, 
+    this.state = {
+      id: id,
       loaded: false, errors: null,
-      data: { 
+      data: {
         status: ".",
-      }, 
+      },
     };
     this.user = (this.props.user) || null;
   }
@@ -70,7 +70,7 @@ class SubmissionDetails extends React.Component {
       })
   }
 
-  pollResult() { 
+  pollResult() {
     if (shouldStopPolling(this.state.data.status)) {
       clearInterval(this.timer)
       return;
@@ -88,7 +88,7 @@ class SubmissionDetails extends React.Component {
     clearInterval(this.timer)
   }
 
-  render() { 
+  render() {
     if (this.state.redirectUrl) {
       return <Navigate to={`${this.state.redirectUrl}`} />
     }
@@ -100,11 +100,11 @@ class SubmissionDetails extends React.Component {
     const polling = (loaded && !shouldStopPolling(data.status));
 
     return (
-      <div className="submission-info">
-        <h4 className="submission-title"> 
-          { 
-            !loaded ? 
-            <span><SpinLoader/> Loading...</span> : 
+      <div className="submission-info wrapper-vanilla">
+        <h4 className="submission-title">
+          {
+            !loaded ?
+            <span><SpinLoader/> Loading...</span> :
             <span>
               {`Submission#${data.id}`}
               {polling && <div className="loading_3dot"></div>}
@@ -113,12 +113,12 @@ class SubmissionDetails extends React.Component {
         </h4>
         <hr/>
         <div className={`submission-details ${loaded && "text-left"}`}>
-          { 
-            !this.state.loaded ? <span><SpinLoader/> Loading...</span> 
+          {
+            !this.state.loaded ? <span><SpinLoader/> Loading...</span>
             : <>
               <div className="general info-subsection">
                 {
-                  (!!this.user && this.user.is_staff) && 
+                  (!!this.user && this.user.is_staff) &&
                   <div>
                     <h5>Admin Panel</h5>
                     <Row>
@@ -140,14 +140,14 @@ class SubmissionDetails extends React.Component {
                     <span><strong>Problem:</strong>
                       <Link to={`/problem/${data.problem.shortname}`}>
                         { data.problem.title }
-                      </Link> 
+                      </Link>
                     </span>
                   </Col>
                   <Col >
                     <span><strong>Author:</strong>
                       <Link to={`/user/${data.user.owner.username}`}>
                         { data.user.owner.username }
-                      </Link> 
+                      </Link>
                     </span>
                   </Col>
                   <Col >
@@ -162,7 +162,7 @@ class SubmissionDetails extends React.Component {
               <div className="source info-subsection">
                 <h5>Source</h5>
                 <Row><Col>
-                  <CodeEditor 
+                  <CodeEditor
                     code={data.source}
                     onCodeChange={() => {}}
                     ace={data.language_ace}
@@ -177,7 +177,7 @@ class SubmissionDetails extends React.Component {
                   <tbody>
                   {
                     data.test_cases.map(
-                      (test_case) => <SubmissionTestCase 
+                      (test_case) => <SubmissionTestCase
                         key={test_case.id} data={test_case}
                       />
                     )

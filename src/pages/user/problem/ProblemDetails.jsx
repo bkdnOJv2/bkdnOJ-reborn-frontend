@@ -4,7 +4,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 
 import PDFViewer from 'components/PDFViewer/PDFViewer';
-import { FaPaperPlane, FaSignInAlt, FaExternalLinkAlt, FaWrench } from 'react-icons/fa';
+import { FaPaperPlane, FaSignInAlt, FaWrench } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
 import { SpinLoader } from 'components';
@@ -26,7 +26,7 @@ class ProblemDetails extends React.Component {
       redirectUrl: null,
       submitFormShow: false,
     };
-    this.user = (this.props.user.user);
+    this.user = (this.props.user);
   }
 
   handleSubmitFormOpen() { this.setState({ submitFormShow: true })}
@@ -67,7 +67,7 @@ class ProblemDetails extends React.Component {
     const {loaded, errors, data} = this.state;
 
     return (
-      <div className="problem-info">
+      <div className="problem-info wrapper-vanilla">
         <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Problem Not Found</span>}

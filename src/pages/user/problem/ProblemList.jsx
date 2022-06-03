@@ -90,7 +90,7 @@ class ProblemList extends React.Component {
     const contest = this.context.contest;
     if (contest) {
       setTitle(`Contest. ${contest.name} | Problems`)
-      this.setState({ contest }, 
+      this.setState({ contest },
         () => this.callApi({page: this.state.currPage})
       )
     } else this.callApi({page: this.state.currPage})
@@ -104,7 +104,7 @@ class ProblemList extends React.Component {
     const contest = this.context.contest;
 
     return (
-      <div className="problem-table">
+      <div className="problem-table wrapper-vanilla">
         <h4>Problem Set</h4>
         <ErrorBox errors={this.state.errors} />
           <Table responsive hover size="sm" striped bordered className="rounded">
@@ -120,7 +120,7 @@ class ProblemList extends React.Component {
             </thead>
             <tbody>
               { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
-              { this.state.loaded === true && 
+              { this.state.loaded === true &&
                 <>
                   {
                   this.state.problems.map((prob, idx) => <ProblemListItem

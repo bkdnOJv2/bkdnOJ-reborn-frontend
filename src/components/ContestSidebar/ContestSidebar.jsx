@@ -45,8 +45,8 @@ class ContestSidebar extends React.Component {
           let end_time = new Date(contest.end_time);
           if (!contest.end_time) {
             var hms = this.time_limit;
-            var a = hms.split(':'); 
-            var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]); 
+            var a = hms.split(':');
+            var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
             end_time = (start_time.getTime() + seconds*1000);
           }
 
@@ -73,17 +73,17 @@ class ContestSidebar extends React.Component {
   render() {
     const contest = this.state.contest;
     if (!contest) // Contest not loaded
-      return (<>
+      return (<div className="wrapper-vanilla">
         <h5>
           <div className="loading_3dot d-block">Loading</div>
         </h5>
         <div className="flex-center">
-          <SpinLoader margin="0"/>
+          <SpinLoader margin="10px"/>
         </div>
-      </>)
+      </div>)
 
     if (contest) {
-      return <>
+      return <div className="wrapper-vanilla">
         <h5 style={{paddingBottom: "unset", fontSize: "14px"}}>
           <span><Link to={`/contest/${contest.key}`}>Currently participating</Link></span>
         </h5>
@@ -93,7 +93,7 @@ class ContestSidebar extends React.Component {
         <div>
           <span>{`Time remaining: `}{this.state.label}</span>
         </div>
-      </>
+      </div>
     }
 
   }

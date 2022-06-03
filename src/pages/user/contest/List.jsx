@@ -19,7 +19,7 @@ class ContestListItem extends React.Component {
   }
 
   parseStartTime() {
-    if (this.props.data.start_time) 
+    if (this.props.data.start_time)
       return (
         <span>{new Date(this.props.data.start_time).toLocaleString()}
           <div style={{fontSize: "10px"}}>UTC{this.props.data.start_time.substring(19)}</div>
@@ -34,7 +34,7 @@ class ContestListItem extends React.Component {
   parseParticipation() {
     const type = this.props.type;
     if (type === 'active') {
-      return 
+      return
     }
   }
 
@@ -53,7 +53,7 @@ class ContestListItem extends React.Component {
         </td>
         <td>{this.parseStartTime()}</td>
         <td>{this.parseDuration()}</td>
-        <td id="participate-options">{ 
+        <td id="participate-options">{
           <div className="text-center d-flex flex-column align-items-center" style={{width: "100%"}}>
             <span className="d-inline-flex align-items-center">
               Participants: {this.props.data.user_count}<VscPerson size={16}/>
@@ -140,21 +140,21 @@ class NPContestList extends React.Component {
           </thead>
           <tbody>
               { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
-              { this.state.loaded === true && 
+              { this.state.loaded === true &&
                   <>
-                      { 
-                          this.state.contests.active.map((cont, idx) => 
-                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="active" /> 
+                      {
+                          this.state.contests.active.map((cont, idx) =>
+                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="active" />
                           )
                       }
-                      { 
-                          this.state.contests.present.map((cont, idx) => 
-                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="present"/> 
+                      {
+                          this.state.contests.present.map((cont, idx) =>
+                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="present"/>
                           )
                       }
-                      { 
-                          this.state.contests.future.map((cont, idx) => 
-                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="future"/> 
+                      {
+                          this.state.contests.future.map((cont, idx) =>
+                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="future"/>
                           )
                       }
                   </>
@@ -212,7 +212,7 @@ class ContestList extends React.Component {
 
   render() {
     return (
-      <div className="contest-table">
+      <div className="contest-table wrapper-vanilla">
         <NPContestList />
 
         <hr className="m-2" />
@@ -232,11 +232,11 @@ class ContestList extends React.Component {
             </thead>
             <tbody>
               { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
-              { this.state.loaded === true && 
+              { this.state.loaded === true &&
                 <>
-                  { 
-                    this.state.pastContests.map((cont, idx) => 
-                      <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="past" /> 
+                  {
+                    this.state.pastContests.map((cont, idx) =>
+                      <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="past" />
                     )
                   }
                 </>

@@ -16,14 +16,14 @@ import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
 import {
-  SubmissionList, SubmissionDetails, ProblemList, 
+  SubmissionList, SubmissionDetails, ProblemList,
   ProblemDetails, JudgeStatuses, Submit,
   ContestList, ContestApp,
 } from 'pages/user';
 
 import {
   AdminUserList, AdminUserDetails, AdminUserNew,
-  AdminProblemList, AdminProblemDetails, 
+  AdminProblemList, AdminProblemDetails,
   AdminSubmissionList, AdminSubmissionDetails,
   AdminJudgeList, AdminJudgeDetails, AdminJudgeNew,
   AdminApp
@@ -63,7 +63,7 @@ class App extends React.Component {
       <HistoryRouter history={history}>
         <Routes>
           {
-            this.isAdmin() && 
+            this.isAdmin() &&
             <>
               <Route path="/admin" element={<AdminApp />}>
                 <Route index path="" element={
@@ -135,11 +135,11 @@ class App extends React.Component {
               <OneColumn mainContent={<ProblemList />}
               />
             } />
-            <Route path="/problem/:shortname" 
+            <Route path="/problem/:shortname"
               element={<OneColumn mainContent={<ProblemDetails />}
                       />}
             />
-            {/* <Route path="/problem/:shortname/submit" 
+            {/* <Route path="/problem/:shortname/submit"
               element={<ListSidebar mainContent={<Submit />} />}
             /> */}
 
@@ -158,7 +158,7 @@ class App extends React.Component {
             } />
 
             <Route path="/contest/:key" element={<ContestApp />}>
-              <Route index path="problem" element={
+              <Route path="problem" element={
                 <ProblemList />
               }/>
               <Route path="problem/:shortname" element={
@@ -173,7 +173,7 @@ class App extends React.Component {
                     <h4>Standing</h4>
                 </div>
               }/>
-
+              <Route path="" element={<Navigate to="problem" replace />} />
               <Route path="*" element={<Navigate to="problem" replace />} />
             </Route>
 
@@ -194,7 +194,7 @@ class App extends React.Component {
       </HistoryRouter>
     )
   }
-} 
+}
 const mapStateToProps = state => {
   return {
     user : state.user.user
