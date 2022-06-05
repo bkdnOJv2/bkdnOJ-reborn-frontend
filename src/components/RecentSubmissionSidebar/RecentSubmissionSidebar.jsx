@@ -8,7 +8,9 @@ import contestAPI from 'api/contest';
 import { ErrorBox, SpinLoader } from 'components';
 import ContestContext from 'context/ContestContext';
 
-import dateFormatter from 'helpers/dateFormatter';
+import { getHourMinuteSecond, getYearMonthDate } from 'helpers/dateFormatter';
+
+import './RecentSubmissionSidebar.scss';
 
 class RSubItem extends React.Component {
   parseTime(time) {
@@ -23,31 +25,33 @@ class RSubItem extends React.Component {
       return `${(mem+1023)/1024} MB`
     return `${mem} KB`
   }
-  parseDate(date) {
-    return dateFormatter(date);
-  }
+
   render() {
     const {id, problem, user, status, result, time, memory, date} = this.props;
     const verdict = (status === "D" ? result : status);
 
     return (
       <tr>
-        <td className="text-truncate">
+        <td className="text-truncate" style={{width: "5%"}}>
           <Link to={`submission/${id}`}>{id}</Link>
         </td>
-        <td className="text-truncate">
+        <td className="text-truncate" style={{width: "10%"}}>
           <Link to={`problem/${problem.shortname}`}>{problem.shortname}</Link>
         </td>
 
         {
-          <td className={`verdict ${verdict.toLowerCase()}`}>
+          <td className={`verdict ${verdict.toLowerCase()}`} style={{width: "6%"}}>
             <span>{verdict}</span>
           </td>
         }
 
-        <td>{this.parseTime(time)}</td>
-        <td>{this.parseMemory(memory)}</td>
-        <td >{this.parseDate(date)}</td>
+        <td className="flex-center responsive-date" style={{fontWeight: 100}}>
+          <div className="d-none d-lg-block">{`${getYearMonthDate(date)}, ${getHourMinuteSecond(date)}`}</div>
+          <div className="d-block d-lg-none">
+            <div style={{fontSize: "8px"}}>{getYearMonthDate(date)}</div>
+            <div style={{fontSize: "10px"}}>{getHourMinuteSecond(date)}</div>
+          </div>
+        </td>
       </tr>
     )
   }
@@ -97,7 +101,7 @@ class RecentSubmissionSidebar extends React.Component {
     const { subs, loaded, user, contest } = this.state;
 
     return (
-      <div className="flex-center wrapper-vanilla">
+      <div className="flex-center wrapper-vanilla" id="recent-submission-sidebar">
         <h4>Recent Submission</h4>
         { !user && <span><Link to='/sign-in'>Log in</Link> to see</span> }
         { !!user && !contest && <span>Contest is not available.</span> }
@@ -107,12 +111,12 @@ class RecentSubmissionSidebar extends React.Component {
           <Table responsive hover size="sm" striped bordered className="rounded">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Problem</th>
-                <th>Status</th>
-                <th>Time</th>
-                <th>Memory</th>
-                <th>Date</th>
+                <th style={{width: "5%"}}>#</th>
+                <th className="text-truncate" style={{width: "10%"}}>Problem</th>
+                <th className="text-truncate" style={{width: "6%"}}>Status</th>
+                {/* <th className="text-truncate">Time</th>
+                <th className="text-truncate">Memory</th> */}
+                <th className="text-truncate">Date</th>
               </tr>
             </thead>
             <tbody>{

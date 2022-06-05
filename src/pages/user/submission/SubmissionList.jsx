@@ -56,7 +56,7 @@ class SubListItem extends React.Component {
         <td className="text-truncate">
           <Link to={`/submission/${id}`}>{id}</Link>
         </td>
-        <td className="text-truncate" style={{maxWidth: "200px"}}>
+        <td className="text-truncate" style={{maxWidth: "100px"}}>
           <Link to={`/problem/${problem.shortname}`}>{problem.title}</Link>
         </td>
         <td className="text-truncate" >
@@ -109,7 +109,6 @@ class SubmissionList extends React.Component {
             currPage: params.page,
             loaded: true,
           })
-          console.log(res)
         })
         .catch((err) => {
           this.setState({

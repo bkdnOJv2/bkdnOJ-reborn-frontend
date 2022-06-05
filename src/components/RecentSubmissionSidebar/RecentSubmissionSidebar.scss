@@ -1,0 +1,44 @@
+@import 'global.scss';
+
+div#recent-submission-sidebar {
+  overflow: hidden !important;
+  table {
+    th, td {
+      width: auto;
+      font-size: 14px;
+      overflow: hidden;
+    }
+    td {
+      font-weight: 100;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+    overflow: hidden !important;
+    margin: unset;
+  }
+
+  .verdict {
+    font-weight: bold;
+    font-family: $font-codeforces;
+
+    &.ac > span {
+      color: $accepted !important;
+    }
+
+    &.wa > span, &.tle > span, &.mle > span, &.ole > span {
+      color: $not-accepted !important;
+    }
+
+    &.ir > span, &.rte > span {
+      color: $runtime-error !important;
+    }
+
+    &.qu > span, &.g > span, &.p > span, &.sc > span {
+      color: $queued !important;
+    }
+
+    &.ie > span, &.ce > span {
+      color: $system-error !important;
+    }
+  }
+}

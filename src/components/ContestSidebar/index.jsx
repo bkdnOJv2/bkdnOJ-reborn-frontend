@@ -73,7 +73,7 @@ class ContestSidebar extends React.Component {
   render() {
     const contest = this.state.contest;
     if (!contest) // Contest not loaded
-      return (<div className="wrapper-vanilla">
+      return (<div className="wrapper-vanilla" id="contest-sidebar">
         <h5>
           <div className="loading_3dot d-block">Loading</div>
         </h5>
@@ -83,7 +83,7 @@ class ContestSidebar extends React.Component {
       </div>)
 
     if (contest) {
-      return <div className="wrapper-vanilla">
+      return <div className="wrapper-vanilla" id="contest-sidebar">
         <h5 style={{paddingBottom: "unset", fontSize: "14px"}}>
           <span><Link to={`/contest/${contest.key}`}>Currently participating</Link></span>
         </h5>
