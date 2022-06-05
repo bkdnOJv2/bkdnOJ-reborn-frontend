@@ -77,16 +77,11 @@ class ContestApp extends React.Component {
           <OneColumn mainContent={[
             <ContestBanner />,
             <ContestNav />,
-            <ListSidebar
-              mainContent={
-                contest
-                ? <Outlet/>
-                : <div className="shadow flex-center" style={{ "height": "100px" }}>
-                  <SpinLoader margin="0"/>
-                </div>
-              }
-              sideComponents={[<ContestSidebar />]}
-            />,
+            contest
+            ? <Outlet/>
+            : <div className="shadow flex-center" style={{ "height": "100px" }}>
+              <SpinLoader margin="0"/>
+            </div>
           ]}/>
         </ContestProvider >
       </div>

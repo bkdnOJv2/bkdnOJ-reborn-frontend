@@ -203,4 +203,5 @@ class SubmissionList extends React.Component {
 
 export {
   SubmissionList,
+  SubListItem
 }

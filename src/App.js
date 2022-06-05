@@ -11,7 +11,11 @@ import ScrollToTop from 'helpers/react-router/ScrollToTop';
 // Components
 import { ListSidebar, OneColumn } from 'layout';
 
-import { Content, ContestSidebar } from 'components';
+import {
+  Content, ContestSidebar,
+  RecentSubmissionSidebar,
+} from 'components';
+
 import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
@@ -152,6 +156,7 @@ class App extends React.Component {
               />
             } />
 
+            {/* ---------------------- CONTEST --------------------------- */}
             <Route path="/contest" element={
               <OneColumn mainContent={<ContestList />}
               />
@@ -159,13 +164,28 @@ class App extends React.Component {
 
             <Route path="/contest/:key" element={<ContestApp />}>
               <Route path="problem" element={
-                <ProblemList />
+                <ListSidebar
+                  mainContent={
+                    <ProblemList />
+                  }
+                  sideComponents={[<RecentSubmissionSidebar />]}
+                />
               }/>
               <Route path="problem/:shortname" element={
-                <ProblemDetails />
+                <ListSidebar
+                  mainContent={
+                    <ProblemDetails />
+                  }
+                  sideComponents={[<ContestSidebar />]}
+                />
               }/>
               <Route path="submission" element={
-                <SubmissionList />
+                <ListSidebar
+                  mainContent={
+                    <SubmissionList />
+                  }
+                  sideComponents={[<ContestSidebar />]}
+                />
               }/>
               <Route path="standing" element={
                 <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
