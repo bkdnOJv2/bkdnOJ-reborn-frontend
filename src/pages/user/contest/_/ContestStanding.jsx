@@ -6,8 +6,11 @@ import { Table } from 'react-bootstrap';
 import { SpinLoader, ErrorBox } from 'components';
 import submissionApi from 'api/submission';
 import contestAPI from 'api/contest';
+
+// Helpers
 import { setTitle } from 'helpers/setTitle';
 
+// Assets
 import top1 from 'assets/common/atcoder_top1.png';
 import top10 from 'assets/common/atcoder_top10.png';
 import top30 from 'assets/common/atcoder_top30.png';
@@ -15,6 +18,8 @@ import top100 from 'assets/common/atcoder_top100.png';
 
 // Contexts
 import ContestContext from 'context/ContestContext';
+
+// Styles
 import './ContestStanding.scss';
 
 class StandingItem extends React.Component {
@@ -52,6 +57,8 @@ class StandingItem extends React.Component {
         )
       })
 
+    const realname = `${user.first_name} ${user.last_name}`;
+
     return (
       <tr>
         <td className="td-rank">
@@ -73,7 +80,18 @@ class StandingItem extends React.Component {
             }
           </div>
         </td>
-        <td>{user.username}</td>
+        <td className="td-participant">
+          <div className="flex-center participant-container">
+            <div className="avatar-container">
+              <img className='img-fluid' src="https://www.gravatar.com/avatar/HASH"></img>
+              {/* <img className='img-fluid' src={user.avatar} alt="User Avatar"></img> */}
+            </div>
+            <div className="flex-center-col">
+              <div className="text-left acc-username">{user.username}</div>
+              {realname.length > 0 && realname !== ' ' && <div className="text-left acc-realname">{realname}</div>}
+            </div>
+          </div>
+        </td>
 
         <td className="td-total">
           <div className="flex-center-col">
@@ -87,9 +105,8 @@ class StandingItem extends React.Component {
         </td>
 
         {
-          best.map((c) => <td
-            className="td-p-best"
-          >{c}</td>)
+          best.map((c, i) => <td className="td-p-best"
+            key={`ct-st-pb-${user.username}-${i}`} >{c}</td>)
         }
       </tr>
     )
@@ -155,14 +172,15 @@ class ContestStanding extends React.Component {
     const { contest } = this.context;
     if (!user || !contest) return; // skip if no user or no contest
     if (prevState.contest !== contest || prevState.user !== user) {
-      this.setState({ user, contest }, () => this.refetch());
-
+      this.setState({ user, contest }, () => {
+        setTitle(`${contest.name} | Standing`)
+        this.refetch()
+      });
     }
   }
 
   render() {
     const { loaded, errors, problems, standing } = this.state;
-    console.log(this.state)
 
     return (
       <div className="wrapper-vanilla p-2" id="contest-standing">
@@ -177,14 +195,15 @@ class ContestStanding extends React.Component {
               <th className="th-participant">Participant</th>
               <th className="th-score">Score</th>
               {
-                problems.map((prob, idx) => <th key={`cs-th-prb-${prob.id}`}
-                  classname={`th-p-best`}>{ prob.label }</th>)
+                problems.map((prob, idx) => <th key={`cs-th-prb-${idx}`}
+                  className={`th-p-best`}>{ prob.label }</th>)
               }
               </tr>
             </thead>
             <tbody>
               {
                 standing.map((part, idx) => <StandingItem
+                  key={`ct-st-row-${idx}`}
                   mapping={this.state.id2idx} rowIdx={idx} {...part} />)
               }
             </tbody>

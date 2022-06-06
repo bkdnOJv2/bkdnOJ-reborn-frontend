@@ -176,7 +176,7 @@ class App extends React.Component {
                   mainContent={
                     <ProblemDetails />
                   }
-                  sideComponents={[<ContestSidebar />]}
+                  sideComponents={[<RecentSubmissionSidebar />]}
                 />
               }/>
               <Route path="submission" element={

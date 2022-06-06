@@ -65,6 +65,7 @@ class RecentSubmissionSidebar extends React.Component {
       subs: [],
       loaded: false,
       errors: null,
+      count: null,
 
       contest: null,
       user: null,
@@ -72,12 +73,15 @@ class RecentSubmissionSidebar extends React.Component {
   }
 
   refetch() {
-    this.setState({ loaded: false, errors: null })
-    contestAPI.getContestSubmissions({ key: this.state.contest.key })
+    this.setState({ loaded: false, count: null, errors: null })
+    const { user } = this.state;
+    contestAPI.getContestSubmissions({ key: this.state.contest.key,
+                                        params: {user: user.username} })
       .then((res) => {
         this.setState({
           loaded: true,
           subs: res.data.results, // first page only
+          count: res.data.count,
         })
         // console.log(res);
       })
@@ -129,10 +133,16 @@ class RecentSubmissionSidebar extends React.Component {
                 <th className="text-truncate">Date</th>
               </tr>
             </thead>
-            <tbody>{
-              subs.map((sub, idx) => <RSubItem
-                key={`recent-sub-${sub.id}`} rowid={idx} {...sub} />)
-            }</tbody>
+            <tbody>
+              { this.state.count === 0 && <>
+                <tr><td colSpan="4">
+                  <em>No Submissions Yet.</em>
+                </td></tr>
+              </> }
+              { this.state.count > 0 &&
+                subs.map((sub, idx) => <RSubItem
+                  key={`recent-sub-${sub.id}`} rowid={idx} {...sub} />) }
+            </tbody>
           </Table>
         </>}
       </div>

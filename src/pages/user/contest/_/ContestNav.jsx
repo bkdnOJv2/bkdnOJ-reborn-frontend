@@ -23,6 +23,12 @@ class ContestNav extends React.Component {
     })
   }
 
+  componentDidMount() {
+    this.setState({
+      active_app: '1509-force-render',
+    })
+  }
+
   componentDidUpdate(prevProps, prevState) {
     const splits=this.props.location.pathname.split('/');
     let part = undefined;
@@ -42,7 +48,7 @@ class ContestNav extends React.Component {
   render() {
     return (
       <>
-      <div className="wrapper-vanilla">
+      <div className={`wrapper-vanilla ${this.props.show===false ? 'd-none' : ''}`}>
         <div className="d-inline-flex text-left" id="contest-app-nav">
           <Link id={`contest-nav-back`} onClick={()=>this.props.navigate(-1)}
             to='#'>{`<< Back`}</Link>

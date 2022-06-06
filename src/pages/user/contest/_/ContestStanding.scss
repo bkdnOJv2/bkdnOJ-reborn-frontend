@@ -10,8 +10,7 @@ div#contest-standing {
   }
 
   th.th-rank, td.td-rank {
-    min-width: fit-content;
-    max-width: 100px;
+    width: 100px;
   }
 
   th.th-participant, td.td-participant {
@@ -19,8 +18,35 @@ div#contest-standing {
     max-width: 300px;
   }
 
-  th.th-p-best, td.td-p-best,
+  td.td-participant {
+    padding-left: 10px;
+    padding-right: 10px;
+    div.participant-container {
+      column-gap: 10px;
+      row-gap: 10px;
+    }
+
+    div.avatar-container {
+      width: 50px;
+      // height: 50px;
+    }
+
+    div.acc-username {
+      width: 100%;
+      font-weight: bold;
+      text-align: left;
+    }
+    div.acc-realname {
+      width: 100%;
+      font-size: 14px;
+      text-align: left;
+    }
+  }
+
   th.th-score, td.td-score {
+    width: 140px;
+  }
+  th.th-p-best, td.td-p-best {
     width: 70px;
   }
 

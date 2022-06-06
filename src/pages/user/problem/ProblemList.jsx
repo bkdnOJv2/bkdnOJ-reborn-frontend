@@ -22,18 +22,37 @@ import 'styles/ClassicPagination.scss';
 class ProblemListItem extends React.Component {
   render() {
     const {shortname, title, solved_count, attempted_count, points} = this.props;
+    const { contest, label, } = this.props;
+    console.log(this.props)
+
     return (
       <tr>
-        <td className="text-truncate" style={{maxWidth: "100px"}}>
-          <Link to={`/problem/${shortname}`}>{shortname}</Link>
-        </td>
-        <td className="text-truncate" style={{maxWidth: "300px"}}>
-          <Link to={`/problem/${shortname}`}>{title}</Link>
-        </td>
+        {
+          !contest
+          ? <td className="text-truncate problem-code">
+            <Link to={`/problem/${shortname}`}>{shortname}</Link>
+          </td>
+          : <td className="text-truncate problem-code" >
+            <Link to={`${label}`}>{label}</Link>
+          </td>
+        }
+
+        {
+          !contest
+          ? <td className="text-truncate problem-title" >
+            <Link to={`/problem/${shortname}`}>{title}</Link>
+          </td>
+          : <td className="text-truncate problem-title" >
+            <Link to={`${shortname}`}>{title}</Link>
+          </td>
+        }
+
         <td>{points}</td>
         <td>{solved_count}</td>
+
         <td>{attempted_count === 0 ? '?' : `${(solved_count*100.0/attempted_count).toFixed(2)}%`}</td>
-        <td>
+
+        <td style={{width: "20px"}}>
           {/* <Link to={`/problem/${shortname}/submit`}><FaPaperPlane/></Link> */}
         </td>
       </tr>
@@ -89,7 +108,7 @@ class ProblemList extends React.Component {
   componentDidMount() {
     const contest = this.context.contest;
     if (contest) {
-      setTitle(`Contest. ${contest.name} | Problems`)
+      setTitle(`${contest.name} | Problems`)
       this.setState({ contest },
         () => this.callApi({page: this.state.currPage})
       )
@@ -110,24 +129,36 @@ class ProblemList extends React.Component {
           <Table responsive hover size="sm" striped bordered className="rounded">
             <thead>
               <tr>
-                <th style={{width: "20%"}}>#</th>
-                <th style={{minWidth: "30%", maxWidth: "50%"}}>Title</th>
+
+                <th className="problem-code">#</th>
+                <th className="problem-title">Title</th>
                 <th style={{width: "12%"}}>Points</th>
                 <th style={{width: "10%"}}>Solved</th>
                 <th style={{width: "10%"}}>AC%</th>
                 <th style={{width: "5%"}}></th>
+
               </tr>
             </thead>
             <tbody>
-              { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
+              { this.state.loaded === false && <tr>
+                <td colSpan="6"><SpinLoader margin="10px" /></td>
+              </tr> }
               { this.state.loaded === true &&
                 <>
-                  {
-                  this.state.problems.map((prob, idx) => <ProblemListItem
-                      key={`prob-${prob.shortname}`}
-                      rowid={idx} {...prob}
-                    />)
-                  }
+                  { this.state.count > 0 && <>
+                    {
+                      this.state.problems.map((prob, idx) => <ProblemListItem
+                          key={`prob-${prob.shortname}`}
+                          rowid={idx} {...prob}
+                        />)
+                    }
+                  </> }
+
+                  { this.state.count === 0 && <>
+                    <tr><td colSpan="6">
+                      <em>No problems available yet.</em>
+                    </td></tr>
+                  </> }
                 </>
               }
             </tbody>

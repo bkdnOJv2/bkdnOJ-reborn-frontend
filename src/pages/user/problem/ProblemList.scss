@@ -8,12 +8,12 @@
     }
   }
 
-  h4 {
+  h4, h5 {
     margin: unset;
     padding: 4px;
 
     font-size: medium;
-
+    font-weight: bold;
     font-family: $font-codeforces;
     background-color: $background-gray;
   }
@@ -21,6 +21,15 @@
     font-size: 14px;
     font-family: $font-codeforces;
     vertical-align: middle;
+
+    &.problem-code {
+      min-width: fit-content;
+      max-width: 50px;
+    }
+    &.problem-title {
+      min-width: fit-content;
+      max-width: 100px;
+    }
   }
   table {
     margin: unset;

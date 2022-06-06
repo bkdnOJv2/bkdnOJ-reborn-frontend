@@ -20,7 +20,7 @@ import './ContestApp.scss';
 
 // Context Components
 import {
-  ContestNav, ContestBanner
+  ContestNav, ContestBanner, ContestController,
 } from './_';
 
 // Context
@@ -51,6 +51,8 @@ class ContestApp extends React.Component {
       contest_key: this.props.params.key,
       contest: null,
       redirectUrl: null,
+
+      showNav: true,
     }
   }
 
@@ -70,19 +72,24 @@ class ContestApp extends React.Component {
   }
 
   render() {
-    const { contest, loaded } = this.state;
+    const { contest, loaded, showNav } = this.state;
+    let mains = [
+      <ContestBanner />,
+      <ContestNav show={showNav}/>,
+      contest ? <Outlet/>
+      : <div className="shadow flex-center" style={{ "height": "100px" }}>
+        <SpinLoader margin="0"/>
+      </div>
+    ]
+    // console.log(mains)
+    // if (showNav) mains.splice(1, 0, <ContestNav/>)
+
     return (
       <div id="contest-app">
         <ContestProvider value={ {contest} }>
-          <OneColumn mainContent={[
-            <ContestBanner />,
-            <ContestNav />,
-            contest
-            ? <Outlet/>
-            : <div className="shadow flex-center" style={{ "height": "100px" }}>
-              <SpinLoader margin="0"/>
-            </div>
-          ]}/>
+          <ContestController showNav={showNav} setShowNav={(v)=>this.setState({showNav: v})}
+          />
+          <OneColumn mainContent={mains}/>
         </ContestProvider >
       </div>
     )

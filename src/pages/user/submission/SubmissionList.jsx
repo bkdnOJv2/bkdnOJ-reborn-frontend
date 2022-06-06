@@ -139,7 +139,7 @@ class SubmissionList extends React.Component {
   componentDidMount() {
     const contest = this.context.contest;
     if (contest) {
-      setTitle(`Contest. ${contest.name} | Submissions`)
+      setTitle(`${contest.name} | Submissions`)
       this.setState({ contest },
         () => this.callApi({page: this.state.currPage})
       )
