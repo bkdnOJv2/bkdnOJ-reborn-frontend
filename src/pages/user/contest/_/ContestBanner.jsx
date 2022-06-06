@@ -20,7 +20,7 @@ export default class ContestBanner extends React.Component {
     const t = this.state.time_left;
     if (t === null) return;
     if (t <= 0) {
-      this.setState({ label: "Finished" })
+      this.setState({ label: "Contest Finished" })
       clearInterval(this.timer);
       return;
     }
@@ -30,6 +30,7 @@ export default class ContestBanner extends React.Component {
     let h = Math.floor(m/60);
     m = m % 60;
     let label = (h<10 ? '0' : '') + h + ':' + (m<10 ? '0':'') + m + ':' + (s<10 ? '0':'') + s + '';
+    label = `Time remaining: ${label}`
     this.setState({ label })
   }
 
@@ -77,7 +78,7 @@ export default class ContestBanner extends React.Component {
               </h4>
               <hr className="divisor"/>
               <span id="contest-time">
-                {`Time remaining: ${this.state.label}`}
+                {`${this.state.label}`}
               </span>
             </> : <>
               <SpinLoader margin="20px"/>

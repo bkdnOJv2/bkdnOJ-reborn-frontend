@@ -22,7 +22,7 @@ import { SignIn, SignUp, SignOut, UserProfile } from 'pages';
 import {
   SubmissionList, SubmissionDetails, ProblemList,
   ProblemDetails, JudgeStatuses, Submit,
-  ContestList, ContestApp,
+  ContestList, ContestApp, ContestStanding,
 } from 'pages/user';
 
 import {
@@ -188,10 +188,7 @@ class App extends React.Component {
                 />
               }/>
               <Route path="standing" element={
-                <div className="shadow text-dark d-flex d-flex flex-column justify-content-center text-center"
-                  style={{minHeight: "400px"}}>
-                    <h4>Standing</h4>
-                </div>
+                <ContestStanding />
               }/>
               <Route path="" element={<Navigate to="problem" replace />} />
               <Route path="*" element={<Navigate to="problem" replace />} />

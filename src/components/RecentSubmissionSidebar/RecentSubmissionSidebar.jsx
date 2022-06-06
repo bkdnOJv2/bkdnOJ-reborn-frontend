@@ -65,6 +65,7 @@ class RecentSubmissionSidebar extends React.Component {
       subs: [],
       loaded: false,
       errors: null,
+
       contest: null,
       user: null,
     }
@@ -78,7 +79,7 @@ class RecentSubmissionSidebar extends React.Component {
           loaded: true,
           subs: res.data.results, // first page only
         })
-        console.log(res);
+        // console.log(res);
       })
       .catch((err) => {
         this.setState({
@@ -86,6 +87,15 @@ class RecentSubmissionSidebar extends React.Component {
           errors: err,
         })
       })
+  }
+
+  componentDidMount() {
+    // Fix when component unmount and remount again,
+    // lifecycle DidUpdate never get invoked because the props doesn't change.
+    this.setState({
+      contest: (this.context && this.context.contest) || null,
+      user: (this.props && this.props.user) || null,
+    })
   }
 
   componentDidUpdate(prevProps, prevState) {

@@ -35,31 +35,28 @@ class ContestSidebar extends React.Component {
     this.setState({ label })
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.contest !== this.props.contest ) {
-      if ( this.props.contest )  {
-        this.setState({ contest: this.props.contest }, () => {
-          const contest = this.state.contest;
+  componentDidUpdate(prevProps, prevState) {
+    const { contest } = this.context;
+    if (prevState.contest !== contest ) {
+      this.setState({ contest })
 
-          let start_time = new Date(contest.start_time);
-          let end_time = new Date(contest.end_time);
-          if (!contest.end_time) {
-            var hms = this.time_limit;
-            var a = hms.split(':');
-            var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
-            end_time = (start_time.getTime() + seconds*1000);
-          }
-
-          this.setState({ time_left : Math.floor((end_time - new Date()) / 1000) });
-
-          clearInterval(this.timer)
-          this.timer = setInterval(() => {
-            let t = this.state.time_left;
-            if (typeof(t) === 'number')
-              this.setState({ time_left: t-1 }, () => this.updateTimeLeftLabel() );
-          }, 1000)
-        })
+      let start_time = new Date(contest.start_time);
+      let end_time = new Date(contest.end_time);
+      if (!contest.end_time) {
+        var hms = this.time_limit;
+        var a = hms.split(':');
+        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+        end_time = (start_time.getTime() + seconds*1000);
       }
+
+      this.setState({ time_left : Math.floor((end_time - new Date()) / 1000) });
+
+      clearInterval(this.timer)
+      this.timer = setInterval(() => {
+        let t = this.state.time_left;
+        if (typeof(t) === 'number')
+          this.setState({ time_left: t-1 }, () => this.updateTimeLeftLabel() );
+      }, 1000)
     }
   }
 
@@ -100,10 +97,11 @@ class ContestSidebar extends React.Component {
 
 };
 
-const mapStateToProps = state => {
-  return {
-    contest: state.contest.contest,
-  }
-}
-
-export default connect(mapStateToProps, null)(ContestSidebar);
+let wrapped = ContestSidebar;
+// const mapStateToProps = state => {
+//   return {
+//     contest: state.contest.contest,
+//   }
+// }
+// export default connect(mapStateToProps, null)(ContestSidebar);
+export default wrapped;
