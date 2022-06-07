@@ -24,7 +24,7 @@ export default class OneColumn extends React.Component {
             (Content, idx) =>
               // TODO: Would multiple OneColumn layout affects each others?
               //       Because there would be multiple div with the same key?
-              <div key={`one-col-${idx}`} id={`one-column-element-${idx}`}>
+              <div key={`one-col-${idx}`} className="one-column-element" id={`one-column-element-i-${idx}`}>
                 {Content}
               </div>
           )

@@ -53,7 +53,7 @@ class AuthorizedMenu extends React.Component {
             this.props.updateProfile({...res.data});
             this.props.updateContest(res.data.current_contest);
         }).catch((err) => {
-            console.log(err);
+            log(err);
         })
     }
 
@@ -131,7 +131,7 @@ class UserAuthSection extends React.Component {
     render() {
         if (this.state.redirectUrl) {
             this.setState({redirectUrl: false})
-            return <Navigate to={this.state.redirectUrl} replace />
+            return <Navigate to={this.state.redirectUrl} />
         }
 
         const user = this.props.user;

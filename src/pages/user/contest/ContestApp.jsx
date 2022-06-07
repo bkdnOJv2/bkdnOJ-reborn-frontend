@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 
 import { Link, Outlet } from 'react-router-dom';
+import { VscError } from 'react-icons/vsc';
 
 import { ListSidebar, OneColumn } from 'layout';
 
@@ -57,7 +58,6 @@ class ContestApp extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.props.params)
     contestAPI.getContest({key : this.state.contest_key})
     .then((res) => {
       this.setState({
@@ -66,21 +66,35 @@ class ContestApp extends React.Component {
       })
     })
     .catch((err) => {
-      toast.error(`Contest is not accessible. (${err})`)
+      this.setState({
+        loaded: true,
+        errors: err,
+      })
+      toast.error(`Contest is not available. (${err.response.status})`, {
+        toastId: "contest-na",
+      })
       // this.props.navigate( -1, { replace: true } )
     })
   }
 
   render() {
     const { contest, loaded, showNav } = this.state;
-    let mains = [
-      <ContestBanner />,
-      <ContestNav show={showNav}/>,
-      contest ? <Outlet/>
-      : <div className="shadow flex-center" style={{ "height": "100px" }}>
-        <SpinLoader margin="0"/>
-      </div>
-    ]
+    let mains = (
+      contest ? [
+        <ContestBanner contestLoaded={loaded} {...this.props} />,
+        <ContestNav />,
+        <Outlet/>
+      ] :
+        !loaded ? [<div className="shadow flex-center" style={{ "height": "200px" }}>
+            <SpinLoader margin="0"/>
+          </div>]
+        : [ <div className="shadow flex-center-col" style={{ "height": "200px" }}>
+              <h4>Contest Not Available</h4>
+              <hr style={{width: "50%"}} className="mt-1"/>
+              <VscError size={30} color="red"/>
+            </div>
+        ]
+    )
     // console.log(mains)
     // if (showNav) mains.splice(1, 0, <ContestNav/>)
 
@@ -102,7 +116,7 @@ wrapped = withNavigation(wrapped);
 const mapStateToProps = state => {
   return {
     user: state.user.user,
-    profile: state.profile.profile,
+    // profile: state.profile.profile,
     contest: state.contest.contest,
   }
 }

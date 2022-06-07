@@ -21,7 +21,7 @@ class SubmitModalResult extends React.Component {
     }
   }
 
-  pollResult() { 
+  pollResult() {
     if (shouldStopPolling(this.state.data.status)) {
       clearInterval(this.timer)
       return;
@@ -115,12 +115,17 @@ export default class SubmitModal extends React.Component {
   }
 
   render() {
+    const { contest } = this.props;
+
     if (!!this.state.redirect && !!this.state.subId) {
-      return <Navigate to={`/submission/${this.state.subId}`} />
+      if (contest)
+        return <Navigate to={`/contest/${contest.key}/submission/${this.state.subId}`} />
+      else
+        return <Navigate to={`/submission/${this.state.subId}`} />
     }
 
     return (
-      <Modal show={this.props.show} 
+      <Modal show={this.props.show}
           onHide={() => this.onHide()}
           className="submit-modal"
           backdrop="static"
@@ -128,7 +133,7 @@ export default class SubmitModal extends React.Component {
         >
         <Modal.Header >
           <Modal.Title>
-            {"Instant Submit "}
+            {`Submit ${contest ? `to ${contest.key}`:""}`}
             <BsFillLightningChargeFill size={20}/>
           </Modal.Title>
         </Modal.Header>
@@ -136,6 +141,7 @@ export default class SubmitModal extends React.Component {
         <Modal.Body>
           <SubmitForm
             prob={this.props.prob} lang={this.props.lang}
+            contest={this.props.contest}
             submitting={this.state.submitting}
             setSubId={(subId) => this.setSubId(subId)}
           />
@@ -146,20 +152,20 @@ export default class SubmitModal extends React.Component {
           {
             !this.state.submitting
             ? <>
-              <div style={{height: "100%", width: "auto", margin: "auto", 
+              <div style={{height: "100%", width: "auto", margin: "auto",
                 display: "flex", verticalAlign: "center"}}>
                 <BsExclamationCircle />
               </div>
-              <span className="warning">This editor only store your most recent code. 
+              <span className="warning">This editor only store your most recent code.
                 Using multiple editors can cause conflict.</span>
             </>
             : <SubmitModalResult subId={this.state.subId}/>
           }
           </div>
 
-          <Button variant="secondary" 
+          <Button variant="secondary"
             onClick={() => this.onHide()}>Close</Button>
-          
+
           {
             this.state.subId === null
             ? <Button variant="dark"

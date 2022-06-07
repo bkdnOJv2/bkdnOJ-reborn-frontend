@@ -29,7 +29,7 @@ const getContestProblem = ({ key, shortname, params }) => {
     return axiosClient.get(`/contest/${key}/problem/${shortname}/`, (params && { params: {...params} }));
 }
 const submitContestProblem = ({ key, shortname, data }) => {
-    return axiosClient.post(`/contest/${key}/problem/${shortname}/submit/`, data );
+    return axiosClient.post(`/contest/${key}/problem/${shortname}/submit/`, JSON.stringify(data) );
 }
 const getContestProblemSubmissions = ({ key, shortname, params }) => {
     return axiosClient.get(`/contest/${key}/problem/${shortname}/submission/`, (params && { params: {...params} }));
@@ -41,10 +41,10 @@ const getContestProblemSubmission = ({ key, shortname, id }) => {
 const contestAPI = {
     getContests, getPastContests, getContest,
 
-    joinContest, leaveContest, 
+    joinContest, leaveContest,
 
-    getContestStanding, 
-    getContestSubmissions, 
+    getContestStanding,
+    getContestSubmissions,
     getContestProblems, getContestProblem, submitContestProblem,
     getContestProblemSubmissions, getContestProblemSubmission,
 }

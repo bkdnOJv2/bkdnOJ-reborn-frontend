@@ -3,9 +3,12 @@ import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 
-import PDFViewer from 'components/PDFViewer/PDFViewer';
 import { FaPaperPlane, FaSignInAlt, FaWrench } from 'react-icons/fa';
+import { VscError } from 'react-icons/vsc';
 
+import PDFViewer from 'components/PDFViewer/PDFViewer';
+
+import contestAPI from 'api/contest';
 import problemAPI from 'api/problem';
 import { SpinLoader } from 'components';
 import { withParams } from 'helpers/react-router'
@@ -14,9 +17,13 @@ import { setTitle } from 'helpers/setTitle';
 import { SubmitModal } from 'pages/user/submit';
 // import { getAdminPageUrl } from 'api/urls';
 
+import ContestContext from 'context/ContestContext';
+
 import './ProblemDetails.scss';
 
 class ProblemDetails extends React.Component {
+  static contextType = ContestContext;
+
   constructor(props) {
     super(props);
     const { shortname } = this.props.params;
@@ -36,14 +43,31 @@ class ProblemDetails extends React.Component {
     this.setState({ numPages })
   }
 
-  componentDidMount() {
-    problemAPI.getProblemDetails({shortname: this.shortname})
+  callApi(params) {
+    this.setState({loaded: false, errors: null})
+
+    let endpoint, data, callback = (v) => {};
+    if (this.state.contest) {
+      endpoint = contestAPI.getContestProblem
+      data = { key: this.state.contest.key, shortname: this.shortname }
+      callback = (res) => {
+        setTitle(`${this.state.contest.name} | Problem. ${res.data.title}`)
+      }
+    } else {
+      endpoint = problemAPI.getProblemDetails
+      data = { shortname: this.shortname }
+      callback = (res) => {
+        setTitle(`Problem. ${res.data.title}`)
+      }
+    }
+
+    endpoint({...data})
       .then((res) => {
         this.setState({
           data: res.data,
           loaded: true,
         })
-        setTitle(`Problem. ${res.data.title}`)
+        callback(res)
       })
       .catch((err) => {
         this.setState({
@@ -51,6 +75,15 @@ class ProblemDetails extends React.Component {
           errors: err,
         })
       })
+  }
+
+  componentDidMount() {
+    const contest = this.context.contest;
+    if (contest) {
+      this.setState({ contest },
+        () => this.callApi({page: this.state.currPage})
+      )
+    } else this.callApi({page: this.state.currPage})
   }
 
   parseMemoryLimit() {
@@ -70,12 +103,17 @@ class ProblemDetails extends React.Component {
       <div className="problem-info wrapper-vanilla">
         <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
-          { loaded && !!errors && <span>Problem Not Found</span>}
+          { loaded && !!errors && <span>Problem Not Available</span>}
           { loaded && !errors && `Problem. ${data.title}` }
         </h4>
         <hr/>
           <div className="problem-details">
           { !loaded && <span><SpinLoader/> Loading...</span> }
+          { loaded && errors && <>
+            <div className="flex-center-col" style={{ "height": "100px" }}>
+              <VscError size={30} color="red"/>
+            </div>
+          </> }
           { loaded && !errors && <>
               <Row style={{margin: "unset"}}>
                 <Col sm={9}>
@@ -125,6 +163,7 @@ class ProblemDetails extends React.Component {
                     onHide={() => this.handleSubmitFormClose()}
                     prob={data.shortname}
                     lang={data.allowed_languages}
+                    contest={this.context.contest}
                   />
 
                   {/* <Link to="/submit" className="btn">Test</Link> */}

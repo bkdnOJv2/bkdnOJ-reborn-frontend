@@ -42,6 +42,11 @@
     }
   }
 
+  span.active-continue-label {
+    background-color: $red-lighter;
+    padding: 0 5px;
+  }
+
   .contest-table-footer {
     margin: 10px;
 

@@ -2,17 +2,48 @@
 
 div#recent-submission-sidebar {
   overflow: hidden !important;
+  div.table-responsive {
+    overflow: hidden;
+  }
+
   table {
+    td {
+      font-weight: 100;
+    }
+    td.prod {
+      font-size: 12px;
+    }
     th, td {
       width: auto;
       font-size: 14px;
-      overflow: hidden;
-    }
-    td {
-      font-weight: 100;
       vertical-align: middle;
-      overflow: hidden;
+      word-break: keep-all;
+
+      &.subid {
+        min-width: 30px;
+      }
+      &.prob {
+        max-width: 20px;
+      }
+      &.verdict {
+        max-width: 40px;
+      }
+      &.responsive-date {
+        div.date {
+          font-size: 10px;
+        }
+        div.time {
+          font-size: 12px;
+        }
+        min-width: 50px;
+      }
     }
+    @media (min-width: 768px) {
+      th.prob, td.prod {
+        max-width: fit-content;
+      }
+    }
+
     overflow: hidden !important;
     margin: unset;
   }

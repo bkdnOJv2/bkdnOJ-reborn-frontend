@@ -4,7 +4,7 @@ import { UPDATE, CLEAR } from './types';
 export const updateContest = ({ contest }) => {
     return {
         type: UPDATE,
-        virtual: contest.virtual,
+        virtual: (contest && contest.virtual) || null,
         ...contest,
     };
 };

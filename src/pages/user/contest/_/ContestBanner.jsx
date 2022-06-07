@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { VscError } from 'react-icons/vsc';
 
 import { SpinLoader } from 'components';
 import ContestContext from 'context/ContestContext';

@@ -2,13 +2,23 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import {VscEyeClosed, VscEye, VscRecord} from 'react-icons/vsc';
 
+import { addClass, removeClass } from 'helpers/dom_functions';
+
 class ContestController extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  toggleNav() {
+    const { showNav } = this.props;
+    const comp = document.getElementById('one-column-element-i-1')
+    if (showNav) addClass(comp, 'd-none');
+    else removeClass(comp, 'd-none');
+    this.props.setShowNav(!showNav)
+  }
+
   render() {
-    const { showNav, setShowNav } = this.props;
+    const { showNav } = this.props;
 
     return (
       <div className="flex-center" style={{
@@ -17,7 +27,7 @@ class ContestController extends React.Component {
         columnGap: "2px",
         width: "unset", height: "unset",
       }}>
-        <Button onClick={()=>setShowNav(!showNav)} className="btn-svg"
+        <Button onClick={()=>this.toggleNav()} className="btn-svg"
           id="ct_ctrl_nav" style={btnStyle}
           size="sm" variant={!showNav ? "light" : "dark"}
         >

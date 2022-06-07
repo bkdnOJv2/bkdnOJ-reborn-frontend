@@ -1,9 +1,11 @@
 import React from 'react';
+import { toast } from 'react-toastify';
+import { connect } from 'react-redux';
 
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
-import { VscPerson } from 'react-icons/vsc';
+import { VscPerson, VscError } from 'react-icons/vsc';
 
 import { SpinLoader, ErrorBox } from 'components';
 import contestAPI from 'api/contest';
@@ -38,10 +40,44 @@ class ContestListItem extends React.Component {
     }
   }
 
+  isInContest(ckey) {
+    const { profile } = this.props;
+    console.log(profile)
+    if (!profile || !profile.current_contest ) return false;
+    if (profile.current_contest.contest.key !== ckey) return false;
+    return true;
+  }
+  isParticipant(ckey) {
+    if (! this.isInContest(ckey) ) return false;
+    const { profile } = this.props;
+    return profile.current_contest.virtual === 0;
+  }
+  isSpectator(ckey) {
+    if (! this.isInContest(ckey) ) return false;
+    const { profile } = this.props;
+    return profile.current_contest.virtual === -1;
+  }
+
+  registerContest(ckey) {
+    const conf = window.confirm(`Đăng ký cuộc thi "${ckey}"? Sau khi đăng ký, bạn có thể nộp bài và xuất hiện trên bảng xếp hạng.`)
+    if (!conf) return false;
+    contestAPI.joinContest({key : ckey})
+    .then((res) => {
+      toast.success(`Đăng ký contest ${ckey} thành công.`, { toastId: 'contest-registered' })
+    })
+    .catch((err) => {
+      const msg = (err.response && err.response.data && err.response.data.detail) || `Đăng ký contest "${ckey}" thất bại.`
+      toast.error(msg, {toastId: 'contest-register-failed'})
+    })
+    .finally(() => this.props.refetch && this.props.refetch())
+  }
+
   render() {
     const ckey = this.props.data.key;
     const cname = this.props.data.name;
+    const { spectate_allow, is_registered } = this.props.data;
     const type = this.props.type;
+    const { user } = this.props;
 
     return (
       <tr>
@@ -55,24 +91,47 @@ class ContestListItem extends React.Component {
         <td>{this.parseDuration()}</td>
         <td id="participate-options">{
           <div className="text-center d-flex flex-column align-items-center" style={{width: "100%"}}>
-            <span className="d-inline-flex align-items-center">
-              Participants: {this.props.data.user_count}<VscPerson size={16}/>
-            </span>
+            <div className="flex-center">
+              Participants: {this.props.data.user_count}<VscPerson size={18}/>
+            </div>
             {
+              /* Active: Present contest that has Live Participation of user */
               type === 'active' && <>
+                {
+                  <div className="flex-center">
+                    <span className="active-continue-label">
+                      <Link to={`/contest/${ckey}`}>
+                        {`Continue >>`}
+                      </Link>
+                    </span>
+                    {/* <span style={{width: "5px"}}></span>
+                    <Link to='#' onClick={(e) => this.leaveContest(ckey)}>
+                      <VscError size={14} color="red" style={{verticleAlign: "middle"}}/>
+                    </Link> */}
+                  </div>
+                }
                 <span className="d-inline-flex align-items-center">
-                  <Link to={`/contest/${ckey}`}>{`Continue >>`}</Link>
+                  <Link to={`/contest/${ckey}/standing`}>{`Current Standing >>`}</Link>
                 </span>
               </>
             }
 
             {
+              /* Active: Present contest that doesnt have Live Participation of user */
               type === 'present' && <>
+                { user && (
+                    spectate_allow ? <span className="d-inline-flex align-items-center">
+                      <Link to={`/contest/${ckey}`}>{`Spectate >>`}</Link>
+                    </span> : <span className="d-inline-flex align-items-center">
+                      <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
+                    </span>
+                  )
+                }
+                { !user && <span className="d-inline-flex align-items-center">
+                    <Link to={`/sign-in`}>{`Log in to Participate >>`}</Link>
+                </span> }
                 <span className="d-inline-flex align-items-center">
-                  <Link to={`/contest/${ckey}`}>{`Participate >>`}</Link>
-                </span>
-                <span className="d-inline-flex align-items-center">
-                  <Link to={`/contest/${ckey}`}>{`Standing >>`}</Link>
+                  <Link to={`/contest/${ckey}/standing`}>{`Current Standing >>`}</Link>
                 </span>
               </>
             }
@@ -80,7 +139,7 @@ class ContestListItem extends React.Component {
             {
               type === 'past' && <>
                 <span className="d-inline-flex align-items-center">
-                  <Link to={`/contest/${ckey}`}>{`Standing >>`}</Link>
+                  <Link to={`/contest/${ckey}/standing`}>{`Standing >>`}</Link>
                 </span>
               </>
             }
@@ -140,21 +199,30 @@ class NPContestList extends React.Component {
           </thead>
           <tbody>
               { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
-              { this.state.loaded === true &&
+              { this.state.loaded === true && !this.state.errors &&
                   <>
                       {
                           this.state.contests.active.map((cont, idx) =>
-                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="active" />
+                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont}
+                              user={this.props.user} profile={this.props.profile}
+                              refetch={() => this.callApi()}
+                              type="active" />
                           )
                       }
                       {
                           this.state.contests.present.map((cont, idx) =>
-                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="present"/>
+                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont}
+                              user={this.props.user} profile={this.props.profile}
+                              refetch={() => this.callApi()}
+                              type="present"/>
                           )
                       }
                       {
                           this.state.contests.future.map((cont, idx) =>
-                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="future"/>
+                              <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont}
+                              user={this.props.user} profile={this.props.profile}
+                              refetch={() => this.callApi()}
+                              type="future"/>
                           )
                       }
                   </>
@@ -213,7 +281,7 @@ class ContestList extends React.Component {
   render() {
     return (
       <div className="contest-table wrapper-vanilla">
-        <NPContestList />
+        <NPContestList {...this.props} />
 
         <hr className="m-2" />
 
@@ -236,7 +304,7 @@ class ContestList extends React.Component {
                 <>
                   {
                     this.state.pastContests.map((cont, idx) =>
-                      <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} type="past" />
+                      <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} user={this.props.user} type="past" />
                     )
                   }
                 </>
@@ -264,4 +332,11 @@ class ContestList extends React.Component {
   }
 }
 
-export default ContestList;
+let wrapped = ContestList;
+const mapStateToProps = state => {
+  return {
+    user: state.user.user,
+    profile: state.profile.profile,
+  }
+}
+export default connect(mapStateToProps, null)(wrapped);

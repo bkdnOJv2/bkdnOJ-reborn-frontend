@@ -23,7 +23,6 @@ class ProblemListItem extends React.Component {
   render() {
     const {shortname, title, solved_count, attempted_count, points} = this.props;
     const { contest, label, } = this.props;
-    console.log(this.props)
 
     return (
       <tr>
@@ -156,7 +155,7 @@ class ProblemList extends React.Component {
 
                   { this.state.count === 0 && <>
                     <tr><td colSpan="6">
-                      <em>No problems available yet.</em>
+                      <em>No Problems Available Yet.</em>
                     </td></tr>
                   </> }
                 </>

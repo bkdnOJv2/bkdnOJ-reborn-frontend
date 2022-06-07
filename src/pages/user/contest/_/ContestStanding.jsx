@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
@@ -158,6 +159,9 @@ class ContestStanding extends React.Component {
         loaded: true,
         errors: err,
       })
+      toast.error(`Standing not available. $(err)`, {
+        toastId: "contest-standing-na",
+      })
     })
   }
 
@@ -170,7 +174,7 @@ class ContestStanding extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const { user } = this.props;
     const { contest } = this.context;
-    if (!user || !contest) return; // skip if no user or no contest
+    if (!contest) return; // skip if no contest
     if (prevState.contest !== contest || prevState.user !== user) {
       this.setState({ user, contest }, () => {
         setTitle(`${contest.name} | Standing`)
@@ -218,7 +222,7 @@ let wrapped = ContestStanding;
 const mapStateToProps = state => {
   return {
     user: state.user.user,
-    profile: state.profile.profile,
+    // profile: state.profile.profile,
   }
 }
 export default connect(mapStateToProps, null)(wrapped);

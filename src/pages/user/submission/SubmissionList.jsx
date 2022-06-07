@@ -172,10 +172,13 @@ class SubmissionList extends React.Component {
             {
               this.state.loaded === false
                 ? <tr><td colSpan="7"><SpinLoader margin="10px" /></td></tr>
-                : this.state.submissions.map((sub, idx) => <SubListItem
+                :
+              this.state.count > 0
+                ? this.state.submissions.map((sub, idx) => <SubListItem
                     key={`sub-${sub.id}`}
                     rowid={idx} {...sub}
                   />)
+                : <tr><td colSpan={7}><em>No Submissions Yet.</em></td></tr>
             }
           </tbody>
         </Table>

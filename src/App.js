@@ -184,7 +184,15 @@ class App extends React.Component {
                   mainContent={
                     <SubmissionList />
                   }
-                  sideComponents={[<ContestSidebar />]}
+                  sideComponents={[<RecentSubmissionSidebar />]}
+                />
+              }/>
+              <Route path="submission/:id" element={
+                <ListSidebar
+                  mainContent={
+                    <SubmissionDetails />
+                  }
+                  sideComponents={[<RecentSubmissionSidebar />]}
                 />
               }/>
               <Route path="standing" element={
