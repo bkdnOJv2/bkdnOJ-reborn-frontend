@@ -30,6 +30,7 @@ import {
   AdminProblemList, AdminProblemDetails,
   AdminSubmissionList, AdminSubmissionDetails,
   AdminJudgeList, AdminJudgeDetails, AdminJudgeNew,
+  AdminContestList, AdminContestDetails,
   AdminApp
 } from 'pages/admin';
 
@@ -105,6 +106,13 @@ class App extends React.Component {
                 }/>
                 <Route path="submission/:id" element={
                   <OneColumn mainContent={<AdminSubmissionDetails />} />
+                }/>
+
+                <Route path="contest" element={
+                  <OneColumn mainContent={<AdminContestList />} />
+                }/>
+                <Route path="contest/:key" element={
+                  <OneColumn mainContent={<AdminContestDetails />} />
                 }/>
 
                 <Route path="judge" element={

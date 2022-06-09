@@ -3,6 +3,9 @@ import axiosClient from "api/axiosClient";
 const getContests = (params) => {
     return axiosClient.get('/contest/', (params && { params: {...params} }));
 }
+const getAllContests = (params) => {
+    return axiosClient.get('/all-contest/', (params && { params: {...params} }));
+}
 const getPastContests = (params) => {
     return axiosClient.get('/past-contest/', (params && { params: {...params} }));
 }
@@ -38,7 +41,15 @@ const getContestProblemSubmission = ({ key, shortname, id }) => {
     return axiosClient.get(`/contest/${key}/problem/${shortname}/submission/${id}/`);
 }
 
+const deleteContest = ({ key }) => {
+    return axiosClient.delete(`/contest/${key}/`);
+}
+const updateContest = ({ key, data }) => {
+    return axiosClient.delete(`/contest/${key}/`, data);
+}
+
 const contestAPI = {
+    getAllContests,
     getContests, getPastContests, getContest,
 
     joinContest, leaveContest,
@@ -47,6 +58,8 @@ const contestAPI = {
     getContestSubmissions,
     getContestProblems, getContestProblem, submitContestProblem,
     getContestProblemSubmissions, getContestProblemSubmission,
+
+    deleteContest, updateContest,
 }
 
 export default contestAPI;

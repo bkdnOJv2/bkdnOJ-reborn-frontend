@@ -82,7 +82,7 @@ class AdminJudgeNew extends React.Component {
     const { data } = this.state;
 
     return (
-      <div className="admin judge-panel">
+      <div className="admin judge-panel wrapper-vanilla">
         <h4 className="judge-title">
           <div className="panel-header">
               <span className="title-text">{`Creating Judge`}</span>
@@ -168,7 +168,7 @@ class AdminJudgeNew extends React.Component {
                 <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
               </Col>
               <Col >
-                <Button variant="dark" size="sm" type="submit" className="mb-1">
+                <Button variant="dark" size="sm" type="submit" >
                   Save
                 </Button>
               </Col>

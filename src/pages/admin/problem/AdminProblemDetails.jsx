@@ -78,7 +78,7 @@ class AdminProblemDetails extends React.Component {
     const {loaded, errors, general, options} = this.state;
 
     return (
-      <div className="admin problem-panel">
+      <div className="admin problem-panel wrapper-vanilla">
         <h4 className="problem-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong</span>}

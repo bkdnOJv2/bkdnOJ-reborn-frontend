@@ -153,7 +153,7 @@ class AdminJudgeList extends React.Component {
     const { submitting } = this.state;
 
     return (
-      <>
+      <div className="admin admin-judges wrapper-vanilla">
       {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
         <div className="border d-inline-flex p-1" >
@@ -226,7 +226,7 @@ class AdminJudgeList extends React.Component {
                 /></span>
         }
       </div>
-      </>
+      </div>
     )
   }
 }

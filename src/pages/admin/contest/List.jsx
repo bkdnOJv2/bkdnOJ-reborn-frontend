@@ -4,54 +4,71 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 
-import { FaPaperPlane, FaRegFileArchive } from 'react-icons/fa';
-import { AiOutlineForm, AiOutlineUpload, AiOutlineArrowRight, AiOutlinePlusCircle } from 'react-icons/ai';
-
-import { SpinLoader, ErrorBox, FileUploader } from 'components';
-import submissionApi from 'api/submission';
+import { SpinLoader, ErrorBox } from 'components';
+import contestAPI from 'api/contest';
 import { setTitle } from 'helpers/setTitle';
+import { getYearMonthDate, getHourMinuteSecond } from 'helpers/dateFormatter';
 
 import './List.scss'
 import 'styles/ClassicPagination.scss';
 
-class SubmissionListItem extends React.Component {
-  render() {
-    const { id, date, time, memory, status, result, user, 
-      contest_object, problem } = this.props;
-    const {rowidx, selectChk, onSelectChkChange} = this.props;
+const CLASSNAME = 'Contest';
 
-    const verdict = (result ? result : status);
+class ContestListItem extends React.Component {
+  formatDateTime(date) {
+    const d = new Date(date);
+    return (
+      <div className="flex-center-col">
+        <div style={{fontSize: "10px"}}>
+          {getYearMonthDate(d)}
+        </div>
+        <div style={{fontSize: "12px"}}>
+          {getHourMinuteSecond(d)}
+        </div>
+      </div>
+    )
+  }
+
+  render() {
+    const { id, ckey, name, start_time, end_time, is_visible, 
+      is_organization_private, is_rated, format_name } = this.props;
+    const {rowidx, selectChk, onSelectChkChange} = this.props;
 
     return (
       <tr>
-        <td className="text-truncate" style={{maxWidth: "40px"}}>
-          <Link to={`/admin/submission/${id}`}>
+        <td className="text-truncate" >
+          <Link to={`/admin/contest/${ckey}`}>
             {id}
           </Link>
         </td>
-        <td className="text-truncate" style={{maxWidth: "100px"}}>
-          <Link to={`/admin/problem/${problem.shortname}`}>
-            {problem.title}
+        <td className="text-truncate" >
+          <Link to={`/admin/contest/${ckey}`}>
+            {ckey}
           </Link>
         </td>
-        <td className="text-truncate" style={{maxWidth: "100px"}}>
+        <td className="text-truncate" style={{maxWidth: "150px"}}>
+          <Link to={`/admin/contest/${ckey}`}>
+            {name}
+          </Link>
+        </td>
+        <td className="text-truncate" >
+          {this.formatDateTime(start_time)}
+        </td>
+        <td className="text-truncate" >
+          {this.formatDateTime(end_time)}
+        </td>
+        <td>
           {
-            !!contest_object
-            ? <Link to={`/admin/contest/${contest_object.id}`}>
-                {contest_object.id}
-              </Link>
-            : "None"
+            is_visible ? (
+              is_organization_private ? "Orgs" : "Public"
+            ) : "Private"
           }
         </td>
-        <td className="text-truncate" style={{maxWidth: "100px"}}>
-          <Link to={`/admin/user/${user}`}>
-            {user}
-          </Link>
-        </td>
-        <td>{verdict}</td>
-        <td className="text-truncate" style={{maxWidth: "200px"}}>
+        <td>{is_rated ? "Yes" : "No"}</td>
+        <td>{format_name}</td>
+        {/* <td className="text-truncate" style={{maxWidth: "200px"}}>
           {(new Date(date)).toLocaleString()}
-        </td>
+        </td> */}
         <td>
             <input type="checkbox" value={selectChk}
               onChange={() => onSelectChkChange()}/>
@@ -61,21 +78,18 @@ class SubmissionListItem extends React.Component {
   }
 }
 
-class AdminSubmissionList extends React.Component {
+class AdminContestList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      submissions: [],
+      contests: [],
       selectChk: [],
       currPage: 0,
       pageCount: 1,
       loaded: false,
       errors: null,
-
-      selectedZip: null,
-      submitting: false,
     }
-    setTitle('Admin | Submissions')
+    setTitle('Admin | Contests')
   }
 
   selectChkChangeHandler(idx) {
@@ -93,10 +107,10 @@ class AdminSubmissionList extends React.Component {
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
-    submissionApi.getSubmissions({page: params.page+1})
+    contestAPI.getAllContests({page: params.page+1})
       .then((res) => {
         this.setState({
-          submissions: res.data.results,
+          contests: res.data.results,
           count: res.data.count,
           pageCount: res.data.total_pages,
           currPage: params.page,
@@ -106,9 +120,10 @@ class AdminSubmissionList extends React.Component {
         })
       })
       .catch((err) => {
+        console.log(err);
         this.setState({
           loaded: true,
-          errors: ["Cannot fetch submissions. Please retry again."],
+          errors: ["Cannot fetch contests. Please retry again."],
         })
       })
   }
@@ -130,28 +145,28 @@ class AdminSubmissionList extends React.Component {
     })
 
     if (ids.length === 0) {
-      alert('Không có Submission nào đang được chọn.');
+      alert(`Không có ${CLASSNAME} nào đang được chọn.`);
       return;
     }
 
     // TODO: Write a bulk delete API for submissions
-    const conf = window.confirm('Xóa các Submission ' + JSON.stringify(ids) + '?');
+    const conf = window.confirm(`Xóa các ${CLASSNAME} ` + JSON.stringify(ids) + '?');
     if (conf) {
       let reqs = []
       ids.forEach((id) => {
-        reqs.push( submissionApi.adminDeleteSubmission({id}) )
+        reqs.push( contestAPI.adminDeleteContest({id}) )
       })
 
       Promise.all(reqs).then((res) => {
         console.log(res)
         this.callApi({page: this.state.currPage});
       }).catch((err) => {
-        let msg = 'Không thể xóa các submission này.';
+        let msg = `Không thể xóa các ${CLASSNAME} này.`;
         if (err.response) {
           if (err.response.status === 405)
             msg += ' Phương thức chưa được implemented.';
           if (err.response.status === 404)
-            msg = 'Không tìm thấy một trong số Submission được chọn. Có lẽ chúng đã bị xóa?'
+            msg = `Không tìm thấy một trong số ${CLASSNAME} được chọn. Có lẽ chúng đã bị xóa?`
           if ([403, 401].includes(err.response.status))
             msg = 'Không có quyền cho thao tác này.';
         }
@@ -164,7 +179,7 @@ class AdminSubmissionList extends React.Component {
     const { submitting } = this.state;
 
     return (
-      <div className="admin admin-submissions wrapper-vanilla">
+      <div className="admin admin-contests wrapper-vanilla">
       {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
         <sub>No options available yet</sub>
@@ -178,19 +193,21 @@ class AdminSubmissionList extends React.Component {
       </div>
 
       {/* Problem List */}
-      <div className="admin-table submission-table">
-        <h4>Submission List</h4>
+      <div className="admin-table contest-table">
+        <h4>Contest List</h4>
         <ErrorBox errors={this.state.errors} />
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
             <tr>
-              <th style={{maxWidth: "10%"}}>#</th>
-              <th style={{minWidth: "20%", maxWidth: "20%"}}>Problem</th>
-              <th style={{width: "12%"}}>Contest</th>
-              <th style={{width: "10%"}}>Author</th>
-              <th style={{width: "10%"}}>Status</th>
-              <th style={{width: "20%"}}>When</th>
-              <th style={{width: "8%"}}>
+              <th >#</th>
+              <th style={{maxWidth: "10%"}}>Key</th>
+              <th style={{minWidth: "20%", maxWidth: "20%"}}>Name</th>
+              <th style={{minWidth: "15%"}}>Start</th>
+              <th style={{minWidth: "15%"}}>End</th>
+              <th >Visible?</th>
+              <th >Rated?</th>
+              <th >Format</th>
+              <th >
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
               </th>
             </tr>
@@ -199,9 +216,9 @@ class AdminSubmissionList extends React.Component {
             {
               this.state.loaded === false
                 ? <tr><td colSpan="7"><SpinLoader margin="10px" /></td></tr>
-                : this.state.submissions.map((sub, idx) => <SubmissionListItem
-                    key={`sub-${sub.id}`}
-                    rowidx={idx} {...sub}
+                : this.state.contests.map((sub, idx) => <ContestListItem
+                    key={`cont-${sub.id}`}
+                    rowidx={idx} ckey={sub.key} {...sub}
                     selectChk={this.state.selectChk[idx]}
                     onSelectChkChange={() => this.selectChkChangeHandler(idx)}
                   />)
@@ -229,4 +246,4 @@ class AdminSubmissionList extends React.Component {
   }
 }
 
-export default AdminSubmissionList;
+export default AdminContestList;

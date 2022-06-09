@@ -226,7 +226,7 @@ export default class GeneralDetails extends React.Component {
           <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
         </Col>
         <Col >
-          <Button variant="dark" size="sm" type="submit" className="mb-1">
+          <Button variant="dark" size="sm" type="submit">
             Save
           </Button>
         </Col>

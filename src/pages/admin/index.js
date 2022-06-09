@@ -4,6 +4,7 @@ import { AdminUserList, AdminUserDetails, AdminUserNew } from './user';
 import { AdminProblemDetails, AdminProblemList } from './problem';
 import { AdminSubmissionDetails, AdminSubmissionList } from './submission';
 import { AdminJudgeDetails, AdminJudgeList, AdminJudgeNew } from './judge';
+import { AdminContestList, AdminContestDetails } from './contest';
 
 export {
     AdminApp,
@@ -11,4 +12,6 @@ export {
     AdminSubmissionDetails, AdminSubmissionList,
     AdminJudgeDetails, AdminJudgeList, AdminJudgeNew,
     AdminUserList, AdminUserDetails, AdminUserNew, 
+
+    AdminContestList, AdminContestDetails,
 }

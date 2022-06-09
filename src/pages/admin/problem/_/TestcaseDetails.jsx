@@ -11,7 +11,7 @@ class ButtonPanel extends React.Component {
     return (
       <Row className="button-panel">
         <Col >
-          <Button variant="dark" size="sm" type="submit" className="m-1">
+          <Button variant="dark" size="sm" type="submit">
             Save
           </Button>
         </Col>
