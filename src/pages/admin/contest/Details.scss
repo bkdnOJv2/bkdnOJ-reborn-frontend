@@ -9,10 +9,14 @@ div.admin.contest-panel {
     margin: 4px;
   }
 
+  th, td {
+    vertical-align: middle;
+  }
+
   .panel-header {
     display: inline-flex;
     width: 100%;
-    
+
     span.title-text {
       flex-grow: 1;
     }

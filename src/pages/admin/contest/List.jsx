@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
+
+import {AiOutlinePlusCircle, AiOutlineArrowRight,
+  AiOutlineForm, } from 'react-icons/ai';
 
 import { SpinLoader, ErrorBox } from 'components';
 import contestAPI from 'api/contest';
@@ -30,7 +33,7 @@ class ContestListItem extends React.Component {
   }
 
   render() {
-    const { id, ckey, name, start_time, end_time, is_visible, 
+    const { id, ckey, name, start_time, end_time, is_visible,
       is_organization_private, is_rated, format_name } = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
 
@@ -88,6 +91,8 @@ class AdminContestList extends React.Component {
       pageCount: 1,
       loaded: false,
       errors: null,
+
+      redirectUrl: null,
     }
     setTitle('Admin | Contests')
   }
@@ -176,13 +181,28 @@ class AdminContestList extends React.Component {
   }
 
   render() {
+    if (this.state.redirectUrl)
+      return ( <Navigate to={`${this.state.redirectUrl}`} /> )
+
     const { submitting } = this.state;
 
     return (
       <div className="admin admin-contests wrapper-vanilla">
       {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
-        <sub>No options available yet</sub>
+        <div className="border d-inline-flex p-1" >
+          <Button size="sm"
+            variant="dark" className="btn-svg" disabled={submitting}
+            onClick={(e) => this.setState({ redirectUrl: 'new' })}
+          >
+            <AiOutlinePlusCircle />
+            <span className="d-none d-md-inline-flex">Add (Form)</span>
+            <span className="d-inline-flex d-md-none">
+              <AiOutlineArrowRight/>
+              <AiOutlineForm />
+            </span>
+          </Button>
+        </div>
       </div>
 
       {/* Place for displaying information about admin actions  */}
@@ -215,7 +235,7 @@ class AdminContestList extends React.Component {
           <tbody>
             {
               this.state.loaded === false
-                ? <tr><td colSpan="7"><SpinLoader margin="10px" /></td></tr>
+                ? <tr><td colSpan="9"><SpinLoader margin="10px" /></td></tr>
                 : this.state.contests.map((sub, idx) => <ContestListItem
                     key={`cont-${sub.id}`}
                     rowidx={idx} ckey={sub.key} {...sub}

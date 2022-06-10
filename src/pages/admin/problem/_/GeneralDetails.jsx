@@ -141,8 +141,8 @@ export default class GeneralDetails extends React.Component {
             <Row>
               <Form.Label column="sm" sm={3}> Only public to organizations </Form.Label>
               <Col >
-                <Form.Control size="sm" type="checkbox" id="is_privated_to_orgs"
-                  checked={data.is_privated_to_orgs} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
+                <Form.Control size="sm" type="checkbox" id="is_organization_private"
+                  checked={data.is_organization_private} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
                 />
               </Col>
             </Row>

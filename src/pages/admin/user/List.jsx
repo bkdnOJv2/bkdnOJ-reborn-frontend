@@ -153,7 +153,7 @@ class AdminUserList extends React.Component {
   }
 
   render() {
-    if (this.state.redirectUrl) 
+    if (this.state.redirectUrl)
       return ( <Navigate to={`${this.state.redirectUrl}`} /> )
 
     const { submitting } = this.state;
@@ -163,7 +163,7 @@ class AdminUserList extends React.Component {
       {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
         <div className="border d-inline-flex p-1" >
-        <Button size="sm" onClick={(e)=>alert('Create new')}
+        <Button size="sm"
           variant="dark" className="btn-svg" disabled={ submitting }
           onClick={(e) => this.setState({ redirectUrl: 'new' })}
         >

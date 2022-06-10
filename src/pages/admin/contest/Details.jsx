@@ -2,8 +2,11 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Tabs, Tab } from 'react-bootstrap';
 import { FaRegTrashAlt } from 'react-icons/fa';
+
+import { General, Participation, Problem, Submission
+} from './_';
 
 import contestAPI from 'api/contest';
 import { SpinLoader } from 'components';
@@ -66,9 +69,9 @@ class AdminContestDetails extends React.Component {
   }
 
   render() {
-    if (this.state.redirectUrl) 
+    if (this.state.redirectUrl)
       return ( <Navigate to={`${this.state.redirectUrl}`} /> )
-    
+
     const {loaded, errors, data} = this.state;
 
     return (
@@ -77,7 +80,7 @@ class AdminContestDetails extends React.Component {
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong.</span>}
           { loaded && !errors && <div className="panel-header">
-              <span className="title-text">{`Viewing Contest | ${data.name}`}</span>
+              <span className="title-text text-truncate">{`Viewing Contest | ${data.name}`}</span>
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
@@ -92,73 +95,25 @@ class AdminContestDetails extends React.Component {
           { !loaded && <span><SpinLoader/> Loading...</span> }
 
           { loaded && !errors && <>
-            <Form id="contest-general" onSubmit={(e) => this.formSubmitHandler(e)}>
-              <Row>
-                <Form.Label column="sm" xs={2} > ID </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="Contest id" id="id"
-                        value={data.id || ''} disabled readOnly
-                /></Col>
-              </Row>
-              <Row>
-                <Form.Label column="sm" lg={2}> Key </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="Contest key/shortname/code" id="key"
-                        value={data.key || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                /></Col>
-
-                <Form.Label column="sm" lg={2}> Name </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="Contest Name" id="name"
-                        value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                /></Col>
-              </Row>
-
-              <Row>
-                <Form.Label column="sm" > Is Rated? </Form.Label>
-                <Col > <Form.Control size="sm" type="checkbox" id="is_rated"
-                        checked={data.is_rated || false}
-                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
-                /></Col>
-              </Row>
-
-              <Row>
-                <Form.Label column="sm" > Is Visible? </Form.Label>
-                <Col > <Form.Control size="sm" type="checkbox" id="is_visible"
-                        checked={data.is_visible || false}
-                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
-                /></Col>
-                <Form.Label column="sm" > Is Visible For Organizations Only? </Form.Label>
-                <Col > <Form.Control size="sm" type="checkbox" id="is_organization_private"
-                        checked={data.is_organization_private || false}
-                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
-                /></Col>
-              </Row>
-
-              <Row>
-                <Form.Label column="sm" md={2}> Start Time </Form.Label>
-                <Col> <Form.Control size="sm" type="datetime-local" id="start_time"
-                        value={data.start_time} onChange={(e)=>console.log(e.target.value)}
-                /></Col>
-                <Form.Label column="sm" md={2}> End Time </Form.Label>
-                <Col> <Form.Control size="sm" type="datetime-local" id="start_time"
-                        value={data.end_time} onChange={(e)=>console.log(e.target.value)}
-                /></Col>
-              </Row>
-
-
-              <hr className="m-2" />
-
-              <Row>
-                <Col lg={10}>
-                  <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
-                </Col>
-                <Col >
-                  <Button variant="dark" size="sm" type="submit" >
-                    Save
-                  </Button>
-                </Col>
-              </Row>
-            </Form>
-          </>
-          }
+          <Tabs defaultActiveKey="general" id="general" className="pl-2">
+            <Tab eventKey="general" title="General">
+              <General
+              data={data} />
+            </Tab>
+            <Tab eventKey="prob" title="Problems">
+              <Problem
+              />
+            </Tab>
+            <Tab eventKey="part" title="Participations">
+              <Participation
+              />
+            </Tab>
+            <Tab eventKey="sub" title="Submissions">
+              <Submission
+              />
+            </Tab>
+          </Tabs>
+          </> }
         </div>
       </div>
     )
