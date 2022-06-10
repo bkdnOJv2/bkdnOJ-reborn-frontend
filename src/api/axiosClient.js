@@ -66,11 +66,10 @@ axiosClient.interceptors.response.use(
         if (res.data) {
           if (res.data.code === "token_not_valid") {
             __ls_remove_credentials();
+            window.location.href = "/sign-in"
           }
         }
-        if (window.location.pathname !== "/sign-in")
-          window.location.href = "/sign-in"
-        break;
+         //ak;
       default:
         break;
     }

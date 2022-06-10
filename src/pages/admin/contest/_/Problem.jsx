@@ -103,6 +103,7 @@ class Problem extends React.Component {
 
         <hr className="m-2"/>
 
+        <div className="admin-table">
         <Table responsive hover size="sm" striped bordered className="rounded mb-0">
           <thead>
             <tr>
@@ -130,7 +131,7 @@ class Problem extends React.Component {
           <tbody>
           {
             problems.map((prob, ridx) =>
-              <tr>
+              <tr key={`ct-pr-${prob.shortname}`}>
                 <td> <Form.Control size="sm" type="text" id="order" value={prob.order}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
@@ -155,6 +156,7 @@ class Problem extends React.Component {
           }
           </tbody>
         </Table>
+        </div>
 
         <Row className="mt-2">
           <Col xs={9}></Col>

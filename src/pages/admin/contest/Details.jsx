@@ -106,7 +106,7 @@ class AdminContestDetails extends React.Component {
             </Tab>
             <Tab eventKey="part" title="Participations">
               <Participation
-              />
+                ckey={this.key} />
             </Tab>
             <Tab eventKey="sub" title="Submissions">
               <Submission
