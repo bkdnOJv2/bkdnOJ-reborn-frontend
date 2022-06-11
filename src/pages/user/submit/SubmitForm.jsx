@@ -69,12 +69,14 @@ export default class SubmitForm extends React.Component {
           this.props.setSubId(res.data.id)
         })
         .catch((err) => {
-          if (err.response && err.response.data && err.response.data.detail)
+          if (err.response && err.response.data && err.response.data.detail) {
             toast.error(err.response.data.detail, {
-              toastId: "submit-contest-ended",
-              autoClose: false,
+              toastId: "submit-failed",
+              // autoClose: false,
             })
-          console.log(err.response)
+            if (this.props.setSubErrors)
+              this.props.setSubErrors(err.response.data.detail)
+          }
           this.setState({error : err.response.data})
         })
     }

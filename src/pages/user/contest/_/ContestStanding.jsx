@@ -52,7 +52,7 @@ class StandingItem extends React.Component {
               `${v.points}`
             }</div>
             <div className="p-best-time text-truncate time">{
-              parseFloat(v.time).toFixed(2)
+              Math.floor(parseFloat(v.time))
             }</div>
           </div>
         )
@@ -159,7 +159,7 @@ class ContestStanding extends React.Component {
         loaded: true,
         errors: err,
       })
-      toast.error(`Standing not available. $(err)`, {
+      toast.error(`Standing not available. (${err.response.status})`, {
         toastId: "contest-standing-na",
       })
     })

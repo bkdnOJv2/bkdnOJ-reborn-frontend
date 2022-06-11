@@ -51,22 +51,26 @@ class ProblemDetails extends React.Component {
       endpoint = contestAPI.getContestProblem
       data = { key: this.state.contest.key, shortname: this.shortname }
       callback = (res) => {
+        this.setState({
+          data: { ...res.data.problem_data, ...res.data } ,
+          loaded: true,
+        })
         setTitle(`${this.state.contest.name} | Problem. ${res.data.title}`)
       }
     } else {
       endpoint = problemAPI.getProblemDetails
       data = { shortname: this.shortname }
       callback = (res) => {
+        this.setState({
+          data: res.data,
+          loaded: true,
+        })
         setTitle(`Problem. ${res.data.title}`)
       }
     }
 
     endpoint({...data})
       .then((res) => {
-        this.setState({
-          data: res.data,
-          loaded: true,
-        })
         callback(res)
       })
       .catch((err) => {
@@ -97,7 +101,12 @@ class ProblemDetails extends React.Component {
     if (this.state.redirectUrl) {
       return <Navigate to={`${this.state.redirectUrl}`} />
     }
-    const {loaded, errors, data} = this.state;
+    const {loaded, errors, data, contest} = this.state;
+
+    const isLoggedIn = !!this.user;
+    const isInContest = !!contest;
+    const isAllowedToSubmitToContest = isInContest && (contest.is_registered || contest.spectate_allow);
+    const isSuperuser = isLoggedIn && this.user.is_superuser;
 
     return (
       <div className="problem-info wrapper-vanilla">
@@ -139,19 +148,26 @@ class ProblemDetails extends React.Component {
                   </ul>
                 </Col>
                 <Col sm={3} className="options">
-                  {
-                    this.user === null && (
+                  { // Not Log-in
+                    !isLoggedIn && (
                     <Link to="#" className="btn"
                       onClick={() => this.setState({redirectUrl: '/sign-in'})}>
                       Sign In To Submit <FaSignInAlt size={12}/>
                     </Link>)
-                  }{
-                    this.user !== null && (<Link to="#" className="btn"
+                  }{ // Logged-in, not registered for Contest
+                    isLoggedIn && isInContest && !(contest.is_registered || contest.spectate_allow) && (
+                    <Link to="#" className="btn"
+                      onClick={() => this.setState({redirectUrl: '/contest'})}>
+                      Register to Submit <FaSignInAlt size={12}/>
+                    </Link>)
+                  }{ // Logged-in and (not in contest OR in contest and allow to submit)
+                    isLoggedIn && (!isInContest || isAllowedToSubmitToContest) &&
+                    (<Link to="#" className="btn"
                       onClick={() => this.handleSubmitFormOpen()}>
                       Submit <FaPaperPlane size={12}/>
                     </Link>)
                   }{
-                    (this.user !== null && this.user.is_staff) && (
+                    isSuperuser && (
                       <Link to="#" className="btn" style={{color: "red"}}
                         onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
                         Admin <FaWrench size={12}/>

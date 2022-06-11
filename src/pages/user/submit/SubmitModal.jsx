@@ -52,9 +52,14 @@ class SubmitModalResult extends React.Component {
   }
 
   render() {
+    const {subErrors} = this.props;
+    if (subErrors)
+      return <div className="note">{subErrors}</div>
+
     const {subId, data} = this.state;
     if (subId === null || data.status === '...')
       return <div className="note loading_3dot">Submitting</div>
+
     if (data.status === 'QU')
       return <div className="note loading_3dot">Queuing</div>
     if (data.status === 'P')
@@ -101,13 +106,13 @@ export default class SubmitModal extends React.Component {
     super(props);
     this.state = {
       subId: null,
+      errors: null,
       redirect: false,
       submitting: false,
     }
   }
-  setSubId(id) {
-    this.setState({subId : id})
-  }
+  setErrors(err) { this.setState({ errors: err }) }
+  setSubId(id) { this.setState({subId : id}) }
 
   onHide() {
     this.setState({ subId: null, submitting: false })
@@ -144,6 +149,7 @@ export default class SubmitModal extends React.Component {
             contest={this.props.contest}
             submitting={this.state.submitting}
             setSubId={(subId) => this.setSubId(subId)}
+            setSubErrors={(err) => this.setErrors(err)}
           />
         </Modal.Body>
 
@@ -159,7 +165,7 @@ export default class SubmitModal extends React.Component {
               <span className="warning">This editor only store your most recent code.
                 Using multiple editors can cause conflict.</span>
             </>
-            : <SubmitModalResult subId={this.state.subId}/>
+            : <SubmitModalResult subId={this.state.subId} subErrors={this.state.errors}/>
           }
           </div>
 
