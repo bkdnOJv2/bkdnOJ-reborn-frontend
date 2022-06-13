@@ -1,92 +1,92 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import {
   Form, Row, Col, Table, Button
 } from 'react-bootstrap';
 
-const PROBLEMS = [
-        {
-            "id": 12,
-            "shortname": "TREEQUERY",
-            "title": "Truy vấn trên cây",
-            "solved_count": 0,
-            "attempted_count": 0,
-            "contest": "contest2",
-            "points": 100,
-            "partial": true,
-            "is_pretested": false,
-            "order": 0,
-            "output_prefix_override": 0,
-            "max_submissions": null,
-            "label": "1"
-        },
-        {
-            "id": 8,
-            "shortname": "HELLO",
-            "title": "Hello World",
-            "solved_count": 1,
-            "attempted_count": 1,
-            "contest": "contest2",
-            "points": 100,
-            "partial": false,
-            "is_pretested": false,
-            "order": 1,
-            "output_prefix_override": null,
-            "max_submissions": null,
-            "label": "2"
-        },
-        {
-            "id": 9,
-            "shortname": "SNAKEGAME",
-            "title": "Trò chơi con rắn",
-            "solved_count": 0,
-            "attempted_count": 0,
-            "contest": "contest2",
-            "points": 100,
-            "partial": true,
-            "is_pretested": false,
-            "order": 2,
-            "output_prefix_override": null,
-            "max_submissions": null,
-            "label": "3"
-        }
-    ];
+import contestAPI from 'api/contest';
+import {ErrorBox, SpinLoader} from 'components';
+
+const INIT_CONT_PROBLEM = {
+  points: 1,
+  partial: false,
+  is_pretested: false,
+  max_submissions: null,
+};
 
 class Problem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      problems: PROBLEMS || [],
+      ckey: this.props.ckey,
+      problems: [],
 
       loaded: false,
       errors: null,
     }
   }
 
-  clarifyPopup(msg) {
-    return (
-      <Link to="#" onClick={() => alert(msg)}>?</Link>
-    )
+  refetch() {
+    contestAPI.getContestProblems({key: this.state.ckey})
+    .then((res) => {
+      this.setState({
+        loaded: true,
+        count: res.data.count,
+        problems: res.data.results,
+      })
+    })
+    .catch((err) => {
+      console.log(err);
+      this.setState({
+        loaded: true,
+        errors: [err.response.detail]
+      })
+    })
   }
 
-  formSubmitHandler(e) {
-    e.preventDefault();
+  componentDidMount() {
+    this.refetch();
   }
+
+  // ---------
+  clarifyPopup(msg) { return <Link to="#" onClick={() => alert(msg)}>?</Link> }
+
+  // ---------
   problemChangeHandler(idx, e, params={}) {
     const problems = this.state.problems;
     let prob = problems[idx];
 
     const isCheckbox = params.isCheckbox || false;
-    if (!isCheckbox) prob[e.target.id] = e.target.value
-    else prob[e.target.id] = !prob[e.target.id]
+    if (!isCheckbox) {
+      if (e.target.id === 'order')
+        prob[e.target.id] = parseInt(e.target.value)
+      else
+        prob[e.target.id] = e.target.value
+    } else prob[e.target.id] = !prob[e.target.id]
 
     this.setState({
       problems: problems.map( (p) => p===prob.id?prob:p )
     })
   }
 
+  // -------- Form Submit
+  formSubmitHandler(e) {
+    e.preventDefault();
+    let conf = window.confirm('Bạn có chắc chắn với thay đổi này?')
+    contestAPI.updateContestProblems({key: this.state.ckey, data: this.state.problems})
+    .then((res) => {
+      toast.success('OK Updated.')
+      // this.refetch();
+    })
+    .catch((err) => {
+      console.log(err)
+      this.setState({errors: err.response.data})
+    })
+  }
+
   render() {
-    const { problems } = this.state;
+    const { loaded, errors, count, problems } = this.state;
 
     return (
       <>
@@ -94,16 +94,35 @@ class Problem extends React.Component {
 
         <div className="options mb-1">
           <div className="border d-inline-flex p-1">
-            <Button size="sm" variant="dark">Sắp xếp theo Order</Button>
+            <Button size="sm" variant="dark" onClick={() => {
+              let probs = problems.slice()
+              probs.sort((p1, p2) => {
+                const v1 = isNaN(p1.order) ? 9999 : p1.order;
+                const v2 = isNaN(p2.order) ? 9999 : p2.order;
+                return (v1 < v2 ? -1 : 0);
+              })
+              console.log(probs)
+              this.setState({problems: probs})
+            }}>Sắp xếp theo Order</Button>
           </div>
           <div className="border d-inline-flex p-1">
-            <Button size="sm" variant="dark">Đánh số Order từ 0</Button>
+            <Button size="sm" variant="dark" onClick={() => {
+              let probs = problems.slice() // Copy array
+              for (let i=0; i<problems.length; i++) probs[i].order = i
+              this.setState({problems : probs})
+            }}>Tự đánh số Order từ trên xuống</Button>
+          </div>
+          <div className="border d-inline-flex p-1">
+            <Button size="sm" variant="dark" onClick={() => {
+              this.setState({errors: null}); this.refetch()
+            }}>Reset</Button>
           </div>
         </div>
 
         <hr className="m-2"/>
 
         <div className="admin-table">
+        <ErrorBox errors={errors} />
         <Table responsive hover size="sm" striped bordered className="rounded mb-0">
           <thead>
             <tr>
@@ -123,6 +142,7 @@ class Problem extends React.Component {
               <th style={{whiteSpace: "nowrap"}} >
                 Max Subs {this.clarifyPopup('Giới hạn số lần nộp bài tối đa cho phép. Để trống nếu cho phép nộp không giới hạn.')}
               </th>
+              <th></th>
               {/* <th >
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Actions</Link>
               </th> */}
@@ -130,16 +150,20 @@ class Problem extends React.Component {
           </thead>
           <tbody>
           {
-            problems.map((prob, ridx) =>
-              <tr key={`ct-pr-${prob.shortname}`}>
-                <td> <Form.Control size="sm" type="text" id="order" value={prob.order}
+            !loaded && <tr><td colSpan={99}><SpinLoader margin="20px" /></td></tr>
+          }{
+            loaded && count === 0 && <tr><td colSpan={99}><em>No problems added yet.</em></td></tr>
+          }{
+            loaded && count > 0 && problems.map((prob, ridx) =>
+              <tr key={`ct-pr-${ridx}`}><td>
+                <Form.Control size="sm" type="number" id="order" value={isNaN(prob.order) ? '' : prob.order}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
                 <td style={{minWidth: "150px"}}>
-                  <Form.Control size="sm" type="text" id="shortname" value={prob.shortname}
+                  <Form.Control size="sm" type="text" id="shortname" value={prob.shortname || ''}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
-                <td> <Form.Control size="sm" type="number" id="points" value={prob.points || 0}
+                <td> <Form.Control size="sm" type="number" id="points" value={prob.points || ''}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
                 <td> <Form.Control size="sm" type="checkbox" id="partial" checked={prob.partial || false}
@@ -151,7 +175,15 @@ class Problem extends React.Component {
                 <td> <Form.Control size="sm" type="number" id="max_submissions" value={prob.max_submissions || ''}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
-              </tr>
+                <td><Link to="#" onClick={(e) => {
+                  e.preventDefault()
+                  let conf = window.confirm('CHÚ Ý: Xóa một đối tượng ContestProblem có sẵn sẽ dẫn đến hiện tượng Data Corruption: '+
+                    'gây ảnh hưởng đến những ContestSubmission và ContestParticipation tương ứng, nhất là khi Contest đang và đã diễn ra. '+
+                    'Hãy suy xét lựa chọn đổi thứ tự chúng thông qua Order thay vì xóa đi tạo lại một Problem. Một khi nhấn SAVE, sẽ không '+
+                    'thể khôi phục lại những tài nguyên tương ứng.')
+                  if (conf) this.setState({problems: problems.filter((_, i) => i !== ridx) })
+                }}>Delete</Link>
+                </td></tr>
             )
           }
           </tbody>
@@ -159,10 +191,14 @@ class Problem extends React.Component {
         </div>
 
         <Row className="mt-2">
-          <Col xs={9}></Col>
-          <Col>
+          <Col xs={8}></Col>
+          <Col sm={2}>
             <Button size="sm" variant="dark" style={{width: "100%"}}
-              onClick={(e) => console.log(this.state.problems)}> Save </Button>
+              onClick={() => this.setState({ problems: problems.concat({...INIT_CONT_PROBLEM}) })}> Add </Button>
+          </Col>
+          <Col sm={2}>
+            <Button size="sm" variant="danger" style={{width: "100%"}}
+              onClick={(e) => this.formSubmitHandler(e)}> Save </Button>
           </Col>
         </Row>
       </div>

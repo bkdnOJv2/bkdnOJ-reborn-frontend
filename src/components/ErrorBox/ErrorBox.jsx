@@ -6,7 +6,7 @@ import './ErrorBox.scss';
 class ErrorList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       errTitle: props.errTitle,
       errData: props.errData,
     }
@@ -17,15 +17,15 @@ class ErrorList extends React.Component {
       nextProps.errData !== prevState.errData
     )
       return {
-        errTitle: nextProps.errTitle, 
+        errTitle: nextProps.errTitle,
         errData: nextProps.errData,
       };
-    return null; 
+    return null;
   }
 
   render() {
     const { errTitle, errData } = this.state;
-    if (errData instanceof Array) 
+    if (errData instanceof Array)
       return (
         <>
           <h5 key={errTitle} className="error-sub-title">{errTitle}</h5>
@@ -34,7 +34,7 @@ class ErrorList extends React.Component {
           }</ul>
         </>
       )
-    else 
+    else
       return (
         <>
           <h5 className="error-sub-title">error</h5>
@@ -55,13 +55,15 @@ export default class ErrorBox extends React.Component {
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.errors !== prevState.errors)
       return { errors: nextProps.errors };
-    return null; 
+    return null;
   }
 
   render() {
     var { errors } = this.state;
-
     if (!errors) return <></>
+
+    if (typeof(errors) === 'string' || errors instanceof String)
+      errors = [errors]
 
     var general = null;
     if (errors.general) {

@@ -111,7 +111,6 @@ class AdminJudgeList extends React.Component {
     e.preventDefault();
 
     let ids = [];
-    console.log(this.state.selectChk)
     this.state.selectChk.forEach((v, i) => {
       if (v) ids.push(this.state.judges[i].id)
     })

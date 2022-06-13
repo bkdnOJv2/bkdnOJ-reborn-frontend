@@ -6,8 +6,6 @@ import { SpinLoader } from 'components';
 import ContestContext from 'context/ContestContext';
 
 export default class ContestBanner extends React.Component {
-  static contextType = ContestContext;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -35,9 +33,10 @@ export default class ContestBanner extends React.Component {
     this.setState({ label })
   }
 
+  componentDidMount() { this.componentDidUpdate() }
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.contest !== this.context.contest ) {
-      const { contest } = this.context;
+    if (this.props.contest !== this.state.contest ) {
+      const { contest } = this.props;
       this.setState({ contest })
 
       let start_time = new Date(contest.start_time);
@@ -67,16 +66,30 @@ export default class ContestBanner extends React.Component {
 
   render() {
     const { contest } = this.state;
+    let headerComp = <>Loading</>
+    if (contest) {
+      if (contest.allow_spectate)
+        headerComp = <>You are Spectating</>
+      else
+      if (contest.is_registered)
+        headerComp = <>You are Participating</>
+      else
+        headerComp = <>You are Viewing</>
+    }
 
     return (
       <div className="wrapper-vanilla" id="contest-banner">
-        <h4 id="header">Contest</h4>
+        <h4 id="header"> {headerComp} </h4>
+
         <div className="flex-center-col">
           {
             contest ? <>
               <h4 className="m-2" id="contest-name">
-                {`${this.state.contest.name}`}
+                {`${contest.name}`}
               </h4>
+              <sup className="pb-1">
+                {`Contest Type: ${contest.format_name}`}
+              </sup>
               <hr className="divisor"/>
               <span id="contest-time">
                 {`${this.state.label}`}

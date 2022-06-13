@@ -22,7 +22,11 @@
     font-family: $font-codeforces;
     vertical-align: middle;
   }
-  td#participate-options {
+  td.participate-options {
+    min-width: 180px;
+  }
+
+  td.participate-options {
     a {
       color: $blue-dark;
       &:hover {
@@ -31,6 +35,7 @@
       text-decoration: underline;
       font-size: 12px;
     }
+    min-width: 180px;
   }
 
   table {

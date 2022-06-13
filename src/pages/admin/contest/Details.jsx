@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Form, Row, Col, Button, Tabs, Tab } from 'react-bootstrap';
-import { FaRegTrashAlt } from 'react-icons/fa';
+import { FaGlobe, FaRegTrashAlt } from 'react-icons/fa';
 
 import { General, Participation, Problem, Submission
 } from './_';
@@ -26,8 +26,7 @@ class AdminContestDetails extends React.Component {
     };
   }
 
-  componentDidMount() {
-    setTitle(`Admin | Contest ${this.key}`)
+  refetch() {
     contestAPI.getContest({key: this.key})
       .then((res) => {
         this.setState({
@@ -42,22 +41,17 @@ class AdminContestDetails extends React.Component {
       })
   }
 
-  inputChangeHandler(event, params={isCheckbox: null}) {
-    const isCheckbox = params.isCheckbox || false;
-
-    let newData = this.state.data;
-    if (!isCheckbox) newData[event.target.id] = event.target.value
-    else {
-      newData[event.target.id] = !newData[event.target.id]
-    }
-    this.setState({ data : newData })
+  componentDidMount() {
+    setTitle(`Admin | Contest ${this.key}`)
+    this.refetch();
   }
 
   deleteObjectHandler() {
-    let conf = window.confirm("Deleting this Contest will delete: Contest Submissions, Contest Participation, Contest Problem. "+
-      "Do you still want to delete?");
+    let conf = window.confirm("Xóa Contest này sẽ xóa TẤT CẢ tài nguyên liên quan với nó "+
+      "(ContestSubmissions với Submission tương ứng, ContestParticipation, ContestProblem (nhưng không xóa Problem)). "+
+      "Bạn vẫn muốn xóa?");
     if (conf) {
-      contestAPI.deleteContest({id: this.id})
+      contestAPI.deleteContest({key: this.key})
         .then((res) => {
           toast.success("OK Deleted.");
           this.setState({ redirectUrl : '/admin/contest/' })
@@ -82,6 +76,12 @@ class AdminContestDetails extends React.Component {
           { loaded && !errors && <div className="panel-header">
               <span className="title-text text-truncate">{`Viewing Contest | ${data.name}`}</span>
               <span>
+                <Button className="btn-svg" size="sm" variant="dark"
+                  onClick={()=>this.setState({ redirectUrl: `/contest/${this.key}` })}>
+                    <FaGlobe/><span className="d-none d-md-inline">View on Site</span>
+                </Button>
+              </span>
+              <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
                     <FaRegTrashAlt/><span className="d-none d-md-inline">Delete</span>
@@ -98,11 +98,11 @@ class AdminContestDetails extends React.Component {
           <Tabs defaultActiveKey="general" id="general" className="pl-2">
             <Tab eventKey="general" title="General">
               <General
-              data={data} />
+                ckey={this.key} data={data} refetch={()=>this.refetch()} />
             </Tab>
             <Tab eventKey="prob" title="Problems">
               <Problem
-              />
+                ckey={this.key}/>
             </Tab>
             <Tab eventKey="part" title="Participations">
               <Participation

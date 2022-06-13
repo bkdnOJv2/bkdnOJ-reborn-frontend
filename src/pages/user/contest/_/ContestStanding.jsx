@@ -33,6 +33,9 @@ class StandingItem extends React.Component {
     if (data && data.constructor === Object)
       Object.keys(data).forEach((k) => {
         const v = data[k]; // => {'time': ..., 'points': ...}
+
+        // this might not exists because admin of contest decide to delete them, but the contest data is still there
+        if (!mapping[k]) return;
         const i = mapping[k].pos;
 
         const pts = mapping[k].points;
@@ -142,7 +145,7 @@ class ContestStanding extends React.Component {
         problems: res.data.problems,
       })
 
-      let mapping = {}
+      let mapping = {}; // mapping here is a list of problems in the contest -> their id
       let uniq=0;
       res.data.problems.forEach( (prob) => {
         if (mapping[prob.id]) return;

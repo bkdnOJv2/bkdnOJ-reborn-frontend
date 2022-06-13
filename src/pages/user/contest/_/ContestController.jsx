@@ -1,8 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import {VscEyeClosed, VscEye, VscRecord} from 'react-icons/vsc';
+import {FaWrench} from 'react-icons/fa';
 
 import { addClass, removeClass } from 'helpers/dom_functions';
+import { withNavigation } from 'helpers/react-router';
 
 class ContestController extends React.Component {
   constructor(props) {
@@ -18,7 +21,8 @@ class ContestController extends React.Component {
   }
 
   render() {
-    const { showNav } = this.props;
+    const { showNav, user } = this.props;
+    const isStaff = user && user.is_staff;
 
     return (
       <div className="flex-center" style={{
@@ -32,8 +36,16 @@ class ContestController extends React.Component {
           size="sm" variant={!showNav ? "light" : "dark"}
         >
           {!showNav ? <VscEye/> : <VscEyeClosed/>}
-          Nav
+          <span className="d-none d-md-inline">Nav</span>
         </Button>
+
+        { isStaff && <Button onClick={()=>this.props.navigate(`/admin/contest/${this.props.ckey}`)}
+          className="btn-svg" style={btnStyle}
+          size="sm" variant="danger"
+        >
+          <FaWrench />
+          <span className="d-none d-md-inline">Adm.</span>
+        </Button> }
 
         {/* <Button onClick={(e)=>alert('Click')} className="btn-svg"
           id="ct-ctrl-live"
@@ -44,9 +56,15 @@ class ContestController extends React.Component {
       </div>
     )
   }
-}
+};
 
-export default ContestController;
+let wrapped = ContestController;
+wrapped = withNavigation(wrapped);
+const mapStateToProps = state => {
+  return { user : state.user.user }
+}
+wrapped = connect(mapStateToProps, null)(wrapped);
+export default wrapped;
 
 const btnStyle = {
   height: "30px",

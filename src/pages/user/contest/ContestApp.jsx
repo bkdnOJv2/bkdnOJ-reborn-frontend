@@ -79,9 +79,10 @@ class ContestApp extends React.Component {
 
   render() {
     const { contest, loaded, showNav } = this.state;
+
     let mains = (
       contest ? [
-        <ContestBanner contestLoaded={loaded} {...this.props} />,
+        <ContestBanner contestLoaded={loaded} contest={contest} />,
         <ContestNav />,
         <Outlet/>
       ] :
@@ -101,8 +102,11 @@ class ContestApp extends React.Component {
     return (
       <div id="contest-app">
         <ContestProvider value={ {contest} }>
-          <ContestController showNav={showNav} setShowNav={(v)=>this.setState({showNav: v})}
-          />
+          {
+            contest && <ContestController
+            showNav={showNav} setShowNav={(v)=>this.setState({showNav: v})} ckey={contest.key}
+            />
+          }
           <OneColumn mainContent={mains}/>
         </ContestProvider >
       </div>

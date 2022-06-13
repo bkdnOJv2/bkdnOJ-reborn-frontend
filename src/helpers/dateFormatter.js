@@ -20,7 +20,7 @@ export function getYearMonthDate(date) {
     if (! isFinite(d)) return "N/A";
 
     const mm = d.getMonth() + 1;
-    const dd = d.getDate() + 1;
+    const dd = d.getDate();
     return d.getFullYear()+'/'+(mm < 10?'0':'')+mm+'/'+(dd<10?'0':'')+dd;
 }
 export function getHourMinuteSecond(date) {
@@ -28,9 +28,9 @@ export function getHourMinuteSecond(date) {
     const d = new Date(date);
     if (! isFinite(d)) return "N/A";
 
-    return ("0" + d.getUTCHours()).slice(-2) + ":" +
-        ("0" + d.getUTCMinutes()).slice(-2) + ":" +
-        ("0" + d.getUTCSeconds()).slice(-2);
+    return ("0" + d.getHours()).slice(-2) + ":" +
+        ("0" + d.getMinutes()).slice(-2) + ":" +
+        ("0" + d.getSeconds()).slice(-2);
 }
 
 export default function dateFormatter(date, short=false) {
@@ -39,19 +39,19 @@ export default function dateFormatter(date, short=false) {
     if (! isFinite(d)) return "N/A";
     const now = new Date();
 
-    const year = d.getUTCFullYear();
-    const day = d.getUTCDate();
+    var timeString = ("0" + d.getHours()).slice(-2) + ":" +
+        ("0" + d.getMinutes()).slice(-2) + ":" +
+        ("0" + d.getSeconds()).slice(-2);
 
-    var timeString = ("0" + d.getUTCHours()).slice(-2) + ":" +
-        ("0" + d.getUTCMinutes()).slice(-2) + ":" +
-        ("0" + d.getUTCSeconds()).slice(-2);
+    // const year = d.getFullYear();
+    // const day = d.getDate();
 
     // if (now.getUTCFullYear() === year)
     //     return `${getMonthShort(d)} ${day}${getDaySuffix(day)}, ${getWeekDayShort(d)}, ${timeString}`
 
-    var dateString = d.getUTCFullYear() + "/" +
-        ("0" + (d.getUTCMonth()+1)).slice(-2) + "/" +
-        ("0" + d.getUTCDate()).slice(-2) + " " +
+    var dateString = d.getFullYear() + "/" +
+        ("0" + (d.getMonth()+1)).slice(-2) + "/" +
+        ("0" + d.getDate()).slice(-2) + " " +
         timeString;
 
     return dateString;

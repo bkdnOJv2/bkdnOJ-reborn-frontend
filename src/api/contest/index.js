@@ -28,9 +28,15 @@ const getContestParticipations = ({ key, params }) => {
 const getContestSubmissions = ({ key, params }) => {
     return axiosClient.get(`/contest/${key}/submission/`, (params && { params: {...params} }));
 }
+
 const getContestProblems = ({ key, params }) => {
     return axiosClient.get(`/contest/${key}/problem/`, (params && { params: {...params} }));
 }
+const updateContestProblems = ({ key, data }) => {
+    return axiosClient.post(`/contest/${key}/problem/`, data); // actually patching
+}
+
+
 const getContestProblem = ({ key, shortname, params }) => {
     return axiosClient.get(`/contest/${key}/problem/${shortname}/`, (params && { params: {...params} }));
 }
@@ -44,11 +50,15 @@ const getContestProblemSubmission = ({ key, shortname, id }) => {
     return axiosClient.get(`/contest/${key}/problem/${shortname}/submission/${id}/`);
 }
 
+const createContest = ({data}) => {
+    return axiosClient.post(`/contest/`, data);
+}
+
 const deleteContest = ({ key }) => {
     return axiosClient.delete(`/contest/${key}/`);
 }
 const updateContest = ({ key, data }) => {
-    return axiosClient.delete(`/contest/${key}/`, data);
+    return axiosClient.patch(`/contest/${key}/`, data);
 }
 
 const contestAPI = {
@@ -60,10 +70,14 @@ const contestAPI = {
     getContestStanding,
     getContestSubmissions,
     getContestParticipations,
+
+    // ContestProblem
     getContestProblems, getContestProblem, submitContestProblem,
+    updateContestProblems,
+
     getContestProblemSubmissions, getContestProblemSubmission,
 
-    deleteContest, updateContest,
+    createContest, deleteContest, updateContest,
 }
 
 export default contestAPI;

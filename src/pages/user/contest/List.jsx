@@ -87,9 +87,9 @@ class ContestListItem extends React.Component {
         <td className="text-truncate" style={{maxWidth: "300px"}}>
           <Link to={`/contest/${ckey}`}>{cname}</Link>
         </td>
-        <td>{this.parseStartTime()}</td>
+        <td className="contest-start">{this.parseStartTime()}</td>
         <td>{this.parseDuration()}</td>
-        <td id="participate-options">{
+        <td className="participate-options">{
           <div className="text-center d-flex flex-column align-items-center" style={{width: "100%"}}>
             <div className="flex-center">
               Participants: {this.props.data.user_count}<VscPerson size={18}/>
@@ -192,9 +192,9 @@ class NPContestList extends React.Component {
             <tr>
               <th style={{width: "13%"}}>#</th>
               <th style={{width: "30%"}}>Name</th>
-              <th style={{width: "15%"}}>Start Time</th>
+              <th className="contest-start">When</th>
               <th style={{width: "8%"}}>Duration</th>
-              <th style={{width: "20%"}}>Participate</th>
+              <th className="participate-options">Participate</th>
             </tr>
           </thead>
           <tbody>
@@ -286,46 +286,46 @@ class ContestList extends React.Component {
         <hr className="m-2" />
 
         <div className="past-contest">
-            <h4>Past Contests</h4>
-            <ErrorBox errors={this.state.errors} />
-            <Table responsive hover size="sm" striped bordered className="rounded">
-            <thead>
-              <tr>
-                <th style={{width: "13%"}}>#</th>
-                <th style={{width: "30%"}}>Name</th>
-                <th style={{width: "15%"}}>Start Time</th>
-                <th style={{width: "8%"}}>Duration</th>
-                <th style={{width: "20%"}}>Participate</th>
-              </tr>
-            </thead>
-            <tbody>
-              { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
-              { this.state.loaded === true &&
-                <>
-                  {
-                    this.state.pastContests.map((cont, idx) =>
-                      <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} user={this.props.user} type="past" />
-                    )
-                  }
-                </>
-              }
-            </tbody>
-            </Table>
-            {
-            this.state.loaded === false
-                ? <SpinLoader margin="0" />
-                : <span className="classic-pagination">Page: <ReactPaginate
-                    breakLabel="..."
-                    onPageChange={this.handlePageClick}
-                    forcePage={this.state.currPage}
-                    pageLabelBuilder={(page) => `[${page}]`}
-                    pageRangeDisplayed={3}
-                    pageCount={this.state.pageCount}
-                    renderOnZeroPageCount={null}
-                    previousLabel={null}
-                    nextLabel={null}
-                    /></span>
+          <h4>Past Contests</h4>
+          <ErrorBox errors={this.state.errors} />
+          <Table responsive hover size="sm" striped bordered className="rounded">
+          <thead>
+            <tr>
+              <th style={{width: "13%"}}>#</th>
+              <th style={{width: "30%"}}>Name</th>
+              <th className="contest-start">When</th>
+              <th style={{width: "8%"}}>Duration</th>
+              <th className="participate-options">Participate</th>
+            </tr>
+          </thead>
+          <tbody>
+            { this.state.loaded === false && <tr><td colSpan="6"><SpinLoader margin="10px" /></td></tr> }
+            { this.state.loaded === true &&
+              <>
+                {
+                  this.state.pastContests.map((cont, idx) =>
+                    <ContestListItem key={`cont-${cont.key}`} rowid={idx} data={cont} user={this.props.user} type="past" />
+                  )
+                }
+              </>
             }
+          </tbody>
+          </Table>
+          {
+            this.state.loaded === false
+              ? <SpinLoader margin="0" />
+              : <span className="classic-pagination">Page: <ReactPaginate
+                  breakLabel="..."
+                  onPageChange={this.handlePageClick}
+                  forcePage={this.state.currPage}
+                  pageLabelBuilder={(page) => `[${page}]`}
+                  pageRangeDisplayed={3}
+                  pageCount={this.state.pageCount}
+                  renderOnZeroPageCount={null}
+                  previousLabel={null}
+                  nextLabel={null}
+                  /></span>
+          }
         </div>
       </div>
     )

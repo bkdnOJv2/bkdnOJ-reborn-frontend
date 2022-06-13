@@ -1,8 +1,13 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   Form, Row, Col, Button, Accordion
 } from 'react-bootstrap';
+
+import contestAPI from 'api/contest';
+import { SpinLoader, ErrorBox } from 'components';
+import { withNavigation } from 'helpers/react-router';
 
 class General extends React.Component {
   constructor(props) {
@@ -10,9 +15,11 @@ class General extends React.Component {
     this.state = {
       ckey: this.props.ckey,
       data: this.props.data,
+      errors: null,
     }
   }
 
+  // -------------- Setters Getters
   inputChangeHandler(event, params={isCheckbox: null}) {
     const isCheckbox = params.isCheckbox || false;
 
@@ -23,33 +30,64 @@ class General extends React.Component {
     }
     this.setState({ data : newData })
   }
+  getTime(key) {
+    const data = this.state.data;
+    if (data && data[key]) {
+      let time = new Date(data[key])
+      time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+      return time.toISOString().slice(0, 16);
+    }
+    return '';
+  }
+  setTime(key, v) {
+    let time = new Date(v)
+    const data = this.state.data;
+    console.log(key, time.toISOString())
+    console.log('Before', data)
+    this.setState({ data : { ...data, [key]: time.toISOString() } },
+    () => console.log('After', data)
+    );
 
+  }
+
+  // -------------- apis
+  refetch(){
+    if (this.props.refetch) this.props.refetch()
+  }
+
+  // ------------- Lifecycle
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.data !== this.props.data) {
+      this.setState({ data: this.props.data, })
+    }
+  }
+
+  // ------------- form submit
   formSubmitHandler(e) {
     e.preventDefault();
 
+    this.setState({errors: null})
+
     let sendData = this.state.data;
-    console.log("Data", sendData);
-    let reqs = [];
 
-    return;
-
-    reqs.push()
-    Promise.all(
-      reqs
-    ).then((results) => {
-      toast.success("Saved.")
-      // this.setState({ data: results[0].data });
-      // this.props.setProblemTitle && this.props.setProblemTitle(results[0].data.title)
-      console.log(results);
+    contestAPI.updateContest({key: this.state.ckey, data: sendData})
+    .then((results) => {
+      toast.success("OK Saved.")
+      if (results.data.key !== this.state.ckey)
+        this.props.navigate(`/admin/contest/${results.data.key}`);
+      else this.props.refetch();
     }).catch((err) => {
-      console.log(err);
+      console.log(err.response.data);
+      this.setState({ errors: err.response.data })
     })
   }
 
   render() {
-    const { data } = this.props;
+    const { data } = this.state;
 
     return (
+      <>
+      <ErrorBox errors={this.state.errors} />
       <Form id="contest-general" onSubmit={(e) => this.formSubmitHandler(e)}>
             <Row>
               <Form.Label column="sm" lg={1} > ID </Form.Label>
@@ -70,26 +108,34 @@ class General extends React.Component {
             <Row>
               <Form.Label column="sm" md={2} className="required"> Start Time </Form.Label>
               <Col md={4}> <Form.Control size="sm" type="datetime-local" id="start_time"
-                      value={data.start_time} onChange={(e)=>this.inputChangeHandler(e)}
+                      value={this.getTime('start_time') || ''}
+                      onChange={(e)=>this.setTime(e.target.id, e.target.value)}
               /></Col>
 
               <Form.Label column="sm" md={2} className="required"> End Time </Form.Label>
               <Col md={4}> <Form.Control size="sm" type="datetime-local" id="end_time"
-                      value={data.end_time} onChange={(e)=>this.inputChangeHandler(e)}
+                      value={this.getTime('end_time') || ''}
+                      onChange={(e)=>this.setTime(e.target.id, e.target.value)}
               /></Col>
+
+              <Col xl={12}>
+                <sub>
+                  Giới hạn thời gian làm bài cho tham dự chính thức (Live Participation).
+                </sub>
+              </Col>
             </Row>
 
             <Row>
-              <Form.Label column="sm" md={2}> Time Limit </Form.Label>
-              <Col md={10}> <Form.Control size="sm" id="time_limit"
+              <Form.Label column="sm" md={3}> Time Limit (phút) </Form.Label>
+              <Col md={9}> <Form.Control size="sm" id="time_limit"
                       value={data.time_limit || ''} onChange={(e)=>this.inputChangeHandler(e)}
               />
               </Col>
               <Col xl={12}>
                 <sub>
                   Giới hạn thời gian làm bài cho mỗi lần tham dự. Nếu nhập một số nguyên,
-                  mỗi lần tham dự thí sinh chỉ được làm bài từ
-                  <code>start_time</code> tới <code>start_time+time_limit</code>(phút).
+                  mỗi lần tham dự thí sinh chỉ được làm bài từ Thời gian Tham dự cộng <code>time_limit</code>.
+                  Option này chủ yếu dành cho Virtual Participation (chưa triển khai).
                 </sub>
               </Col>
             </Row>
@@ -98,7 +144,8 @@ class General extends React.Component {
               <Form.Label column="sm" md={3}> Contest Format </Form.Label>
               <Col md={9}>
                   <Form.Select aria-label={data.format_name}
-                    defaultValue={data.format_name || 'default'}
+                    value={data.format_name || 'default'}
+                    onChange={e => this.inputChangeHandler(e)}
                     size="sm" id="format_name"
                     className="mb-1"
                   >
@@ -108,12 +155,17 @@ class General extends React.Component {
                     <option value="ioi">IOI (trước 2016)</option>
                   </Form.Select>
               </Col>
+
+              <Form.Label column="sm" xl={12}> Contest Format Custom Config </Form.Label>
+              <Col> <Form.Control size="sm" xl={12} type="textarea" placeholder="JSON - Describe custom contest rules" id="format_config"
+                      value={data.format_config || ''} onChange={(e) => this.inputChangeHandler(e)}
+              /></Col>
             </Row>
 
             <Row>
               <Form.Label column="sm" xl={12}> Mô tả </Form.Label>
               <Col> <Form.Control size="sm" xl={12} type="textarea" placeholder="Contest Description" id="description"
-                      value={data.description} onChange={(e) => this.inputChangeHandler(e)}
+                      value={data.description || ''} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
 
@@ -125,7 +177,7 @@ class General extends React.Component {
               <Row>
                 <Form.Label column="sm" md={4}> Làm tròn điểm (đến số thập phân) </Form.Label>
                 <Col > <Form.Control size="sm" type="number" id="points_precision"
-                        value={data.points_precision} onChange={(e)=>this.inputChangeHandler(e)}
+                        value={data.points_precision || 6} onChange={(e)=>this.inputChangeHandler(e)}
                 />
                 </Col>
               </Row>
@@ -291,9 +343,11 @@ class General extends React.Component {
           </Col>
         </Row>
       </Form>
+      </>
     )
   }
 };
 
 let wrapped = General;
+wrapped = withNavigation(wrapped);
 export default wrapped;
