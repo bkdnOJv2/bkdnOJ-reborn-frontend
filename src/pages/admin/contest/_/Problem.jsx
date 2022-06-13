@@ -32,7 +32,6 @@ class Problem extends React.Component {
     .then((res) => {
       this.setState({
         loaded: true,
-        count: res.data.count,
         problems: res.data.results,
       })
     })
@@ -86,7 +85,7 @@ class Problem extends React.Component {
   }
 
   render() {
-    const { loaded, errors, count, problems } = this.state;
+    const { loaded, errors, problems } = this.state;
 
     return (
       <>
@@ -152,9 +151,9 @@ class Problem extends React.Component {
           {
             !loaded && <tr><td colSpan={99}><SpinLoader margin="20px" /></td></tr>
           }{
-            loaded && count === 0 && <tr><td colSpan={99}><em>No problems added yet.</em></td></tr>
+            loaded && problems.length === 0 && <tr><td colSpan={99}><em>No problems added yet.</em></td></tr>
           }{
-            loaded && count > 0 && problems.map((prob, ridx) =>
+            loaded && problems.length > 0 && problems.map((prob, ridx) =>
               <tr key={`ct-pr-${ridx}`}><td>
                 <Form.Control size="sm" type="number" id="order" value={isNaN(prob.order) ? '' : prob.order}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
