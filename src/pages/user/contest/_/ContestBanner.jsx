@@ -9,54 +9,54 @@ export default class ContestBanner extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      label: '...',
-      time_left: null,
-      contest: null,
+      time_label: '...',
+      contest: {},
     }
   }
-
   updateTimeLeftLabel() {
-    const t = this.state.time_left;
-    if (t === null) return;
-    if (t <= 0) {
-      this.setState({ label: "Contest Finished" })
-      clearInterval(this.timer);
+    const contest = this.state.contest;
+    let start_time = new Date(contest.start_time);
+    let end_time = new Date(contest.end_time);
+    if (isNaN(start_time) || isNaN(end_time)) {
       return;
     }
 
-    let s = t % 60;
-    let m = Math.floor(t/60);
-    let h = Math.floor(m/60);
-    m = m % 60;
-    let label = (h<10 ? '0' : '') + h + ':' + (m<10 ? '0':'') + m + ':' + (s<10 ? '0':'') + s + '';
-    label = `Time remaining: ${label}`
-    this.setState({ label })
+    let now = new Date()
+    let lbl = '';
+    let t = 0
+    if (now < start_time) {
+      lbl = "Contest Starting In ";
+      t = Math.floor((start_time - now)/1000);
+    } else if (now < end_time) {
+      lbl = "Contest is Running: ";
+      t = Math.floor((end_time - now)/1000);
+    } else {
+      lbl = "Contest is Finished";
+      t = 0;
+      clearInterval(this.timer);
+    }
+    this.setState({ time_label: lbl })
+
+    let hhmmss = '';
+    if (t > 0) {
+      let s = t % 60;
+      let m = Math.floor(t/60);
+      let h = Math.floor(m/60);
+      m = m % 60;
+      hhmmss = (h<10 ? '0' : '') + h + ':' + (m<10 ? '0':'') + m + ':' + (s<10 ? '0':'') + s + '';
+    }
+    this.setState({ time_label: `${lbl} ${hhmmss}` })
   }
+
 
   componentDidMount() { this.componentDidUpdate() }
   componentDidUpdate(prevProps, prevState) {
     if (this.props.contest !== this.state.contest ) {
       const { contest } = this.props;
-      this.setState({ contest })
-
-      let start_time = new Date(contest.start_time);
-      let end_time = new Date(contest.end_time);
-      if (!contest.end_time) {
-        var hms = this.time_limit;
-        var a = hms.split(':');
-        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
-        end_time = (start_time.getTime() + seconds*1000);
-      }
-
-      this.setState({ time_left : Math.floor((end_time - new Date()) / 1000) }, ()=>{
+      this.setState({ contest }, () => {
         clearInterval(this.timer)
-
-        this.timer = setInterval(() => {
-          let t = this.state.time_left;
-          this.setState({ time_left: t-1 }, () => this.updateTimeLeftLabel() );
-        }, 1000)
+        this.timer = setInterval(() => this.updateTimeLeftLabel(), 1000)
       })
-
     }
   }
 
@@ -68,11 +68,11 @@ export default class ContestBanner extends React.Component {
     const { contest } = this.state;
     let headerComp = <>Loading</>
     if (contest) {
-      if (contest.allow_spectate)
-        headerComp = <>You are Spectating</>
-      else
-      if (contest.is_registered)
+      if (contest.is_registered && !contest.spectate_allow)
         headerComp = <>You are Participating</>
+      else
+      if (contest.is_registered && contest.spectate_allow)
+        headerComp = <>You are Spectating</>
       else
         headerComp = <>You are Viewing</>
     }
@@ -92,7 +92,7 @@ export default class ContestBanner extends React.Component {
               </sup>
               <hr className="divisor"/>
               <span id="contest-time">
-                {`${this.state.label}`}
+                {`${this.state.time_label}`}
               </span>
             </> : <>
               <SpinLoader margin="20px"/>

@@ -12,7 +12,7 @@ export default class GeneralDetails extends React.Component {
     this.state = {
       shortname: this.props.shortname,
       data: this.props.data,
-      options: this.props.options.actions.PUT || this.props.options.actions.PATCH,
+      // options: this.props.options.actions.PUT || this.props.options.actions.PATCH,
       selectedPdf: null
     }
   }
@@ -56,7 +56,7 @@ export default class GeneralDetails extends React.Component {
     Promise.all(
       reqs
     ).then((results) => {
-      toast.success("Saved.")
+      toast.success("OK Updated.")
       this.setState({ data: results[0].data });
       this.props.setProblemTitle && this.props.setProblemTitle(results[0].data.title)
       // console.log(results);
@@ -156,11 +156,12 @@ export default class GeneralDetails extends React.Component {
               <Form.Label column="sm" lg={4}> Submission Visibility Mode </Form.Label>
               <Col>
                   <Form.Select aria-label={data.submission_visibility_mode}
-                    defaultValue={data.submission_visibility_mode || 'FOLLOW'}
-                    size="sm" id="submission_visibility_mode"
-                    className="mb-1"
+                    id='submission_visibility_mode'
+                    value={data.submission_visibility_mode || ''}
+                    onChange={(e) => this.inputChangeHandler(e)}
+                    size="sm" id="submission_visibility_mode" className="mb-1"
                   >
-                    <option value="FOLLOW">Follow bkdnOJ's setting.</option>
+                    {/* <option value="FOLLOW">Follow bkdnOJ's setting.</option> */}
                     <option value="ALWAYS">Users can see all submissions</option>
                     <option value="SOLVED">Users can see their own, plus see others if user has solved that problem.</option>
                     <option value="ONLY_OWN">Users can only see their own submissions.</option>

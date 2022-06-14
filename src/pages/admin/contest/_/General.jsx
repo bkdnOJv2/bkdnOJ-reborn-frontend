@@ -9,12 +9,14 @@ import contestAPI from 'api/contest';
 import { SpinLoader, ErrorBox } from 'components';
 import { withNavigation } from 'helpers/react-router';
 
+const JSON_FIELDS = ["authors", "private_contestants"]
+
 class General extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       ckey: this.props.ckey,
-      data: this.props.data,
+      data: this.jsonizeData(this.props.data),
       errors: null,
     }
   }
@@ -47,7 +49,13 @@ class General extends React.Component {
     this.setState({ data : { ...data, [key]: time.toISOString() } },
     () => console.log('After', data)
     );
-
+  }
+  jsonizeData(data) {
+    let newData = {...data};
+    JSON_FIELDS.forEach((key) => {
+      newData[key] = JSON.stringify(newData[key])
+    })
+    return newData;
   }
 
   // -------------- apis
@@ -58,26 +66,39 @@ class General extends React.Component {
   // ------------- Lifecycle
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.data !== this.props.data) {
-      this.setState({ data: this.props.data, })
+      this.setState({ data: this.jsonizeData(this.props.data) })
     }
   }
 
   // ------------- form submit
   formSubmitHandler(e) {
     e.preventDefault();
-
     this.setState({errors: null})
 
-    let sendData = this.state.data;
+    let sendData = {...this.state.data};
+    let parse_err = null;
+    JSON_FIELDS.forEach((key) => {
+      try {
+        const val1= sendData[key]
+        if (val1 instanceof Array) return;
+
+        const val2 = JSON.parse(val1 || '"[]"');
+        sendData[key] = val2;
+      } catch (err) {
+        alert(`Không thể JSON hóa trường ${key}. Hãy đảm bảo chúng là một mảng các string.`)
+        parse_err = err;
+      }
+    })
+    if (parse_err) return;
 
     contestAPI.updateContest({key: this.state.ckey, data: sendData})
     .then((results) => {
-      toast.success("OK Saved.")
+      toast.success("OK Updated.")
       if (results.data.key !== this.state.ckey)
         this.props.navigate(`/admin/contest/${results.data.key}`);
       else this.props.refetch();
     }).catch((err) => {
-      console.log(err.response.data);
+      toast.error(`Update Failed. ${err.response.status}`)
       this.setState({ errors: err.response.data })
     })
   }
@@ -89,6 +110,11 @@ class General extends React.Component {
       <>
       <ErrorBox errors={this.state.errors} />
       <Form id="contest-general" onSubmit={(e) => this.formSubmitHandler(e)}>
+
+        <Accordion defaultActiveKey="-1">
+          <Accordion.Item eventKey="-1" className="general">
+            <Accordion.Header>Thiết lập chung</Accordion.Header>
+            <Accordion.Body>
             <Row>
               <Form.Label column="sm" lg={1} > ID </Form.Label>
               <Col lg={1}> <Form.Control size="sm" type="text" placeholder="Contest id" id="id"
@@ -168,8 +194,9 @@ class General extends React.Component {
                       value={data.description || ''} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
+          </Accordion.Body>
+        </Accordion.Item>
 
-        <Accordion defaultActiveKey="-1">
           <Accordion.Item eventKey="0" className="options">
             <Accordion.Header>Lựa chọn thêm</Accordion.Header>
             <Accordion.Body>
@@ -216,8 +243,8 @@ class General extends React.Component {
 
               <Row>
                 <Form.Label column="sm" sm={3} className="required"> Authors </Form.Label>
-                <Col sm={9}> <Form.Control size="sm" type="text" placeholder="authors" id="authors"
-                        value={JSON.stringify(data.authors)} disabled
+                <Col sm={9}> <Form.Control size="sm" type="text" placeholder='["author1", "author2"]' id="authors"
+                        value={data.authors || ''} onChange={(e) => this.inputChangeHandler(e)}
                 /></Col>
                 <Col xl={12}>
                   <sub>Sẽ được quyền xem và chỉnh sửa Contest. Tên tác giả sẽ được hiển thị công khai.</sub>
@@ -251,11 +278,13 @@ class General extends React.Component {
                 /></Col>
 
                 <Form.Label column="sm" xs={3}> Thí sinh riêng </Form.Label>
-                <Col xs={9}> <Form.Control size="sm" type="text" placeholder="Contestants" id="private_contestants"
-                        value={JSON.stringify(data.private_contestants)} disabled
+                <Col xs={9}> <Form.Control size="sm" type="text" placeholder='["user1","user2","user3"]' id="private_contestants"
+                        value={data.private_contestants || ''} onChange={(e) => this.inputChangeHandler(e)}
                 /></Col>
                 <Col xl={12}>
-                  <sub>Cho phép các người dùng được thêm có thê truy cập và tham dự Contest với tư cách Thí sinh.</sub>
+                  <sub>Chỉ cho phép các người dùng được thêm có thê đăng ký Contest với tư cách Thí sinh.
+                    Định dạng: mảng các string là các username <code>["username1", "username2", "username3"]</code>
+                  </sub>
                 </Col>
               </Row>
 
@@ -271,14 +300,14 @@ class General extends React.Component {
                         value={JSON.stringify(data.organizations)} disabled
                 /></Col>
                 <Col xl={12}>
-                  <sub>Cho phép thành viên của các tổ chức được thêm có thể truy cập và tham dự contest với tư cách Thí sinh.</sub>
+                  <sub>Cho phép thành viên của các tổ chức được thêm có thể đăng ký Contest với tư cách Thí sinh.</sub>
                 </Col>
               </Row>
 
               <Row>
                 <Form.Label column="sm" xs={3}> Cấm những thí sinh này </Form.Label>
-                <Col xs={9}> <Form.Control size="sm" type="text" placeholder="Contestants" id="private_contestants"
-                        value={JSON.stringify(data.private_contestants)} disabled
+                <Col xs={9}> <Form.Control size="sm" type="text" placeholder='["banned_username1", "banned_username2"]' id="banned_users"
+                        value={JSON.stringify(data.banned_users)} disabled
                 /></Col>
               </Row>
             </Accordion.Body>
@@ -287,6 +316,11 @@ class General extends React.Component {
           <Accordion.Item eventKey="2" className="rating">
             <Accordion.Header>Rating</Accordion.Header>
             <Accordion.Body>
+              <Row>
+                <Col xl={12}>
+                  <sub>***Chưa hỗ trợ Rating</sub>
+                </Col>
+              </Row>
 
               <Row>
                 <Form.Label column="sm" > Is Rated? </Form.Label>

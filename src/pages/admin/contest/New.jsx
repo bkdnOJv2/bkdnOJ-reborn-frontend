@@ -91,7 +91,7 @@ class AdminContestNew extends React.Component {
           <ErrorBox errors={this.state.errors} />
           <Form id="contest-general" onSubmit={(e) => this.formSubmitHandler(e)}>
             <Row>
-              <Form.Label column="sm" sm={3} > Contest Key </Form.Label>
+              <Form.Label column="sm" sm={3} className="required" > Contest Key </Form.Label>
               <Col> <Form.Control size="sm" type="text" placeholder="Mã định danh cho Contest" id="key"
                       value={data.key || ''} onChange={(e)=>this.inputChangeHandler(e)} required
               /></Col>

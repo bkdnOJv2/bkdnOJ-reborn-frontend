@@ -99,7 +99,7 @@ class ProblemList extends React.Component {
       .catch((err) => {
         this.setState({
           loaded: true,
-          errors: ["Cannot fetch problems. Please retry again."],
+          errors: ["Cannot fetch problems at the moment."],
         })
       })
   }
@@ -120,6 +120,7 @@ class ProblemList extends React.Component {
 
   render() {
     const contest = this.context.contest;
+    const { loaded, errors } = this.state;
 
     return (
       <div className="problem-table wrapper-vanilla">
@@ -139,10 +140,10 @@ class ProblemList extends React.Component {
               </tr>
             </thead>
             <tbody>
-              { this.state.loaded === false && <tr>
+              { !loaded && <tr>
                 <td colSpan="6"><SpinLoader margin="10px" /></td>
               </tr> }
-              { this.state.loaded === true &&
+              { loaded && !errors &&
                 <>
                   { this.state.count > 0 && <>
                     {

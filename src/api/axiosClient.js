@@ -74,7 +74,7 @@ axiosClient.interceptors.response.use(
       default:
         break;
     }
-    log("Interceptors@Status Code: " + res.status);
+    // log("Interceptors@Status Code: " + res.status);
     return Promise.reject(error);
   }
 );

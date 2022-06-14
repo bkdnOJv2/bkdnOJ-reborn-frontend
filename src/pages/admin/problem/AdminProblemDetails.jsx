@@ -34,15 +34,16 @@ class AdminProblemDetails extends React.Component {
 
   async componentDidMount() {
     Promise.all([
-      problemAPI.adminOptionsProblemDetails({shortname: this.shortname}),
+      //problemAPI.adminOptionsProblemDetails({shortname: this.shortname}),
       problemAPI.getProblemDetails({shortname: this.shortname})
     ]).then((res) => {
-      const [optionsRes, generalRes] = res;
+      // const [optionsRes, generalRes] = res;
+      const [generalRes] = res;
       // console.log(optionsRes.data)
       // console.log(generalRes.data)
       this.setState({
         problemTitle: generalRes.data.title,
-        options: optionsRes.data,
+        // options: optionsRes.data,
         general: generalRes.data,
         loaded: true,
       })

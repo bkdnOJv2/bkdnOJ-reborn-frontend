@@ -34,7 +34,7 @@ class ContestListItem extends React.Component {
 
   render() {
     const { id, ckey, name, start_time, end_time, is_visible,
-      is_organization_private, is_rated, format_name } = this.props;
+      is_private, is_organization_private, is_rated, format_name } = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
 
     return (
@@ -63,7 +63,7 @@ class ContestListItem extends React.Component {
         <td>
           {
             is_visible ? (
-              is_organization_private ? "Orgs" : "Public"
+              (is_organization_private || is_private) ? "Orgs/Users" : "Public"
             ) : "Private"
           }
         </td>
@@ -146,7 +146,7 @@ class AdminContestList extends React.Component {
 
     let ids = [];
     this.state.selectChk.forEach((v, i) => {
-      if (v) ids.push(this.state.submissions[i].id)
+      if (v) ids.push(this.state.contests[i].key)
     })
 
     if (ids.length === 0) {
@@ -158,8 +158,8 @@ class AdminContestList extends React.Component {
     const conf = window.confirm(`Xóa các ${CLASSNAME} ` + JSON.stringify(ids) + '?');
     if (conf) {
       let reqs = []
-      ids.forEach((id) => {
-        reqs.push( contestAPI.adminDeleteContest({id}) )
+      ids.forEach((k) => {
+        reqs.push( contestAPI.deleteContest({key: k}) )
       })
 
       Promise.all(reqs).then((res) => {

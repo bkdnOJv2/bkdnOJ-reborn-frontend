@@ -24,8 +24,8 @@ class ErrorList extends React.Component {
   }
 
   render() {
-    const { errTitle, errData } = this.state;
-    if (errData instanceof Array)
+    let { errTitle, errData } = this.state;
+    if (errData instanceof Array) {
       return (
         <>
           <h5 key={errTitle} className="error-sub-title">{errTitle}</h5>
@@ -34,7 +34,7 @@ class ErrorList extends React.Component {
           }</ul>
         </>
       )
-    else
+    } else {
       return (
         <>
           <h5 className="error-sub-title">error</h5>
@@ -43,6 +43,7 @@ class ErrorList extends React.Component {
           </ul>
         </>
       )
+    }
   }
 }
 
@@ -62,8 +63,12 @@ export default class ErrorBox extends React.Component {
     var { errors } = this.state;
     if (!errors) return <></>
 
-    if (typeof(errors) === 'string' || errors instanceof String)
-      errors = [errors]
+    if (typeof(errors) === 'string' || errors instanceof String) {
+      if (errors.length > 256) {
+        errors = errors.slice(0, 256) + '...';
+      }
+      errors = {general: errors}
+    }
 
     var general = null;
     if (errors.general) {

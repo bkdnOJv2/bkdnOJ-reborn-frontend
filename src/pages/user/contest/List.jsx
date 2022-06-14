@@ -16,8 +16,54 @@ import './List.scss'
 import 'styles/ClassicPagination.scss';
 
 class ContestListItem extends React.Component {
-  constructor(props){
-    super(props);
+  constructor(props) {
+    super(props)
+    this.state = {
+      time_label: null,
+    }
+  }
+
+  updateTimeLeftLabel() {
+    const contest = this.props.data;
+    let start_time = new Date(contest.start_time);
+    let end_time = new Date(contest.end_time);
+    if (isNaN(start_time) || isNaN(end_time)) {
+      clearInterval(this.timer);
+      return;
+    }
+
+    let now = new Date()
+    let lbl = '';
+    let t = 0
+    if (now < start_time) {
+      lbl = "Contest Starting In ";
+      t = Math.floor((start_time - now)/1000);
+    } else if (now < end_time) {
+      lbl = "Contest is Running: ";
+      t = Math.floor((end_time - now)/1000);
+    } else {
+      lbl = "Contest is Finished";
+      t = 0;
+      clearInterval(this.timer);
+    }
+    this.setState({ time_label: lbl })
+
+    let hhmmss = '';
+    if (t > 0) {
+      let s = t % 60;
+      let m = Math.floor(t/60);
+      let h = Math.floor(m/60);
+      m = m % 60;
+      hhmmss = (h<10 ? '0' : '') + h + ':' + (m<10 ? '0':'') + m + ':' + (s<10 ? '0':'') + s + '';
+    }
+    this.setState({ time_label: `${lbl} ${hhmmss}` })
+  }
+  componentDidMount() {
+    clearInterval(this.timer)
+    this.timer = setInterval(() => this.updateTimeLeftLabel(), 1000)
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer)
   }
 
   parseStartTime() {
@@ -58,9 +104,15 @@ class ContestListItem extends React.Component {
     return profile.current_contest.virtual === -1;
   }
 
-  registerContest(ckey) {
-    const conf = window.confirm(`Đăng ký cuộc thi "${ckey}"? Sau khi đăng ký, bạn có thể nộp bài và xuất hiện trên bảng xếp hạng.`)
+  registerContest(ckey, ooc) {
+    let conf = false;
+    if (ooc) {
+      conf = window.confirm(`Đăng ký cuộc thi "${ckey}" ở tư cách spectator? Bạn sẽ có thể nộp bài, nhưng sẽ không xuất hiện trên bảng xếp hạng.`)
+    } else {
+      conf = window.confirm(`Đăng ký cuộc thi "${ckey}"? Sau khi đăng ký, bạn có thể nộp bài và xuất hiện trên bảng xếp hạng.`)
+    }
     if (!conf) return false;
+
     contestAPI.joinContest({key : ckey})
     .then((res) => {
       toast.success(`Đăng ký contest ${ckey} thành công.`, { toastId: 'contest-registered' })
@@ -75,7 +127,7 @@ class ContestListItem extends React.Component {
   render() {
     const ckey = this.props.data.key;
     const cname = this.props.data.name;
-    const { spectate_allow, is_registered } = this.props.data;
+    const { spectate_allow, register_allow, is_registered } = this.props.data;
     const type = this.props.type;
     const { user } = this.props;
 
@@ -87,7 +139,16 @@ class ContestListItem extends React.Component {
         <td className="text-truncate" style={{maxWidth: "300px"}}>
           <Link to={`/contest/${ckey}`}>{cname}</Link>
         </td>
-        <td className="contest-start">{this.parseStartTime()}</td>
+        <td className="contest-start">
+          {this.parseStartTime()}
+          {
+            type !== 'past' && <>
+              <span className="d-inline-flex align-items-center">
+                {this.state.time_label}
+              </span>
+            </>
+          }
+        </td>
         <td>{this.parseDuration()}</td>
         <td className="participate-options">{
           <div className="text-center d-flex flex-column align-items-center" style={{width: "100%"}}>
@@ -98,17 +159,11 @@ class ContestListItem extends React.Component {
               /* Active: Present contest that has Live Participation of user */
               type === 'active' && <>
                 {
-                  <div className="flex-center">
-                    <span className="active-continue-label">
-                      <Link to={`/contest/${ckey}`}>
-                        {`Continue >>`}
-                      </Link>
-                    </span>
-                    {/* <span style={{width: "5px"}}></span>
-                    <Link to='#' onClick={(e) => this.leaveContest(ckey)}>
-                      <VscError size={14} color="red" style={{verticleAlign: "middle"}}/>
-                    </Link> */}
-                  </div>
+                  <span className="active-continue-label">
+                    <Link to={`/contest/${ckey}`}>
+                      {`Continue >>`}
+                    </Link>
+                  </span>
                 }
                 <span className="d-inline-flex align-items-center">
                   <Link to={`/contest/${ckey}/standing`}>{`Current Standing >>`}</Link>
@@ -119,13 +174,23 @@ class ContestListItem extends React.Component {
             {
               /* Active: Present contest that doesnt have Live Participation of user */
               type === 'present' && <>
-                { user && (
+                { user && !is_registered && <>{
                     spectate_allow ? <span className="d-inline-flex align-items-center">
-                      <Link to={`/contest/${ckey}`}>{`Spectate >>`}</Link>
-                    </span> : <span className="d-inline-flex align-items-center">
+                      <Link to="#" onClick={() => this.registerContest(ckey, true)}>{`Register (out of competition) >>`}</Link>
+                    </span> :
+                    register_allow ?
+                    <span className="d-inline-flex align-items-center">
                       <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
                     </span>
-                  )
+                    : <span className="d-inline-flex align-items-center">
+                      <code>Register is not Allowed.</code>
+                    </span>
+                  }</>
+                }
+                { user && is_registered && spectate_allow &&
+                  <Link to={`/contest/${ckey}`}>
+                    {`Spectate >>`}
+                  </Link>
                 }
                 { !user && <span className="d-inline-flex align-items-center">
                     <Link to={`/sign-in`}>{`Log in to Participate >>`}</Link>
@@ -133,6 +198,32 @@ class ContestListItem extends React.Component {
                 <span className="d-inline-flex align-items-center">
                   <Link to={`/contest/${ckey}/standing`}>{`Current Standing >>`}</Link>
                 </span>
+              </>
+            }
+            {
+              /* Future: Not started yet */
+              type === 'future' && <>
+                { user && (
+                    spectate_allow ? <span className="d-inline-flex align-items-center">
+                      <Link to={`/contest/${ckey}`}>{`Spectate >>`}</Link>
+                    </span> :
+                    ( register_allow ? (
+                        is_registered ?
+                        <span className="d-inline-flex align-items-center">
+                          <Link to="#">{`Registered`}</Link>
+                        </span>
+                        : <span className="d-inline-flex align-items-center">
+                          <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
+                        </span>
+                      ) : <span className="d-inline-flex align-items-center">
+                        <code>Register is not Allowed.</code>
+                      </span>
+                    )
+                  )
+                }
+                { !user && <span className="d-inline-flex align-items-center">
+                    <Link to={`/sign-in`}>{`Log in to Participate >>`}</Link>
+                </span> }
               </>
             }
 

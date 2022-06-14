@@ -73,15 +73,16 @@ class Problem extends React.Component {
   formSubmitHandler(e) {
     e.preventDefault();
     let conf = window.confirm('Bạn có chắc chắn với thay đổi này?')
-    contestAPI.updateContestProblems({key: this.state.ckey, data: this.state.problems})
-    .then((res) => {
-      toast.success('OK Updated.')
-      // this.refetch();
-    })
-    .catch((err) => {
-      console.log(err)
-      this.setState({errors: err.response.data})
-    })
+    if (conf)
+      contestAPI.updateContestProblems({key: this.state.ckey, data: this.state.problems})
+      .then((res) => {
+        toast.success('OK Updated.')
+        // this.refetch();
+      })
+      .catch((err) => {
+        console.log(err)
+        this.setState({errors: err.response.data})
+      })
   }
 
   render() {

@@ -109,8 +109,10 @@ class RecentSubmissionSidebar extends React.Component {
   }
 
   render() {
-    const { subs, loaded, user, contest } = this.state;
+    const { subs, loaded, errors, user, contest } = this.state;
     // console.log('Rerender')
+    if (errors)
+      return <></>
 
     return (
       <div className="wrapper-vanilla" id="recent-submission-sidebar">
@@ -119,7 +121,7 @@ class RecentSubmissionSidebar extends React.Component {
         { !!user && !contest && <span>Contest is not available.</span> }
         { !!user && !!contest && !loaded && <SpinLoader margin="20px"/>}
         { !!user && !!contest && !!loaded && <>
-          <ErrorBox errors={this.state.errors} />
+          <ErrorBox errors={errors} />
           <Table responsive hover size="sm" striped bordered className="rounded">
             <thead>
               <tr>
@@ -130,14 +132,18 @@ class RecentSubmissionSidebar extends React.Component {
               </tr>
             </thead>
             <tbody>
-              { this.state.count === 0 && <>
-                <tr><td colSpan="4">
-                  <em>No Submissions Yet.</em>
-                </td></tr>
-              </> }
-              { this.state.count > 0 &&
-                subs.map((sub, idx) => <RSubItem
-                  key={`recent-sub-${sub.id}`} rowid={idx} {...sub} />) }
+              {
+                loaded && !errors && <>
+                { this.state.count === 0 && <>
+                  <tr><td colSpan="4">
+                    <em>No Submissions Yet.</em>
+                  </td></tr>
+                </> }
+                { this.state.count > 0 &&
+                  subs.map((sub, idx) => <RSubItem
+                    key={`recent-sub-${sub.id}`} rowid={idx} {...sub} />) }
+                </>
+              }
             </tbody>
           </Table>
         </>}

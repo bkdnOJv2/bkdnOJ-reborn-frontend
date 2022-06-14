@@ -113,7 +113,7 @@ class SubmissionList extends React.Component {
         .catch((err) => {
           this.setState({
             loaded: true,
-            errors: ["Cannot fetch contest submissions. Please retry again."],
+            errors: ["Cannot fetch submissions at the moment."],
           })
         })
     } else {
@@ -130,7 +130,7 @@ class SubmissionList extends React.Component {
         .catch((err) => {
           this.setState({
             loaded: true,
-            errors: ["Cannot fetch submissions at the moment. Please retry again."],
+            errors: ["Cannot fetch submissions at the moment."],
           })
         })
     }
@@ -152,10 +152,12 @@ class SubmissionList extends React.Component {
   }
 
   render() {
+    const {loaded, errors, count } = this.state;
+
     return (
       <div className="submission-table wrapper-vanilla">
         <h4>Submissions</h4>
-        <ErrorBox errors={this.state.errors} />
+        <ErrorBox errors={errors} />
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
             <tr>
@@ -170,15 +172,19 @@ class SubmissionList extends React.Component {
           </thead>
           <tbody>
             {
-              this.state.loaded === false
+              !loaded
                 ? <tr><td colSpan="7"><SpinLoader margin="10px" /></td></tr>
                 :
-              this.state.count > 0
-                ? this.state.submissions.map((sub, idx) => <SubListItem
-                    key={`sub-${sub.id}`}
-                    rowid={idx} {...sub}
-                  />)
-                : <tr><td colSpan={7}><em>No Submissions Yet.</em></td></tr>
+                (
+                  !errors && <> {
+                    this.state.count > 0
+                      ? this.state.submissions.map((sub, idx) => <SubListItem
+                          key={`sub-${sub.id}`}
+                          rowid={idx} {...sub}
+                        />)
+                      : <tr><td colSpan={7}><em>No Submissions Yet.</em></td></tr>
+                    }</>
+                )
             }
           </tbody>
         </Table>

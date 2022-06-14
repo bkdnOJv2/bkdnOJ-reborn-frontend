@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Row, Col, Table } from 'react-bootstrap';
 import { FaWrench } from 'react-icons/fa';
+import { VscError } from 'react-icons/vsc';
 
 import submissionAPI from 'api/submission';
 import { SpinLoader } from 'components';
@@ -71,7 +72,8 @@ class SubmissionDetails extends React.Component {
   }
 
   pollResult() {
-    if (shouldStopPolling(this.state.data.status)) {
+    if (shouldStopPolling(this.state.data.status) || !!this.state.errors) {
+      console.log('Clear?')
       clearInterval(this.timer)
       return;
     }
@@ -93,29 +95,41 @@ class SubmissionDetails extends React.Component {
       return <Navigate to={`${this.state.redirectUrl}`} />
     }
 
-    const { data, loaded } = this.state;
+    const { data, loaded, errors, contest } = this.state;
+
+    const isLoggedIn = !!this.user;
+    const isInContest = !!contest;
+    const isSuperuser = isLoggedIn && this.user.is_superuser;
+
     let verdict = 'QU';
-    if (loaded)
+    if (loaded && !errors)
       verdict = (data.status === "D" ? data.result : data.status);
-    const polling = (loaded && !shouldStopPolling(data.status));
+    const polling = (loaded && !errors && !shouldStopPolling(data.status));
 
     return (
       <div className="submission-info wrapper-vanilla">
         <h4 className="submission-title">
-          {
-            !loaded ?
-            <span><SpinLoader/> Loading...</span> :
-            <span>
-              {`Submission#${data.id}`}
-              {polling && <div className="loading_3dot"></div>}
-            </span>
-          }
+            { !loaded && <span><SpinLoader/> Loading...</span> }
+            { loaded && !!errors && <span>Submission Not Available</span>}
+            { loaded && !errors &&
+              <span>
+                {`Submission#${data.id}`}
+                {polling && <div className="loading_3dot"></div>}
+              </span>
+            }
         </h4>
         <hr/>
         <div className={`submission-details ${loaded && "text-left"}`}>
           {
-            !this.state.loaded ? <span><SpinLoader/> Loading...</span>
-            : <>
+            !loaded && <span><SpinLoader/> Loading...</span>
+          }{
+            loaded && errors && <>
+              <div className="flex-center-col" style={{ "height": "100px" }}>
+                <VscError size={30} color="red"/>
+              </div>
+            </>
+          }{
+            loaded && !errors && <>
               <div className="general info-subsection">
                 {
                   (!!this.user && this.user.is_staff) &&
