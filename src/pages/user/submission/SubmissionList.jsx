@@ -113,7 +113,7 @@ class SubmissionList extends React.Component {
         .catch((err) => {
           this.setState({
             loaded: true,
-            errors: ["Cannot fetch submissions at the moment."],
+            errors: err.response.data || "Cannot fetch submissions at the moment.",
           })
         })
     } else {
@@ -182,7 +182,7 @@ class SubmissionList extends React.Component {
                           key={`sub-${sub.id}`}
                           rowid={idx} {...sub}
                         />)
-                      : <tr><td colSpan={7}><em>No Submissions Yet.</em></td></tr>
+                      : <tr><td colSpan={7}><em>No submission is available yet.</em></td></tr>
                     }</>
                 )
             }

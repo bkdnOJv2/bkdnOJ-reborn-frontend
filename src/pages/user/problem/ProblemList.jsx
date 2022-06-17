@@ -97,9 +97,10 @@ class ProblemList extends React.Component {
         })
       })
       .catch((err) => {
+        console.log(err.response.data);
         this.setState({
           loaded: true,
-          errors: ["Cannot fetch problems at the moment."],
+          errors: err.response.data || "Cannot fetch problems at the moment.",
         })
       })
   }
@@ -156,7 +157,7 @@ class ProblemList extends React.Component {
 
                   { this.state.count === 0 && <>
                     <tr><td colSpan="6">
-                      <em>No Problems Available Yet.</em>
+                      <em>No problem is available yet.</em>
                     </td></tr>
                   </> }
                 </>

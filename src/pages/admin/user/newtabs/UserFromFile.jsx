@@ -6,7 +6,7 @@ import { Form, Row, Col, Button, Accordion } from 'react-bootstrap';
 import { VscSave } from 'react-icons/vsc';
 
 import userAPI from 'api/user';
-import { FileUploader, ErrorBox } from 'components';
+import { FileUploader, SpinLoader, ErrorBox } from 'components';
 
 const saveFile = async (blob) => {
   const a = document.createElement('a');
@@ -23,6 +23,7 @@ export default class UserFromFile extends React.Component {
     super(props);
 
     this.state = {
+      submitting: false,
       file : null,
     }
   }
@@ -78,16 +79,20 @@ export default class UserFromFile extends React.Component {
           </Accordion.Item>
         </Accordion>
         <div className="border m-1" >
+        <Row ><Col xl={12} className="text-center">{
+          this.state.submitting && <div className="loading_3dot">Đang xử lý yêu cầu</div>
+        }</Col></Row>
         <Row style={{overflow: "auto"}}>
           <Col className="m-1">
-              <FileUploader
-                onFileSelectSuccess={(file) => this.setFile(file)}
-                onFileSelectError={({ error }) => alert(error)}
-              />
+            <FileUploader
+              onFileSelectSuccess={(file) => this.setFile(file)}
+              onFileSelectError={({ error }) => alert(error)}
+            />
           </Col>
-          <Col sm={2} className="m-1">
+          <Col sm={2} className="m-1 flex-center">
               <Button variant="dark" size="sm" className="btn-svg" disabled={this.state.submitting}
                 onClick={(e) => this.sendFile(e)}><VscSave/> Submit</Button>
+              { this.state.submitting && <SpinLoader size="20px" margin="0 0 0 15px"/> }
           </Col>
         </Row>
         </div>

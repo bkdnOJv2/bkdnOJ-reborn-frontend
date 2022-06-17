@@ -5,6 +5,10 @@ import {getConnectionUrl} from 'api/urls';
 const getProblems = ({ params }) => {
     return axiosClient.get('/problem/', (params && { params: {...params} }));
 }
+const createProblem = ({ params, data }) => {
+    return axiosClient.post(`/problem/`, data)
+}
+
 const getProblemDetails = ({shortname}) => {
     return axiosClient.get(`/problem/${shortname}`);
 }
@@ -42,6 +46,8 @@ const adminGetProblemDetailsTest = ({shortname, params}) => {
 
 const problemAPI = {
     getProblems,
+    createProblem,
+
     getProblemDetails,
 
     submitToProblem,

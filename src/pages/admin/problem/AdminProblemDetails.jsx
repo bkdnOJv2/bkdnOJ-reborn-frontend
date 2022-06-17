@@ -7,7 +7,7 @@ import { Button, Tabs, Tab } from 'react-bootstrap';
 import { FaRegTrashAlt, FaGlobe } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
-import { SpinLoader } from 'components';
+import { SpinLoader, ErrorBox } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
@@ -29,10 +29,12 @@ class AdminProblemDetails extends React.Component {
       problemTitle: undefined,
       general: undefined,
       testData: undefined,
+
+      formErrors: null,
     };
   }
-
-  async componentDidMount() {
+  refetch(newshortname=null) {
+    if (newshortname) this.shortname=newshortname;
     Promise.all([
       //problemAPI.adminOptionsProblemDetails({shortname: this.shortname}),
       problemAPI.getProblemDetails({shortname: this.shortname})
@@ -42,18 +44,23 @@ class AdminProblemDetails extends React.Component {
       // console.log(optionsRes.data)
       // console.log(generalRes.data)
       this.setState({
+        shortname: generalRes.data.shortname,
         problemTitle: generalRes.data.title,
         // options: optionsRes.data,
         general: generalRes.data,
         loaded: true,
       })
-      setTitle(`Admin | Problem. ${generalRes.data.title}`)
+      setTitle(`Admin | Problem | ${generalRes.data.title}`)
     }).catch((err) => {
       this.setState({
         loaded: true,
         errors: err,
       })
     })
+  }
+
+  componentDidMount() {
+    this.refetch();
   }
 
   deleteObjectHandler() {
@@ -77,6 +84,7 @@ class AdminProblemDetails extends React.Component {
       )
     }
     const {loaded, errors, general, options} = this.state;
+    const { formErrors } = this.state;
 
     return (
       <div className="admin problem-panel wrapper-vanilla">
@@ -85,7 +93,7 @@ class AdminProblemDetails extends React.Component {
           { loaded && !!errors && <span>Something went wrong</span>}
           { loaded && !errors && (
             <div className="panel-header">
-              <span className="title-text">{`Editing problem. ${this.state.problemTitle}`}</span>
+              <span className="title-text">{`Problem | ${this.state.problemTitle}`}</span>
               <span>
                 <Button className="btn-svg" size="sm" variant="dark"
                   onClick={()=>this.setState({ redirectUrl: `/problem/${this.shortname}` })}>
@@ -106,17 +114,24 @@ class AdminProblemDetails extends React.Component {
           { !loaded && <span><SpinLoader/> Loading...</span> }
 
           { loaded && !errors && <>
+          <ErrorBox errors={formErrors} />
           <Tabs defaultActiveKey="general" id="prob-tabs" className="pl-2">
             <Tab eventKey="general" title="General">
               <GeneralDetails shortname={this.shortname} data={general} options={options}
                 setProblemTitle={((title) => this.setState({problemTitle : title}))}
+                setErrors={(e)=>this.setState({formErrors: e})}
+                refetch={(newshort)=>this.refetch(newshort)}
               />
             </Tab>
             <Tab eventKey="data" title="Test Data">
-              <TestDataDetails shortname={this.shortname} />
+              <TestDataDetails key={`prb-dt-test-data${this.shortname}`} shortname={this.shortname}
+                setErrors={(e)=>this.setState({formErrors: e})}
+              />
             </Tab>
             <Tab eventKey="test" title="Test Cases">
-              <TestcaseDetails shortname={this.shortname} />
+              <TestcaseDetails key={`prb-dt-test-case${this.shortname}`} shortname={this.shortname}
+                setErrors={(e)=>this.setState({formErrors: e})}
+              />
             </Tab>
           </Tabs>
           </>

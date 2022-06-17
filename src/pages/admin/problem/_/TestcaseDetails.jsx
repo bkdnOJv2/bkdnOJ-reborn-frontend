@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
 import { Form, Accordion, Button, Table, Row, Col } from 'react-bootstrap';
 import { ErrorBox, SpinLoader } from 'components'
+import {VscRefresh} from 'react-icons/vsc';
 
 import problemAPI from 'api/problem';
 
@@ -55,7 +56,6 @@ export default class TestcaseDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      shortname: this.props.shortname,
       data: [],
       loaded: false,
       errors: null,
@@ -87,8 +87,8 @@ export default class TestcaseDetails extends React.Component {
     })
   }
 
-  componentDidMount() {
-    const {shortname} = this.state;
+  refetch() {
+    const {shortname} = this.props;
     problemAPI.adminGetProblemDetailsTest({shortname})
       .then((res) => {
         this.setState({
@@ -105,6 +105,10 @@ export default class TestcaseDetails extends React.Component {
       })
   }
 
+  componentDidMount() {
+    this.refetch();
+  }
+
   formSubmitHandler(e) {
     e.preventDefault();
     alert('Editing this resource is not implemented.');
@@ -116,13 +120,21 @@ export default class TestcaseDetails extends React.Component {
 
     return (
       <Form id="problem-testcase-form" onSubmit={(e) => this.formSubmitHandler(e)}>
+        <Row className="options m-1 border">
+          <Col> </Col>
+          <Button variant="dark" size="sm" className="btn-svg"
+            onClick={()=>this.refetch()}>
+            <VscRefresh/> Refresh
+          </Button>
+        </Row>
+
         <Accordion defaultActiveKey="0">
           {/* General Settings */}
           <Accordion.Item eventKey="0" className="testcases">
             <Accordion.Header>Testcases</Accordion.Header>
             <Accordion.Body>
               <ErrorBox errors={this.state.errors} />
-              <sub>Những testcase này được tự động tạo ra từ file nén Archive trong tab Test Data.</sub>
+              <sub className="ml-2">Những testcase này được tự động tạo ra từ file nén Archive trong tab Test Data.</sub>
               <Table responsive hover size="sm" striped bordered className="rounded text-center">
                 <thead>
                   <tr>

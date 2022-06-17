@@ -6,7 +6,7 @@ import { FaWrench } from 'react-icons/fa';
 import { VscError } from 'react-icons/vsc';
 
 import submissionAPI from 'api/submission';
-import { SpinLoader } from 'components';
+import { SpinLoader, ErrorBox } from 'components';
 import { CodeEditor } from 'components/CodeEditor';
 
 import { withParams } from 'helpers/react-router'
@@ -63,7 +63,7 @@ class SubmissionDetails extends React.Component {
         this.setState({ data: res.data, })
       })
       .catch((err) => {
-        this.setState({ errors: err, })
+        this.setState({ errors: err.response.data || "Cannot Fetch this Submission.", })
         console.log('Error when Polling', err)
       })
       .finally(() => {
@@ -125,6 +125,7 @@ class SubmissionDetails extends React.Component {
           }{
             loaded && errors && <>
               <div className="flex-center-col" style={{ "height": "100px" }}>
+                {/* <ErrorBox errors={errors} /> */}
                 <VscError size={30} color="red"/>
               </div>
             </>

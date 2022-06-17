@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
-import { Button, Table } from 'react-bootstrap';
+import { Button, Table, Form, Modal } from 'react-bootstrap';
 
 import { FaPaperPlane, FaRegFileArchive } from 'react-icons/fa';
 import { AiOutlineForm, AiOutlineUpload, AiOutlineArrowRight, AiOutlinePlusCircle } from 'react-icons/ai';
@@ -10,14 +10,19 @@ import { AiOutlineForm, AiOutlineUpload, AiOutlineArrowRight, AiOutlinePlusCircl
 import { SpinLoader, ErrorBox, FileUploader } from 'components';
 import problemApi from 'api/problem';
 import { setTitle } from 'helpers/setTitle';
+import { withNavigation } from 'helpers/react-router';
 
 import './AdminProblemList.scss'
 import 'styles/ClassicPagination.scss';
 
 class ProblemListItem extends React.Component {
   render() {
-    const {shortname, title, points, is_published, is_privated_to_orgs} = this.props;
+    const {shortname, title, points, is_public, is_organization_private} = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
+
+    const visible = is_public ? (
+      is_organization_private ? "Orgs Only" : "Public"
+    ) : "Private";
 
     return (
       <tr>
@@ -32,8 +37,7 @@ class ProblemListItem extends React.Component {
           </Link>
         </td>
         <td>{points}</td>
-        <td>{is_published ? "Yes" : "No"}</td>
-        <td>{is_privated_to_orgs ? "Yes" : "No"}</td>
+        <td>{visible}</td>
         <td>
             <input type="checkbox" value={selectChk[rowidx]}
               onChange={(e) => onSelectChkChange(rowidx)}
@@ -57,6 +61,8 @@ class AdminProblemList extends React.Component {
 
       selectedZip: null,
       submitting: false,
+
+      newModalShow: false,
     }
     setTitle('Admin | Problems')
   }
@@ -92,7 +98,7 @@ class AdminProblemList extends React.Component {
       .catch((err) => {
         this.setState({
           loaded: true,
-          errors: ["Cannot fetch problems. Please retry again."],
+          errors: (err.response.data || "Cannot fetch problems. Please retry again."),
         })
       })
   }
@@ -143,6 +149,10 @@ class AdminProblemList extends React.Component {
     }
   }
 
+  newModalToggle(bool) {
+    this.setState({ newModalShow : bool })
+  }
+
   render() {
     const {selectedZip, submitting} = this.state;
 
@@ -151,13 +161,9 @@ class AdminProblemList extends React.Component {
       {/* Options for Admins: Create New,.... */}
       <div className="admin-options">
         <div className="border d-inline-flex p-1" >
-        <Button size="sm" onClick={(e)=>alert('Create new')}
-          variant="dark" className="btn-svg" disabled={true || submitting}
-          onClick={(e) => {
-            this.setState({submitting: true}, () => 
-              setTimeout(() => this.setState({submitting: false}), 2000)
-            )
-          }}
+        <Button size="sm"
+          variant="dark" className="btn-svg"
+          onClick={(e) => this.setState({newModalShow: true}) }
         >
           <AiOutlinePlusCircle />
           <span className="d-none d-md-inline-flex">Add (Form)</span>
@@ -176,7 +182,7 @@ class AdminProblemList extends React.Component {
           <Button disabled={submitting}
             onClick={(e)=>{
               if (!selectedZip) alert("Please select a .zip file.");
-              else { 
+              else {
                 this.setState({submitting: true}, () => {
                   const formData = new FormData();
                   formData.append("archive", selectedZip);
@@ -187,9 +193,7 @@ class AdminProblemList extends React.Component {
                     })
                     .catch((err) => {
                       const data = err.response.data;
-                      let errors = {...data.errors}
-                      if (data.detail) errors.general = data.detail
-                      this.setState({ errors })
+                      this.setState({ errors: data })
                     })
                     .finally(() => this.setState({submitting: false}))
                 })
@@ -197,7 +201,7 @@ class AdminProblemList extends React.Component {
             }}
             size="sm" variant="dark" className="btn-svg"
           >
-            <AiOutlinePlusCircle /> 
+            <AiOutlinePlusCircle />
             <span className="d-none d-md-inline-flex">Add (upload Zip)</span>
             <span className="d-inline-flex d-md-none">
               <AiOutlineArrowRight/>
@@ -223,8 +227,7 @@ class AdminProblemList extends React.Component {
               <th style={{width: "20%"}}>#</th>
               <th style={{minWidth: "30%", maxWidth: "30%"}}>Title</th>
               <th style={{width: "12%"}}>Points</th>
-              <th style={{width: "10%"}}>Public?</th>
-              <th style={{width: "10%"}}>Orgs Limited?</th>
+              <th style={{width: "10%"}}>Visible?</th>
               <th style={{width: "8%"}}>
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
               </th>
@@ -259,9 +262,59 @@ class AdminProblemList extends React.Component {
                 /></span>
         }
       </div>
+
+      <NaviNewProb show={this.state.newModalShow} toggle={(b)=>this.newModalToggle(b)} />
       </div>
     )
   }
 }
+
+class NewProblemModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      shortname: '',
+      errors: null,
+    }
+  }
+  onSubmit(e) {
+    e.preventDefault();
+    problemApi.createProblem({ data: {shortname: this.state.shortname} })
+    .then((res) => {
+      toast.success('OK Created.');
+      this.props.navigate(`/admin/problem/${res.data.shortname}`);
+    })
+    .catch((err) => {
+      console.log(err)
+      this.setState({errors: err.response.data})
+    })
+  }
+
+  render() {
+    const {show, toggle} = this.props;
+    return (
+      <Modal show={show} onHide={() => toggle(false)}>
+        <Modal.Header>
+          <Modal.Title>+ Create Problem</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ErrorBox errors={this.state.errors} />
+          <div>Problem Code</div>
+          <Form.Control type="text" id="problem-shortname" placeholder="Problem Code"
+            value={this.state.shortname} onChange={(e)=>this.setState({shortname: e.target.value})} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="light" onClick={() => toggle(false)}>
+            Đóng
+          </Button>
+          <Button variant="dark" onClick={(e) => this.onSubmit(e)}>
+            Tạo
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+}
+const NaviNewProb = withNavigation(NewProblemModal);
 
 export default AdminProblemList;

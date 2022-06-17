@@ -12,7 +12,7 @@ div.admin.problem-panel {
   .panel-header {
     display: inline-flex;
     width: 100%;
-    
+
     span.title-text {
       flex-grow: 1;
     }
@@ -38,6 +38,10 @@ div.admin.problem-panel {
       text-align: left;
       border: unset;
       background-color: $background-gray;
+    }
+    p, ul {
+      font-size: 14px;
+      margin-bottom: 5px;
     }
   }
 

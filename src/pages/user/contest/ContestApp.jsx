@@ -57,11 +57,31 @@ class ContestApp extends React.Component {
     }
   }
 
+  getContestStatus(contest) {
+    if (!contest) return null;
+
+    const start_time = new Date(contest.start_time);
+    const end_time = new Date(contest.end_time);
+    if (start_time === null || end_time === null) return null;
+    if (isNaN(start_time) || isNaN(end_time)) return null;
+
+    let now = new Date()
+    if (now < start_time) {
+      return "not-started";
+    } else if (now <= end_time) {
+      return "running";
+    } else {
+      return "ended";
+    }
+  }
+
   componentDidMount() {
     contestAPI.getContest({key : this.state.contest_key})
     .then((res) => {
+      let contest = res.data;
+      contest.status = this.getContestStatus(contest);
       this.setState({
-        contest: res.data,
+        contest: contest,
         loaded: true,
       })
     })

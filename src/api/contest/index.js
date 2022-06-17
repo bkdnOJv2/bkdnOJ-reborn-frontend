@@ -25,6 +25,10 @@ const getContestStanding = ({ key }) => {
 const getContestParticipations = ({ key, params }) => {
     return axiosClient.get(`/contest/${key}/participations/`, (params && { params: {...params} }));
 }
+const addContestParticipations = ({ key, data }) => {
+    return axiosClient.post(`/contest/${key}/participations/add/`, data);
+}
+
 const getContestSubmissions = ({ key, params }) => {
     return axiosClient.get(`/contest/${key}/submission/`, (params && { params: {...params} }));
 }
@@ -69,7 +73,8 @@ const contestAPI = {
 
     getContestStanding,
     getContestSubmissions,
-    getContestParticipations,
+
+    getContestParticipations, addContestParticipations,
 
     // ContestProblem
     getContestProblems, getContestProblem, submitContestProblem,

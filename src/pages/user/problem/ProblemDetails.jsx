@@ -10,7 +10,7 @@ import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import contestAPI from 'api/contest';
 import problemAPI from 'api/problem';
-import { SpinLoader } from 'components';
+import { SpinLoader, ErrorBox } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
@@ -76,7 +76,7 @@ class ProblemDetails extends React.Component {
       .catch((err) => {
         this.setState({
           loaded: true,
-          errors: err,
+          errors: err.response.data || "Cannot Fetch this Problem.",
         })
       })
   }
@@ -120,7 +120,8 @@ class ProblemDetails extends React.Component {
           { !loaded && <span><SpinLoader/> Loading...</span> }
           { loaded && errors && <>
             <div className="flex-center-col" style={{ "height": "100px" }}>
-              <VscError size={30} color="red"/>
+              <ErrorBox errors={errors} />
+              {/* <VscError size={30} color="red"/> */}
             </div>
           </> }
           { loaded && !errors && <>

@@ -231,17 +231,6 @@ class General extends React.Component {
             <Accordion.Header>Quyền truy cập</Accordion.Header>
             <Accordion.Body>
               <Row>
-                <Form.Label column="sm" xs={6}> Hiển thị công khai? </Form.Label>
-                <Col xs={6}> <Form.Control size="sm" type="checkbox" id="is_visible"
-                        checked={data.is_visible || false}
-                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
-                /></Col>
-                <Col xl={12}>
-                  <sub>Cho phép mọi người nhìn thấy và xem contest.</sub>
-                </Col>
-              </Row>
-
-              <Row>
                 <Form.Label column="sm" sm={3} className="required"> Authors </Form.Label>
                 <Col sm={9}> <Form.Control size="sm" type="text" placeholder='["author1", "author2"]' id="authors"
                         value={data.authors || ''} onChange={(e) => this.inputChangeHandler(e)}
@@ -267,6 +256,20 @@ class General extends React.Component {
                 </Col>
                 <Col xl={12}>
                   <sub>Các bài nộp của những thành viên này sẽ không được nhìn thấy bởi Thí sinh và họ sẽ bị ẩn trên bảng xếp hạng.</sub>
+                </Col>
+              </Row>
+
+              <Row>
+                <Form.Label column="sm" xs={6}> Hiển thị công khai? </Form.Label>
+                <Col xs={6}> <Form.Control size="sm" type="checkbox" id="is_visible"
+                        checked={data.is_visible || false}
+                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
+                /></Col>
+                <Col xl={12}>
+                  <sub>Cho phép mọi người nhìn thấy và xem contest. Nếu không tick, chỉ Authors, Collaborators, Reviewers
+                    và các user có đặc quyền mới thấy được contest. Nếu có tick, mọi user sẽ thấy contest. Họ cũng có thể
+                    đăng ký nếu những option dưới không được tick.
+                  </sub>
                 </Col>
               </Row>
 
