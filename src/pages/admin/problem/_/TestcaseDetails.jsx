@@ -7,20 +7,6 @@ import {VscRefresh} from 'react-icons/vsc';
 
 import problemAPI from 'api/problem';
 
-class ButtonPanel extends React.Component {
-  render() {
-    return (
-      <Row className="button-panel">
-        <Col >
-          <Button variant="dark" size="sm" type="submit" disabled>
-            No Op
-          </Button>
-        </Col>
-      </Row>
-    )
-  }
-}
-
 class TestcaseItem extends React.Component {
   render() {
     const {
@@ -61,6 +47,7 @@ export default class TestcaseDetails extends React.Component {
       errors: null,
 
       selectChk: [],
+      submitting: false,
     }
   }
 
@@ -88,21 +75,29 @@ export default class TestcaseDetails extends React.Component {
   }
 
   refetch() {
-    const {shortname} = this.props;
-    problemAPI.adminGetProblemDetailsTest({shortname})
-      .then((res) => {
-        this.setState({
-          data: res.data,
-          selectChk: Array(res.data.length).fill(false),
-          loaded: true,
-          errors: null,
+    if (this.state.submitting) return;
+    this.setState({
+      submitting: true,
+      errors: null,
+    }, () => {
+      const {shortname} = this.props;
+      problemAPI.adminGetProblemDetailsTest({shortname})
+        .then((res) => {
+          this.setState({
+            data: res.data,
+            selectChk: Array(res.data.length).fill(false),
+            loaded: true,
+            errors: null,
+            submitting: false,
+          })
+        }).catch((err) => {
+          this.setState({
+            loaded: true,
+            submitting: false,
+            errors: ['Cannot fetch testcases for this problem. Has it been deleted?']
+          })
         })
-      }).catch((err) => {
-        this.setState({
-          loaded: true,
-          errors: ['Cannot fetch testcases for this problem. Has it been deleted?']
-        })
-      })
+    })
   }
 
   componentDidMount() {
@@ -111,6 +106,7 @@ export default class TestcaseDetails extends React.Component {
 
   formSubmitHandler(e) {
     e.preventDefault();
+    this.props.forceRerender();
     alert('Editing this resource is not implemented.');
   }
 
@@ -121,7 +117,9 @@ export default class TestcaseDetails extends React.Component {
     return (
       <Form id="problem-testcase-form" onSubmit={(e) => this.formSubmitHandler(e)}>
         <Row className="options m-1 border">
-          <Col> </Col>
+          <Col>
+            {this.state.submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span> }
+          </Col>
           <Button variant="dark" size="sm" className="btn-svg"
             onClick={()=>this.refetch()}>
             <VscRefresh/> Refresh
@@ -166,7 +164,14 @@ export default class TestcaseDetails extends React.Component {
           </Accordion.Item>
         </Accordion>
 
-        <ButtonPanel />
+        <Row >
+          <Col >
+            <Button variant="dark" size="sm" type="submit" onClick={(e)=>this.formSubmitHandler(e)}>
+              No Op
+            </Button>
+            { this.state.submitting && <SpinLoader size={20} margin="auto 0 auto 15px" /> }
+          </Col>
+        </Row>
       </Form>
     )
   }

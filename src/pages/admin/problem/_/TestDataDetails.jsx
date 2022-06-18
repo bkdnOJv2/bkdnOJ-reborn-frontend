@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
 import { Accordion, Button, Form, Row, Col } from 'react-bootstrap';
-import { FileUploader } from 'components'
+import { ErrorBox, SpinLoader, FileUploader } from 'components'
 import {VscRefresh} from 'react-icons/vsc';
 
 import problemAPI from 'api/problem';
@@ -17,19 +17,27 @@ export default class TestDataDetails extends React.Component {
         generator_remove: false,
       },
       selectedZip: null,
+      selectedCustomChecker: null,
       submitting: false,
     }
   }
   refetch() {
-    const {shortname} = this.props;
-    problemAPI.adminGetProblemDetailsData({shortname})
-    .then((res) => {
-      console.log(res.data)
-      this.setState({
-        data: {  ...res.data, zipfile_remove: false, generator_remove: false }
+    if (this.state.submitting) return;
+    this.setState({
+      submitting: true,
+      errors: null,
+    }, () => {
+      const {shortname} = this.props;
+      problemAPI.adminGetProblemDetailsData({shortname})
+      .then((res) => {
+        this.setState({
+          data: {  ...res.data, zipfile_remove: false, generator_remove: false },
+          submitting: false,
+        })
+      }).catch((err) => {
+        this.setState({ submitting: false, })
+        console.log(err);
       })
-    }).catch((err) => {
-      console.log(err)
     })
   }
 
@@ -38,6 +46,7 @@ export default class TestDataDetails extends React.Component {
   }
 
   setSelectedZip(file) { this.setState({selectedZip: file}) }
+  setSelectedCustomChecker(file) { this.setState({selectedCustomChecker: file}) }
 
   inputChangeHandler(event, params={isCheckbox: null}) {
     const isCheckbox = params.isCheckbox || false;
@@ -52,28 +61,27 @@ export default class TestDataDetails extends React.Component {
 
   formSubmitHandler(e) {
     e.preventDefault();
+    if (this.state.submitting) return;
+
     let {zipfile, ...sendData} = this.state.data;
     let formData = new FormData();
 
     if (this.state.selectedZip)
       formData.append("zipfile", this.state.selectedZip)
-    for (let key in sendData)
-      formData.append(key, sendData[key])
+    if (this.state.selectedCustomChecker)
+      formData.append("custom_checker", this.state.selectedCustomChecker)
+
+    for (let key in sendData) {
+      if (! [null, undefined].includes(sendData[key]))
+        formData.append(key, sendData[key])
+    }
 
     this.setState({ submitting: true }, () => {
       problemAPI.adminEditProblemDataForm({
         shortname: this.props.shortname, formData
       }).then((res) => {
-        toast.success("Saved.")
-        // console.log(res)
-        this.setState({
-          data: {
-            ...res.data,
-            zipfile_remove: false,
-            generator_remove: false,
-          },
-          submitting: false,
-        })
+        toast.success("OK Updated.")
+        this.props.forceRerender();
       }).catch((err) => {
         console.log(err);
         this.setState({
@@ -88,9 +96,13 @@ export default class TestDataDetails extends React.Component {
     const {data} = this.state;
     return (
       <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
+        <ErrorBox errors={this.state.errors} />
         <Row className="options m-1 border">
-          <Col> </Col>
+          <Col>
+            {this.state.submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span> }
+          </Col>
           <Button variant="dark" size="sm" className="btn-svg"
+            disabled={this.state.submitting}
             onClick={()=>this.refetch()}>
             <VscRefresh/> Refresh
           </Button>
@@ -118,8 +130,8 @@ export default class TestDataDetails extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Form.Label column="sm" lg={3}> Checker </Form.Label>
-          <Col lg={9}>
+          <Form.Label column="sm" lg={2}> Checker </Form.Label>
+          <Col lg={10}>
               <Form.Select aria-label={data.checker} size="sm" value={data.checker}
                 id="checker" onChange={(e) => this.inputChangeHandler(e)}
                 className="mb-1"
@@ -136,19 +148,42 @@ export default class TestDataDetails extends React.Component {
               </Form.Select>
           </Col>
 
-          <Form.Label column="sm" lg={3}> Checker Extra Arguments (JSON) </Form.Label>
-          <Col lg={12}>
+          <Form.Label column="sm" lg={2}> Custom Checker </Form.Label>
+          <Col lg={10}>
+            <div className="p-0">
+              {
+                data.custom_checker ? <a href={data.custom_checker} className="text-truncate">{data.custom_checker}</a>
+                : "None"
+              }
+              <FileUploader
+                onFileSelectSuccess={(file) => this.setSelectedCustomChecker(file)}
+                onFileSelectError={({ error }) => alert(error)}
+              />
+            </div>
+          </Col>
+
+          <Form.Label column="sm" xl={12}> Checker Extra Arguments (JSON) </Form.Label>
+          <Col xl={12}>
             <Form.Control size="sm" as="textarea" placeholder={`{"precision": 6}`} id="checker_args"
                   value={data.checker_args || ''} onChange={(e) => this.inputChangeHandler(e)}
                   className="mb-1"
             />
           </Col>
           <Col xl={12}><sub>
-            Tham số thêm cho checker. <code>(args)</code>
+            Tham số thêm cho checker (<code>checker_args</code>)
           </sub></Col>
         </Row>
 
-        <Row>
+        <Row><Col lg={10}><sub></sub></Col>
+          <Col >
+          <Button variant="dark" size="sm" type="submit"
+            disabled={this.state.submitting}>
+              Save
+          </Button>
+          { this.state.submitting && <SpinLoader size={20} margin="auto 0 auto 15px" /> }
+          </Col>
+        </Row>
+        <Row className="help-text checker-help">
           <Col xl={12} className="m-0 p-0"><strong>Checker Help</strong></Col>
           <Col xl={12} className="m-0 p-0">
             <Accordion defaultActiveKey="-1">
@@ -202,7 +237,7 @@ export default class TestDataDetails extends React.Component {
             </Accordion.Item>
 
             <Accordion.Item eventKey="4" className="checker-non-trailing-spaces-help">
-              <Accordion.Header>Checker: Non-trainling spaces</Accordion.Header>
+              <Accordion.Header>Checker: Non-trailling spaces</Accordion.Header>
               <Accordion.Body className="p-1">
                 <p>Output sẽ được so theo từng dòng. Mỗi dòng sẽ được xóa tất cả ký tự trắng phía bên phải trước, sau đó được so sánh bằng.
                   Số lượng dòng phải bằng nhau.</p>
@@ -232,20 +267,9 @@ export default class TestDataDetails extends React.Component {
                 </p>
               </Accordion.Body>
             </Accordion.Item>
-          </Accordion>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col lg={10}>
-          <sub></sub>
-        </Col>
-        <Col >
-          <Button variant="dark" size="sm" type="submit">
-            Save
-          </Button>
-        </Col>
-      </Row>
+            </Accordion>
+          </Col>
+        </Row>
       </Form>
     )
   }

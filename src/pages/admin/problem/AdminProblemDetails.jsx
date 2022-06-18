@@ -34,7 +34,12 @@ class AdminProblemDetails extends React.Component {
     };
   }
   refetch(newshortname=null) {
-    if (newshortname) this.shortname=newshortname;
+    let childKey = this.state.childKey;
+    if (newshortname) {
+      this.shortname=newshortname;
+      childKey = Math.random();
+    }
+
     Promise.all([
       //problemAPI.adminOptionsProblemDetails({shortname: this.shortname}),
       problemAPI.getProblemDetails({shortname: this.shortname})
@@ -49,8 +54,9 @@ class AdminProblemDetails extends React.Component {
         // options: optionsRes.data,
         general: generalRes.data,
         loaded: true,
+        childKey,
       })
-      setTitle(`Admin | Problem | ${generalRes.data.title}`)
+      setTitle(`Admin | Problem | ${generalRes.data.shortname}`)
     }).catch((err) => {
       this.setState({
         loaded: true,
@@ -117,20 +123,26 @@ class AdminProblemDetails extends React.Component {
           <ErrorBox errors={formErrors} />
           <Tabs defaultActiveKey="general" id="prob-tabs" className="pl-2">
             <Tab eventKey="general" title="General">
-              <GeneralDetails shortname={this.shortname} data={general} options={options}
+              <GeneralDetails
+                shortname={this.shortname} data={general}
                 setProblemTitle={((title) => this.setState({problemTitle : title}))}
                 setErrors={(e)=>this.setState({formErrors: e})}
+
                 refetch={(newshort)=>this.refetch(newshort)}
               />
             </Tab>
             <Tab eventKey="data" title="Test Data">
-              <TestDataDetails key={`prb-dt-test-data${this.shortname}`} shortname={this.shortname}
+              <TestDataDetails
+                key={`prb-dt-data${this.state.childKey}`} shortname={this.shortname}
                 setErrors={(e)=>this.setState({formErrors: e})}
+                forceRerender={() => this.setState({childKey: Math.random()})}
               />
             </Tab>
             <Tab eventKey="test" title="Test Cases">
-              <TestcaseDetails key={`prb-dt-test-case${this.shortname}`} shortname={this.shortname}
+              <TestcaseDetails
+                key={`prb-dt-case${this.state.childKey}`} shortname={this.shortname}
                 setErrors={(e)=>this.setState({formErrors: e})}
+                forceRerender={() => this.setState({childKey: Math.random()})}
               />
             </Tab>
           </Tabs>

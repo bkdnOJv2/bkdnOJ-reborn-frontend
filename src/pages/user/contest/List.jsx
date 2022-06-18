@@ -19,7 +19,7 @@ class ContestListItem extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      time_label: null,
+      time_label: 'Loading..',
     }
   }
 
@@ -143,7 +143,7 @@ class ContestListItem extends React.Component {
           {this.parseStartTime()}
           {
             type !== 'past' && <>
-              <span className="d-inline-flex align-items-center">
+              <span className="d-inline-flex align-items-center contest-status-lbl">
                 {this.state.time_label}
               </span>
             </>

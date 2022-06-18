@@ -133,6 +133,7 @@ class AdminProblemList extends React.Component {
       })
 
       Promise.all(reqs).then((res) => {
+        toast.success('OK Deleted.')
         this.callApi({page: this.state.currPage});
       }).catch((err) => {
         let msg = 'Không thể xóa các problem này.';
@@ -279,6 +280,8 @@ class NewProblemModal extends React.Component {
   }
   onSubmit(e) {
     e.preventDefault();
+    this.setState({ errors: null })
+
     problemApi.createProblem({ data: {shortname: this.state.shortname} })
     .then((res) => {
       toast.success('OK Created.');
@@ -289,11 +292,15 @@ class NewProblemModal extends React.Component {
       this.setState({errors: err.response.data})
     })
   }
+  close() {
+    this.setState({ errors: null })
+    this.props.toggle(false);
+  }
 
   render() {
     const {show, toggle} = this.props;
     return (
-      <Modal show={show} onHide={() => toggle(false)}>
+      <Modal show={show} onHide={() => this.close()}>
         <Modal.Header>
           <Modal.Title>+ Create Problem</Modal.Title>
         </Modal.Header>
@@ -304,7 +311,7 @@ class NewProblemModal extends React.Component {
             value={this.state.shortname} onChange={(e)=>this.setState({shortname: e.target.value})} />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="light" onClick={() => toggle(false)}>
+          <Button variant="light" onClick={() => this.close()}>
             Đóng
           </Button>
           <Button variant="dark" onClick={(e) => this.onSubmit(e)}>
