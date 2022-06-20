@@ -12,6 +12,8 @@ import { getHourMinuteSecond, getYearMonthDate } from 'helpers/dateFormatter';
 
 import './RecentSubmissionSidebar.scss';
 
+const __RECENT_SUBMISSION_POLL_DELAY = 5000;
+
 class RSubItem extends React.Component {
   parseTime(time) {
     if (time === 0) return "0 ms";
@@ -66,16 +68,23 @@ class RecentSubmissionSidebar extends React.Component {
 
       contest: null,
       user: null,
+
+      isPollingOn: true,
+      isPolling: false,
     }
   }
 
-  refetch() {
-    this.setState({ loaded: false, count: null, errors: null })
+  refetch(poll=false) {
+    if(poll)
+      this.setState({ isPolling: true, errors: null })
+    else
+      this.setState({ loaded: false, count: null, errors: null })
     const { user } = this.state;
     contestAPI.getContestSubmissions({ key: this.state.contest.key,
                                         params: {user: user.username} })
       .then((res) => {
         this.setState({
+          isPolling: false,
           loaded: true,
           subs: res.data.results, // first page only
           count: res.data.count,
@@ -84,6 +93,7 @@ class RecentSubmissionSidebar extends React.Component {
       })
       .catch((err) => {
         this.setState({
+          isPolling: false,
           loaded: true,
           errors: err,
         })
@@ -104,12 +114,19 @@ class RecentSubmissionSidebar extends React.Component {
     const { contest } = this.context;
     if (!user || !contest) return; // skip if no user or no contest
     if (prevState.contest !== contest || prevState.user !== user) {
-      this.setState({ user, contest }, () => this.refetch());
+      this.setState({ user, contest }, () => {
+        this.refetch()
+        clearInterval(this.timer);
+        this.timer = setInterval(()=>this.refetch(true), __RECENT_SUBMISSION_POLL_DELAY)
+      });
     }
+  }
+  componentWillUnmount(){
+    clearInterval(this.timer)
   }
 
   render() {
-    const { subs, loaded, errors, user, contest } = this.state;
+    const { subs, loaded, errors, user, contest, isPolling } = this.state;
     // console.log('Rerender')
     if (errors)
       return <></>

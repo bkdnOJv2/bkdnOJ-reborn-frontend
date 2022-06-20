@@ -10,6 +10,7 @@ import contestAPI from 'api/contest';
 
 // Helpers
 import { setTitle } from 'helpers/setTitle';
+import { getPollDelay } from 'helpers/polling';
 
 // Assets
 import top1 from 'assets/common/atcoder_top1.png';
@@ -22,6 +23,8 @@ import ContestContext from 'context/ContestContext';
 
 // Styles
 import './ContestStanding.scss';
+
+const __STANDING_POLL_DELAY = 7000;
 
 class StandingItem extends React.Component {
   render() {
@@ -85,13 +88,13 @@ class StandingItem extends React.Component {
           </div>
         </td>
         <td className="td-participant">
-          <div className="flex-center participant-container">
+          <div className="flex-center participant-container" style={{justifyContent: "center"}}>
             <div className="avatar-container">
-              <img className='img-fluid' src="https://www.gravatar.com/avatar/HASH"></img>
+              <img style={{width: "100%", heigth: "100%"}} src="https://www.gravatar.com/avatar/HASH"></img>
               {/* <img className='img-fluid' src={user.avatar} alt="User Avatar"></img> */}
             </div>
             <div className="flex-center-col">
-              <div className="text-left acc-username">{user.username}</div>
+              <div className="acc-username text-truncate">{user.username}</div>
               {realname.length > 0 && realname !== ' ' && <div className="text-left acc-realname">{realname}</div>}
             </div>
           </div>
@@ -132,15 +135,22 @@ class ContestStanding extends React.Component {
 
       contest: null,
       user: null,
+
+      isPollingOn: true,
+      isPolling: false,
     }
   }
 
-  refetch() {
-    this.setState({ loaded: false, errors: null })
+  refetch(polling=false) {
+    if (polling)
+      this.setState({ isPolling: true });
+    else
+      this.setState({ loaded: false, errors: null })
     contestAPI.getContestStanding({key : this.state.contest.key})
     .then((res) => {
       this.setState({
         loaded: true,
+        isPolling: false,
         standing: res.data.results,
         problems: res.data.problems,
       })
@@ -159,6 +169,7 @@ class ContestStanding extends React.Component {
     })
     .catch((err) => {
       this.setState({
+        isPollingOn: true,
         loaded: true,
         errors: err,
       })
@@ -182,16 +193,21 @@ class ContestStanding extends React.Component {
       this.setState({ user, contest }, () => {
         setTitle(`${contest.name} | Standing`)
         this.refetch()
+        clearInterval(this.timer);
+        this.timer = setInterval(() => this.refetch(true), __STANDING_POLL_DELAY);
       });
     }
   }
+  componentWillUnmount(){
+    clearInterval(this.timer);
+  }
 
   render() {
-    const { loaded, errors, problems, standing } = this.state;
+    const { loaded, errors, problems, standing, isPollingOn, isPolling } = this.state;
 
     return (
       <div className="wrapper-vanilla p-2" id="contest-standing">
-        <h4>Standing</h4>
+        <h4>Standing {isPolling && <SpinLoader size={18} margin="0 2px"/>} </h4>
         { !loaded && <SpinLoader margin="40px"/> }
         { loaded && <>
           <ErrorBox errors={this.state.errors} />

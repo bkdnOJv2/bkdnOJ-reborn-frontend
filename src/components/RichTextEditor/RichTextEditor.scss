@@ -12,6 +12,7 @@ div.rich-text-editor {
       flex-direction: row;
       padding-left: 0px;
       padding-right: 3px;
+      min-width: 410px;
 
       ul {
         display: inline-flex;
@@ -109,15 +110,21 @@ div.rich-text-editor {
   }
 
   div.wmde-markdown-color {
-    code {
+    * {
       width: unset;
       color: unset;
+      overflow: unset;
+    }
+    code {
       span.katex {
         font-size: 16px;
         display: inline;
       }
       span {
         width: unset;
+      }
+      &.code-highlight, &.undefined {
+        padding: 0 10px;
       }
     }
     span {

@@ -29,7 +29,7 @@ div.admin.problem-panel {
     border: solid 1px $background-gray;
     margin: 2px 0;
 
-    h2 {
+    .accordion-header {
       color: $base !important;
       font-size: 14px;
     }

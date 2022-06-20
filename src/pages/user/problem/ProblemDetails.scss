@@ -60,9 +60,23 @@ div.problem-info {
       margin-top: 5px;
     }
     div.problem-text {
-      // border: solid 1px $base;
-      // white-space: pre-line;
-      text-align: left;
+      padding: 3px 5px;
+      .wmde-markdown.wmde-markdown-color,
+      .w-md-editor-show-preview {
+        margin: unset;
+        padding: unset;
+        text-align: left;
+        border: solid 1px $background-gray;
+        border-radius: 3;
+        box-shadow: unset;
+        background-color: unset;
+      }
+      .wmde-markdown.wmde-markdown-color.w-md-editor-preview {
+        padding: 5px 10px;
+      }
+      .w-md-editor-content {
+        border: unset;
+      }
     }
   }
 }

@@ -3,6 +3,7 @@
 div#contest-standing {
   table {
     margin: unset;
+    table-layout: fixed;
   }
 
   th, td {
@@ -14,13 +15,14 @@ div#contest-standing {
   }
 
   th.th-participant, td.td-participant {
-    min-width: fit-content;
-    max-width: 300px;
+    width: 200px;
   }
 
   td.td-participant {
     padding-left: 10px;
     padding-right: 10px;
+    width: 200px;
+
     div.participant-container {
       column-gap: 10px;
       row-gap: 10px;
@@ -29,9 +31,11 @@ div#contest-standing {
     div.avatar-container {
       width: 50px;
       // height: 50px;
+      vertical-align: middle;
     }
 
     div.acc-username {
+      max-width: 140px;
       width: 100%;
       font-weight: bold;
       text-align: left;
@@ -44,10 +48,12 @@ div#contest-standing {
   }
 
   th.th-score, td.td-score {
-    width: 140px;
+    width: 100px !important;
+    overflow: hidden;
   }
   th.th-p-best, td.td-p-best {
-    width: 70px;
+    width: 70px !important;
+    overflow: hidden;
   }
 
   div.rank-display {

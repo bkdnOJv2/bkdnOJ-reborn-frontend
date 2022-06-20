@@ -133,7 +133,7 @@ class GeneralDetails extends React.Component {
                 /></Col>
               </Row>
               <Row>
-                <Form.Label column="sm" sm={3}> Ngày tạo </Form.Label>
+                <Form.Label column="sm" md={2}> Ngày tạo </Form.Label>
                 <Col> <Form.Control size="sm" type="datetime-local" id="created"
                         onChange={(e)=>this.setTime(e.target.id, e.target.value)}
                         value={this.getTime('created') || ''}
@@ -142,12 +142,14 @@ class GeneralDetails extends React.Component {
 
               <Row>
                 <Form.Label column="sm" lg={12}> Problem Statement </Form.Label>
-                <Col>
+                <Col className="pb-2">
                   {/* <Form.Control size="sm" lg={12} style={{height: "200px"}}
                       as="textarea" placeholder="Problem Statement" id="content"
                       value={data.content} onChange={(e) => this.inputChangeHandler(e)} */}
                   <RichTextEditor value={data.content || ""} onChange={(v) => this.setContent(v)}
-                /></Col>
+                    enableEdit={true}
+                  />
+                </Col>
               </Row>
               <Row>
                 <Form.Label column="sm" xl={12}> PDF </Form.Label>

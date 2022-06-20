@@ -13,6 +13,8 @@ export default class TestDataDetails extends React.Component {
     this.state = {
       data: {
         zipfile: null,
+        custom_checker: null,
+        custom_checker_remove: false,
         zipfile_remove: false,
         generator_remove: false,
       },
@@ -63,7 +65,9 @@ export default class TestDataDetails extends React.Component {
     e.preventDefault();
     if (this.state.submitting) return;
 
-    let {zipfile, ...sendData} = this.state.data;
+    let {
+      zipfile, custom_checker, ...sendData
+    } = this.state.data;
     let formData = new FormData();
 
     if (this.state.selectedZip)
@@ -96,7 +100,6 @@ export default class TestDataDetails extends React.Component {
     const {data} = this.state;
     return (
       <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
-        <ErrorBox errors={this.state.errors} />
         <Row className="options m-1 border">
           <Col>
             {this.state.submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span> }
@@ -107,6 +110,7 @@ export default class TestDataDetails extends React.Component {
             <VscRefresh/> Refresh
           </Button>
         </Row>
+        <ErrorBox errors={this.state.errors} />
         <Row>
           <Form.Label column="sm" md={2}> Archive </Form.Label>
           <Col md={10}>
@@ -144,7 +148,8 @@ export default class TestDataDetails extends React.Component {
                 <option value="sorted">Unordered</option>
                 <option value="identical">Byte identical</option>
                 <option value="linecount">Line-by-line</option>
-                <option value="custom-py3">Custom checker (Py3)</option>
+                <option value="custom-PY3">Custom checker (Py3)</option>
+                <option value="custom-CPP17">Custom checker (C++)</option>
               </Form.Select>
           </Col>
 
@@ -160,6 +165,13 @@ export default class TestDataDetails extends React.Component {
                 onFileSelectError={({ error }) => alert(error)}
               />
             </div>
+          </Col>
+
+          <Form.Label column="sm" sm={3}> Remove Custom Checker? </Form.Label>
+          <Col sm={9}>
+            <Form.Control size="sm" type="checkbox" id="custom_checker_remove"
+              checked={data.custom_checker_remove} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
+            />
           </Col>
 
           <Form.Label column="sm" xl={12}> Checker Extra Arguments (JSON) </Form.Label>
@@ -265,6 +277,108 @@ export default class TestDataDetails extends React.Component {
                   <code>feedback</code> mặc định là <code>true</code>,
                   nghĩa là yêu cầu máy chấm phản hồi feedback đúng/sai cho từng dòng.
                 </p>
+              </Accordion.Body>
+            </Accordion.Item>
+
+            <Accordion.Item eventKey="8" className="custom-checker-py3-help">
+              <Accordion.Header>Custom Checker: Py3</Accordion.Header>
+              <Accordion.Body className="p-1">
+                <p><code>custom-checker</code>
+                  sử dụng cho những bài có nhiều đáp án, cần phải có một cách để kiểm tra đáp án của thí sinh là đúng.
+                  Đây dành cho các checker được viết bằng <code>Python 3</code>. Kèm theo file này vào trường <code>Custom Checker</code>.
+                </p>
+                <p>Tham khảo checker sau cho bài <a href="/admin/problem/SUM42"><code>SUM42</code></a>.
+                  Bài này yêu cầu thí sinh in ra <code>n</code> cặp số nguyên có tổng là <code>42</code>.
+                </p>
+                <pre><code>
+      {`
+      from dmoj.result import CheckerResult
+      def WA(feedback):
+        return CheckerResult(False, 0, feedback)
+      def AC(feedback):
+        return CheckerResult(True, 0, feedback)
+
+      def check(participant_output, judge_output, judge_input, **kwargs):
+        output_tokens = participant_output.split()
+        input_tokens = judge_input.split()
+        ## Chúng ta không cần dùng đến judge_output cho bài này
+        # answer_tokens = judge_output.split()
+
+        n = int(input_tokens[0]) # Token đầu tiên trong input là số nguyên n
+
+        # Check nếu output in ra ít/nhiều hơn mong đợi
+        if len(output_tokens) != n*2:
+          return WA('Output thiếu hoặc thừa số')
+
+        # Check nếu có token không phải số nguyên
+        try:
+          input_tokens = [int(token) for token in input_tokens]
+        except ValueError:
+          return WA('Output chỉ được phép chứa số nguyên')
+
+        # Check rằng buộc: số nguyên lớn hơn 10^9
+        for num in input_tokens:
+          if abs(num) > 10**9:
+            return WA('Output chứa số nguyên có giá trị tuyệt đối lớn hơn 1 tỷ.')
+
+        # Kiểm tra tổng hai số
+        for i in range(n):
+          a, b = int(output_tokens[i*2]), int(output_tokens[i*2+1])
+          if a + b != 42:
+            return WA(f"Cặp số thứ {i+1} có tổng khác 42.")
+
+        # OK acceptted
+        return True`}
+                </code></pre>
+              </Accordion.Body>
+            </Accordion.Item>
+
+            <Accordion.Item eventKey="9" className="custom-checker-c++-help">
+              <Accordion.Header>Custom Checker: C++ (17)</Accordion.Header>
+              <Accordion.Body className="p-1">
+                <p>Tương tự như trên, máy chấm sẽ compile checker trước và cache nó để thực hiện checking. Một số tham số có thể truyền vào
+                  <code>args</code> như sau:
+                  <ul>
+                    <li><code>time_limit</code>: Giới hạn thời gian chạy cho checker. Hệ thống đặt thêm <code>+2s</code> cho checker.
+                      Mặc định: <code>env['generator_time_limit']</code>
+                    </li>
+                    <li><code>memory_limit</code>: Giới hạn memory cho checker. Mặc định: <code>env['generator_memory_limit']</code>
+                    </li>
+                    <li><code>feedback</code>: Nếu là <code>true</code>, hiển thị stdout của checker như là feedback từng testcase.
+                      Mặc định: <code>true</code>
+                    </li>
+                    <li><code>cached</code>: Nếu là <code>true</code>, file binary sẽ được cached lại để tránh compile lại.
+                      Mặc định: <code>true</code>
+                    </li>
+                  </ul>
+                </p>
+                <p>
+                  Nhìn chung, chương trình sẽ nhận 3 tham số theo thứ tự <code>input_file,output_file,judge_file</code>.
+                  Nếu chương trình trả về 0, kết quả là AC. Trả về 1, kết quả là WA. Trả về 7 cùng với một output ra stderr ở định dạng
+                  <code>points X</code> với <code>X</code> là một số nguyên, nghĩa là thí sinh được thưởng <code>X</code> điểm
+                  cho case này. Tất cả mã còn lại gây ra IE.
+                </p>
+                <p>Ví dụ checker sau kiểm tra 2 số nguyên đầu tiên trong output thí sinh có tổng bằng n, số nguyên đầu tiên trong judge input:</p>
+                <pre><code>
+      {`
+      #include <bits/stdc++.h>
+      using namespace std;
+
+      int __ac() { exit(0); }
+      int __wa() { exit(1); }
+      int __partial(int pts=0) { cerr<<"points "<<pts; exit(7); }
+
+      int main(int argc, char* argv[]) {
+        ifstream inp(argv[1]); // Judge Input
+        ifstream out(argv[2]); // Participant Output
+        ifstream ans(argv[3]); // Judge Answer
+
+        int n; inp >> n;
+        int a, b; out >> a >> b;
+        if (a + b == n) __ac();
+        else __wa();
+      }`}
+                </code></pre>
               </Accordion.Body>
             </Accordion.Item>
             </Accordion>

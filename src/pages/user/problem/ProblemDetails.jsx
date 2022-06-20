@@ -13,7 +13,7 @@ import PDFViewer from 'components/PDFViewer/PDFViewer';
 
 import contestAPI from 'api/contest';
 import problemAPI from 'api/problem';
-import { SpinLoader, ErrorBox } from 'components';
+import { SpinLoader, ErrorBox, RichTextEditor } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
@@ -61,6 +61,15 @@ class ProblemDetails extends React.Component {
     });
     setTimeout(() => this.setState({probStatementTypeDisabled: false}), 2000);
   }
+  updateContType(data) {
+    let contType = 'pdf', contTypeSwitchDisabled=false;
+    if (data.content !== "") contType = 'text';
+    if (data.content === "" || !data.pdf) contTypeSwitchDisabled=true;
+    this.setState({
+      probStatementType: contType,
+      probStatementTypeDisabled: contTypeSwitchDisabled,
+    })
+  }
 
   callApi(params) {
     this.setState({loaded: false, errors: null})
@@ -73,7 +82,7 @@ class ProblemDetails extends React.Component {
         this.setState({
           data: { ...res.data.problem_data, ...res.data } ,
           loaded: true,
-        })
+        }, () => this.updateContType(this.state.data))
         setTitle(`${this.state.contest.name} | Problem. ${res.data.title}`)
       }
     } else {
@@ -83,7 +92,7 @@ class ProblemDetails extends React.Component {
         this.setState({
           data: res.data,
           loaded: true,
-        })
+        }, () => this.updateContType(this.state.data))
         setTitle(`Problem. ${res.data.title}`)
       }
     }
@@ -91,13 +100,6 @@ class ProblemDetails extends React.Component {
     endpoint({...data})
       .then((res) => {
         callback(res)
-        let contType = 'pdf', contTypeSwitchDisabled=false;
-        if (res.data.content !== "") contType = 'text';
-        if (res.data.content === "" || !res.data.pdf) contTypeSwitchDisabled=true;
-        this.setState({
-          probStatementType: contType,
-          probStatementTypeDisabled: contTypeSwitchDisabled,
-        })
       })
       .catch((err) => {
         this.setState({
@@ -128,6 +130,7 @@ class ProblemDetails extends React.Component {
       return <Navigate to={`${this.state.redirectUrl}`} />
     }
     const {loaded, errors, data, contest} = this.state;
+    console.log(data)
 
     const isLoggedIn = !!this.user;
     const isInContest = !!contest;
@@ -243,9 +246,12 @@ class ProblemDetails extends React.Component {
                   this.state.probStatementType === 'text' &&
                   (
                     data.content.trim() === ""
-                    ? <em style={{minHeight: "200px", display: "flex", alignItems: "center"}}>Text is not available.</em>
+                    ? <em style={{minHeight: "200px", width: "100%", display: "flex", alignItems: "center"}}>
+                        Text is not available.</em>
                     : <div className="problem-text ml-3 mr-3">
-                      <MDEditor.Markdown source={data.content} />
+                      <RichTextEditor value={data.content || ""} onChange={()=>{}}
+                        enableEdit={false}
+                      />
                     </div>)
                 }
               </Col></Row>

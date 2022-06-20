@@ -177,7 +177,7 @@ class Problem extends React.Component {
                 </td>
                 <td><Link to="#" onClick={(e) => {
                   e.preventDefault()
-                  let conf = window.confirm('CHÚ Ý: Xóa một đối tượng ContestProblem có sẵn sẽ dẫn đến hiện tượng Data Corruption: '+
+                  let conf = window.confirm('CHÚ Ý: Xóa một đối tượng ContestProblem có sẵn sẽ '+
                     'gây ảnh hưởng đến những ContestSubmission và ContestParticipation tương ứng, nhất là khi Contest đang và đã diễn ra. '+
                     'Hãy suy xét lựa chọn đổi thứ tự chúng thông qua Order thay vì xóa đi tạo lại một Problem. Một khi nhấn SAVE, sẽ không '+
                     'thể khôi phục lại những tài nguyên tương ứng.')

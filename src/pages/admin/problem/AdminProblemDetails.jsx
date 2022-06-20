@@ -56,7 +56,7 @@ class AdminProblemDetails extends React.Component {
         loaded: true,
         childKey,
       })
-      setTitle(`Admin | Problem | ${generalRes.data.shortname}`)
+      setTitle(`Admin | Problem. ${generalRes.data.shortname}`)
     }).catch((err) => {
       this.setState({
         loaded: true,
