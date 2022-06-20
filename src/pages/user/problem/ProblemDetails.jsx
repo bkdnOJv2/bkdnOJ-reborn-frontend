@@ -2,8 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
+import MDEditor from '@uiw/react-md-editor';
 
-import { FaPaperPlane, FaSignInAlt, FaWrench } from 'react-icons/fa';
+import { FaPaperPlane, FaSignInAlt, FaWrench,
+  FaAlignJustify, FaRegFilePdf
+} from 'react-icons/fa';
 import { VscError } from 'react-icons/vsc';
 
 import PDFViewer from 'components/PDFViewer/PDFViewer';
@@ -32,6 +35,9 @@ class ProblemDetails extends React.Component {
       data: undefined, loaded: false, errors: null, shortname: shortname,
       redirectUrl: null,
       submitFormShow: false,
+
+      probStatementType: 'text',
+      probStatementTypeDisabled: false,
     };
     this.user = (this.props.user);
   }
@@ -39,8 +45,21 @@ class ProblemDetails extends React.Component {
   handleSubmitFormOpen() { this.setState({ submitFormShow: true })}
   handleSubmitFormClose() { this.setState({ submitFormShow: false })}
 
-  onDocumentLoadSuccess({ numPages }) {
-    this.setState({ numPages })
+  onDocumentLoadSuccess({ numPages }) { this.setState({ numPages }) }
+  toggleProbStatementType() {
+    if (this.state.probStatementTypeDisabled) return;
+
+    const {probStatementType} = this.state;
+    let next = 'text';
+    if (probStatementType === 'text') next = 'pdf';
+    else
+    if (probStatementType === 'pdf') next = 'text';
+
+    // TODO: Hacky solution to prevent user from spaming PDF request
+    this.setState({
+      probStatementType: next, probStatementTypeDisabled: true
+    });
+    setTimeout(() => this.setState({probStatementTypeDisabled: false}), 2000);
   }
 
   callApi(params) {
@@ -72,6 +91,13 @@ class ProblemDetails extends React.Component {
     endpoint({...data})
       .then((res) => {
         callback(res)
+        let contType = 'pdf', contTypeSwitchDisabled=false;
+        if (res.data.content !== "") contType = 'text';
+        if (res.data.content === "" || !res.data.pdf) contTypeSwitchDisabled=true;
+        this.setState({
+          probStatementType: contType,
+          probStatementTypeDisabled: contTypeSwitchDisabled,
+        })
       })
       .catch((err) => {
         this.setState({
@@ -107,6 +133,8 @@ class ProblemDetails extends React.Component {
     const isInContest = !!contest;
     const isAllowedToSubmitToContest = isInContest && (contest.is_registered || contest.spectate_allow);
     const isSuperuser = isLoggedIn && this.user.is_superuser;
+
+    const pdfAvailable = !!(data && data.pdf);
 
     return (
       <div className="problem-info wrapper-vanilla">
@@ -149,7 +177,17 @@ class ProblemDetails extends React.Component {
                   </ul>
                 </Col>
                 <Col sm={3} className="options">
-                  { // Not Log-in
+                  {
+                    <Link to="#" className="btn"
+                      style={this.state.probStatementTypeDisabled ? {color: "gray"} : {}}
+                      onClick={() => this.toggleProbStatementType()}>
+                      {
+                        this.state.probStatementType === 'pdf' && <>To Text<FaAlignJustify size={12}/></>
+                      }{
+                        this.state.probStatementType === 'text' && <>To PDF<FaRegFilePdf size={12}/></>
+                      }
+                    </Link>
+                  }{ // Not Log-in
                     !isLoggedIn && (
                     <Link to="#" className="btn"
                       onClick={() => this.setState({redirectUrl: '/sign-in'})}>
@@ -186,14 +224,31 @@ class ProblemDetails extends React.Component {
                   {/* <Link to="/submit" className="btn">Test</Link> */}
                 </Col>
               </Row>
-              <div className="problem-pdf shadow">
-                {/* <object data={`${this.state.data.pdf}`} type="application/pdf">
-                  <iframe title="problem-pdf-iframe"
-                    src={`https://docs.google.com/viewer?url=${this.state.data.pdf}&embedded=true`}>
-                  </iframe>
-                </object> */}
-                <PDFViewer pdf={data.pdf} />
-              </div>
+
+              <hr className="ml-3 mr-3 mt-1 mb-1"></hr>
+
+              <Row className="problem-statement"><Col>
+                {
+                  // TODO: cached this after first load so it doesn't hit the server everytime the user toggle doc type.
+                  this.state.probStatementType === 'pdf' &&
+                  <div className="problem-pdf shadow">
+                    {/* <object data={`${this.state.data.pdf}`} type="application/pdf">
+                      <iframe title="problem-pdf-iframe"
+                        src={`https://docs.google.com/viewer?url=${this.state.data.pdf}&embedded=true`}>
+                      </iframe>
+                    </object> */}
+                    <PDFViewer pdf={data.pdf} />
+                  </div>
+                }{
+                  this.state.probStatementType === 'text' &&
+                  (
+                    data.content.trim() === ""
+                    ? <em style={{minHeight: "200px", display: "flex", alignItems: "center"}}>Text is not available.</em>
+                    : <div className="problem-text ml-3 mr-3">
+                      <MDEditor.Markdown source={data.content} />
+                    </div>)
+                }
+              </Col></Row>
             </>
           }
         </div>

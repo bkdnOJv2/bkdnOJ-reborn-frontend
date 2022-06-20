@@ -162,8 +162,7 @@ export default class SubmitModal extends React.Component {
                 display: "flex", verticalAlign: "center"}}>
                 <BsExclamationCircle />
               </div>
-              <span className="warning">This editor only store your most recent code.
-                Using multiple editors can cause conflict.</span>
+              <span className="warning">This editor only store your most recent code!</span>
             </>
             : <SubmitModalResult subId={this.state.subId} subErrors={this.state.errors}/>
           }

@@ -32,6 +32,9 @@ div.problem-info {
       align-items: flex-end;
 
       .btn {
+        display: flex;
+        align-items: center;
+
         margin-top: 2px;
         margin-bottom: 2px;
         padding: 0 4px;
@@ -47,11 +50,19 @@ div.problem-info {
     }
   }
 
-  div.problem-pdf {
-    width: 95%;
-    text-align: center;
-    margin: auto;
-    border: solid 2px $background-gray;
-    margin-top: 5px;
+  div.problem-statement {
+    min-height: 200px;
+    div.problem-pdf {
+      width: 95%;
+      text-align: center;
+      margin: auto;
+      border: solid 2px $background-gray;
+      margin-top: 5px;
+    }
+    div.problem-text {
+      // border: solid 1px $base;
+      // white-space: pre-line;
+      text-align: left;
+    }
   }
 }

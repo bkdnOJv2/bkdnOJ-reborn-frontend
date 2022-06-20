@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 import problemAPI from 'api/problem';
 import { withNavigation } from 'helpers/react-router';
-import { SpinLoader, FileUploader } from 'components';
+import { SpinLoader, FileUploader, RichTextEditor } from 'components';
 
 class GeneralDetails extends React.Component {
   constructor(props) {
@@ -48,6 +48,10 @@ class GeneralDetails extends React.Component {
     this.setState({ data : { ...data, [key]: time.toISOString() } },
     () => console.log('After', data)
     );
+  }
+  setContent(v) {
+    const {data} = this.state;
+    this.setState({ data: { ...data, content: v } })
   }
 
   formSubmitHandler(e) {
@@ -137,9 +141,12 @@ class GeneralDetails extends React.Component {
               </Row>
 
               <Row>
-                <Form.Label column="sm" lg={12}> Statement (Not Implemented) </Form.Label>
-                <Col> <Form.Control size="sm" lg={12} as="textarea" placeholder="Problem Statement" id="content"
-                        value={data.content} onChange={(e) => this.inputChangeHandler(e)}
+                <Form.Label column="sm" lg={12}> Problem Statement </Form.Label>
+                <Col>
+                  {/* <Form.Control size="sm" lg={12} style={{height: "200px"}}
+                      as="textarea" placeholder="Problem Statement" id="content"
+                      value={data.content} onChange={(e) => this.inputChangeHandler(e)} */}
+                  <RichTextEditor value={data.content || ""} onChange={(v) => this.setContent(v)}
                 /></Col>
               </Row>
               <Row>

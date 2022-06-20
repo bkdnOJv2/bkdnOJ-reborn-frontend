@@ -8,6 +8,8 @@ import ErrorBox from './ErrorBox/ErrorBox';
 import FileUploader from './FileUploader/FileUploader';
 import CSRFToken from './CSRFToken/CSRFToken';
 
+import RichTextEditor from './RichTextEditor/RichTextEditor';
+
 import ContestSidebar from './ContestSidebar';
 import RecentSubmissionSidebar from './RecentSubmissionSidebar';
 
@@ -21,6 +23,7 @@ export {
     ErrorBox,
     FileUploader,
     CSRFToken,
+    RichTextEditor,
 
     ContestSidebar,
     RecentSubmissionSidebar,
