@@ -57,7 +57,9 @@ class GeneralDetails extends React.Component {
   formSubmitHandler(e) {
     e.preventDefault();
     if (this.state.submitting) return;
-    this.setState({errors: null})
+    if (this.props.setErrors) {
+      this.props.setErrors(null)
+    }
 
     let {pdf, ...sendData} = this.state.data;
     delete sendData.allowed_languages

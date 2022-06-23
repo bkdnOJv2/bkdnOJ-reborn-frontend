@@ -76,6 +76,9 @@ export default class TestcaseDetails extends React.Component {
 
   refetch() {
     if (this.state.submitting) return;
+    if (this.props.setErrors) {
+      this.props.setErrors(null)
+    }
     this.setState({
       submitting: true,
       errors: null,
@@ -87,15 +90,18 @@ export default class TestcaseDetails extends React.Component {
             data: res.data,
             selectChk: Array(res.data.length).fill(false),
             loaded: true,
-            errors: null,
+            // errors: null,
             submitting: false,
           })
         }).catch((err) => {
           this.setState({
             loaded: true,
             submitting: false,
-            errors: ['Cannot fetch testcases for this problem. Has it been deleted?']
+            // errors: ['Cannot fetch testcases for this problem. Has it been deleted?']
           })
+          if (this.props.setErrors) {
+            this.props.setErrors({errors: err.response.data})
+          }
         })
     })
   }

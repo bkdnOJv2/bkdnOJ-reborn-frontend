@@ -5,6 +5,8 @@ import {
 } from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 
+import {getLocalDateWithTimezone} from 'helpers/dateFormatter';
+
 import { SpinLoader, ErrorBox } from 'components';
 import contestAPI from 'api/contest';
 import 'styles/ClassicPagination.scss';
@@ -44,6 +46,8 @@ class Participation extends React.Component {
   refetch(params={page: 0}) {
     this.setState({loaded: false, errors: null})
     let prms = {page : params.page+1}
+    console.log(prms)
+
     if (this.state.virtual) prms.virtual = this.state.virtual;
 
     contestAPI.getContestParticipations({ key:this.ckey, params: prms })
@@ -68,7 +72,7 @@ class Participation extends React.Component {
   }
 
   handlePageClick = (event) => {
-    this.callApi({page: event.selected});
+    this.refetch({page: event.selected});
   }
 
   componentDidMount() {
@@ -134,7 +138,7 @@ class Participation extends React.Component {
               participations.map((part) => <tr key={`ct-part-${part.id}`}>
                 <td>{part.id}</td>
                 <td>{part.user}</td>
-                <td>{part.real_start}</td>
+                <td>{getLocalDateWithTimezone(part.real_start)}</td>
                 <td>{part.virtual}</td>
                 <td>{part.is_disqualified ? "Yes" : "No"}</td>
               </tr>)

@@ -9,7 +9,9 @@ import { AiOutlineForm, AiOutlineUpload, AiOutlineArrowRight, AiOutlinePlusCircl
 
 import { SpinLoader, ErrorBox, FileUploader } from 'components';
 import problemApi from 'api/problem';
+
 import { setTitle } from 'helpers/setTitle';
+import { qmClarify } from 'helpers/components';
 import { withNavigation } from 'helpers/react-router';
 
 import './AdminProblemList.scss'
@@ -17,7 +19,7 @@ import 'styles/ClassicPagination.scss';
 
 class ProblemListItem extends React.Component {
   render() {
-    const {shortname, title, points, is_public, is_organization_private} = this.props;
+    const {shortname, title, points, short_circuit, is_public, is_organization_private} = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
 
     const visible = is_public ? (
@@ -38,6 +40,7 @@ class ProblemListItem extends React.Component {
         </td>
         <td>{points}</td>
         <td>{visible}</td>
+        <td>{short_circuit ? "Yes" : "No"}</td>
         <td>
             <input type="checkbox" value={selectChk[rowidx]}
               onChange={(e) => onSelectChkChange(rowidx)}
@@ -228,7 +231,14 @@ class AdminProblemList extends React.Component {
               <th style={{width: "20%"}}>#</th>
               <th style={{minWidth: "30%", maxWidth: "30%"}}>Title</th>
               <th style={{width: "12%"}}>Points</th>
-              <th style={{width: "10%"}}>Visible?</th>
+              <th style={{width: "10%"}}>
+                Visible{qmClarify("Cho biết Problem này đang ở chế độ hiển thị nào.\n"+
+                            "* Public: mọi người đều thấy\n* Orgs: Một vài tổ chức thấy được.\n"+
+                            "* Private: Chỉ các cá nhân được thêm mới thấy được.")}
+              </th>
+              <th style={{width: "10%"}}>
+                ICPC{qmClarify("Chạy bài ở chế độ ICPC, nghĩa là một test sai sẽ dừng quá trình chấm bài.")}
+              </th>
               <th style={{width: "8%"}}>
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
               </th>

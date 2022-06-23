@@ -194,7 +194,7 @@ class General extends React.Component {
               <Form.Label column="sm" md={6}> Thời gian cache bảng điểm (giây) </Form.Label>
               <Col > <Form.Control size="sm" type="number" id="scoreboard_cache_duration"
                       value={data.scoreboard_cache_duration || 0}
-                      onChange={(e)=>this.setTime(e.target.id, e.target.value)}
+                      onChange={(e)=>this.inputChangeHandler(e)}
               /></Col>
               <Col xl={12}><sub>
                 Thời gian mà hệ thống sẽ cache bảng điểm sau mỗi lần tính.

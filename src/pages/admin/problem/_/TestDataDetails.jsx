@@ -64,6 +64,9 @@ export default class TestDataDetails extends React.Component {
   formSubmitHandler(e) {
     e.preventDefault();
     if (this.state.submitting) return;
+    if (this.props.setErrors) {
+      this.props.setErrors(null)
+    }
 
     let {
       zipfile, custom_checker, ...sendData
@@ -92,6 +95,9 @@ export default class TestDataDetails extends React.Component {
           errors: err.response.data,
           submitting: false,
         })
+        if (this.props.setErrors) {
+          this.props.setErrors({errors: err.response.data})
+        }
       })
     })
   }

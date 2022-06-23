@@ -184,7 +184,7 @@ class ContestListItem extends React.Component {
                       <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
                     </span>
                     : <span className="d-inline-flex align-items-center">
-                      <code>Register is not Allowed.</code>
+                      <span style={{color: "red"}}>Register is not Allowed.</span>
                     </span>
                   }</>
                 }
@@ -217,7 +217,7 @@ class ContestListItem extends React.Component {
                           <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
                         </span>
                       ) : <span className="d-inline-flex align-items-center">
-                        <code>Register is not Allowed.</code>
+                        <span style={{color: "red"}}>Register is not Allowed.</span>
                       </span>
                     )
                   )

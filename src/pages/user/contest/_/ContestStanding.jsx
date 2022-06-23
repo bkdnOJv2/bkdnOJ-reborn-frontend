@@ -52,6 +52,7 @@ class StandingItem extends React.Component {
       is_disqualified, virtual, format_data
     } = this.props;
     const { mapping, isFrozen } = this.props;
+    console.log(isFrozen)
 
     let best = Array( Object.keys(mapping).length ).fill(<></>);
     let data = JSON.parse(format_data);
@@ -76,7 +77,7 @@ class StandingItem extends React.Component {
         const attemptsDuringFrozen = (v.tries - v.frozen_tries);
 
         best[i] = (
-          <div className={`flex-center-col ` + (isFrozen ? "frozen" : "")}>
+          <div className={`flex-center-col ` + ((isFrozen && attemptsDuringFrozen > 0) ? "frozen" : "")}>
             <div className={`p-best-points points ${ptsClsName}`}>
               {`${points}`}
               <span className="extra">(
@@ -171,6 +172,7 @@ class ContestStanding extends React.Component {
 
       isFrozen: true,
       canBreakIce: false,
+      iceBroken: false,
 
       loaded: false,
       errors: null,
@@ -184,11 +186,11 @@ class ContestStanding extends React.Component {
   }
 
   meltingIce() {
-    this.setState({ isFrozen: false, },
+    this.setState({ iceBroken: true, },
       () => this.refetch());
   }
   freezingIce() {
-    this.setState({ isFrozen: true, },
+    this.setState({ iceBroken: false, },
       () => this.refetch())
   }
 
@@ -196,7 +198,7 @@ class ContestStanding extends React.Component {
     if (polling) this.setState({ isPolling: true });
     else this.setState({ loaded: false, errors: null })
 
-    const params = (this.state.isFrozen ? {view_full: 0} : {view_full: 1});
+    const params = (this.state.iceBroken ? {view_full: 1} : {view_full: 0});
 
     contestAPI.getContestStanding({key : this.state.contest.key, params})
     .then((res) => {
@@ -207,6 +209,7 @@ class ContestStanding extends React.Component {
         problems: res.data.problems,
         frozenEnabled: res.data.is_frozen_enabled,
         frozenTime: res.data.frozen_time,
+        isFrozen: res.data.is_frozen,
 
         canBreakIce: (res.data.can_break_ice || false),
       })
@@ -261,7 +264,8 @@ class ContestStanding extends React.Component {
 
   render() {
     const { loaded, errors,
-      problems, standing, frozenEnabled, frozenTime, isFrozen, canBreakIce,
+      problems, standing, frozenEnabled, frozenTime, isFrozen,
+      iceBroken, canBreakIce,
       isPollingOn, isPolling
     } = this.state;
 
@@ -282,7 +286,7 @@ class ContestStanding extends React.Component {
           )}
           <div className="standing-options">
             {canBreakIce &&
-              ( isFrozen ?
+              ( !iceBroken ?
                 <Button  variant="light" className="btn-svg"
                   onClick={() => this.meltingIce()}>
                     <AiOutlineEye size={20}/> Peek..

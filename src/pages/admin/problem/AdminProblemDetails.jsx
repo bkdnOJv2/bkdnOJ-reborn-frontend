@@ -60,7 +60,7 @@ class AdminProblemDetails extends React.Component {
     }).catch((err) => {
       this.setState({
         loaded: true,
-        errors: err,
+        errors: err.response.data,
       })
     })
   }
