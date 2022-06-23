@@ -21,6 +21,9 @@ import './SubmissionDetails.scss';
 class SubmissionTestCase extends React.Component {
   render() {
     const data = this.props.data;
+    const problem = this.props.problem;
+    const maxTime = problem.time_limit;
+
     return (
       <tr className="test-case-result">
         <td>
@@ -28,11 +31,15 @@ class SubmissionTestCase extends React.Component {
         </td>
         <td>
           <span className={`verdict ${data.status.toLowerCase()}`}>
-            <span>{data.status}</span>
+            <span className={`verdict-wrapper ${data.status.toLowerCase()}`}>
+              <span className="text">{data.status}</span>
+            </span>
           </span>
         </td>
         <td>
-          <span className="time">{parseTime(data.time)}</span>
+          <span className="time">{
+            data.status === 'tle' ? `>${parseTime(maxTime)}` : parseTime(data.time)
+          }</span>
         </td>
         <td>
           <span className="time">{parseMem(data.memory)}</span>
@@ -73,7 +80,6 @@ class SubmissionDetails extends React.Component {
 
   pollResult() {
     if (shouldStopPolling(this.state.data.status) || !!this.state.errors) {
-      console.log('Clear?')
       clearInterval(this.timer)
       return;
     }
@@ -102,8 +108,11 @@ class SubmissionDetails extends React.Component {
     const isSuperuser = isLoggedIn && this.user.is_superuser;
 
     let verdict = 'QU';
-    if (loaded && !errors)
+    let maxPoints = 0;
+    if (loaded && !errors){
       verdict = (data.status === "D" ? data.result : data.status);
+      maxPoints = data.problem.points;
+    }
     const polling = (loaded && !errors && !shouldStopPolling(data.status));
 
     return (
@@ -147,17 +156,16 @@ class SubmissionDetails extends React.Component {
                   </div>
                 }
                 <h5>General</h5>
-                <Row>
-                  <Col >
-                    <span><strong>Language:</strong>{ data.language }</span>
-                  </Col>
-                  <Col >
-                    <span><strong>Problem:</strong>
-                      <Link to={`/problem/${data.problem.shortname}`}>
-                        { data.problem.title }
+                {
+                  data.contest_object && <Col >
+                    <span><strong>{`This submission was made in contest `}</strong>
+                      <Link to={`/contest/problem`}>
+                        { data.contest_object }
                       </Link>
                     </span>
                   </Col>
+                }
+                <Row>
                   <Col >
                     <span><strong>Author:</strong>
                       <Link to={`/user/${data.user.owner.username}`}>
@@ -166,22 +174,56 @@ class SubmissionDetails extends React.Component {
                     </span>
                   </Col>
                   <Col >
-                    <span><strong>Result:</strong>
-                      <span className={`verdict ${verdict.toLowerCase()}`}>
-                        <span>{verdict}</span>
-                      </span>
+                    <span><strong>Problem:</strong>
+                      <Link to={`/problem/${data.problem.shortname}`}>
+                        { data.problem.title }
+                      </Link>
                     </span>
                   </Col>
                 </Row>
+                <Row>
+                  <Col >
+                    <span><strong>Result:</strong>
+                      <span className={`verdict ${verdict.toLowerCase()}`}>
+                        <span className={`verdict-wrapper ${verdict.toLowerCase()}`}>
+                          <span className={`text`}>{verdict}</span>
+                        </span>
+                      </span>
+                    </span>
+                  </Col>
+                  <Col >
+                    <span><strong>Points:</strong>
+                    {
+                      typeof(data.points) === 'number'
+                      ? <span className={`verdict ${verdict.toLowerCase()} points`}>
+                          {`(${data.points}/${maxPoints})`}</span>
+                      : <span className="points">Not evaluated</span>
+                    }
+                    </span>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col >
+                    <span><strong>Total Time:</strong>{ parseTime(data.time) }</span>
+                  </Col>
+                  <Col >
+                    <span><strong>Memory:</strong>{ parseMem(data.memory) }</span>
+                  </Col>
+                </Row>
               </div>
+
               <div className="source info-subsection">
                 <h5>Source</h5>
+                <Row>
+                  <Col >
+                    <span><strong>Language: </strong>{ data.language }</span>
+                  </Col>
+                </Row>
                 <Row><Col>
                   <CodeEditor
-                    code={data.source}
-                    onCodeChange={() => {}}
-                    ace={data.language_ace}
-                    readOnly={true}
+                    code={data.source} onCodeChange={() => {}}
+                    ace={data.language_ace} readOnly={true}
                   />
                 </Col></Row>
               </div>
@@ -194,6 +236,7 @@ class SubmissionDetails extends React.Component {
                     data.test_cases.map(
                       (test_case) => <SubmissionTestCase
                         key={test_case.id} data={test_case}
+                        problem={data.problem}
                       />
                     )
                   }

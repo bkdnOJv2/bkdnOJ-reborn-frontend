@@ -136,18 +136,19 @@ class ContestListItem extends React.Component {
         <td className="text-truncate" style={{maxWidth: "100px"}}>
           <Link to={`/contest/${ckey}`}>{ckey}</Link>
         </td>
-        <td className="text-truncate" style={{maxWidth: "300px"}}>
+        <td className="text-truncate" style={{minWidth: "200px", maxWidth: "300px"}}>
           <Link to={`/contest/${ckey}`}>{cname}</Link>
-        </td>
-        <td className="contest-start">
-          {this.parseStartTime()}
           {
             type !== 'past' && <>
+              <br/>
               <span className="d-inline-flex align-items-center contest-status-lbl">
                 {this.state.time_label}
               </span>
             </>
           }
+        </td>
+        <td className="contest-start" style={{minWidth: "150px"}}>
+          {this.parseStartTime()}
         </td>
         <td>{this.parseDuration()}</td>
         <td className="participate-options">{

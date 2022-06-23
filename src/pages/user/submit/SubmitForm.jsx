@@ -1,4 +1,8 @@
 import React from 'react';
+
+import { connect } from 'react-redux';
+import { startPolling } from 'redux/RecentSubmission/actions';
+
 import { toast } from 'react-toastify';
 import {Form} from 'react-bootstrap';
 
@@ -16,7 +20,7 @@ import 'helpers/importAllAceMode';
 import './SubmitForm.scss';
 
 
-export default class SubmitForm extends React.Component {
+class SubmitForm extends React.Component {
   constructor(props) {
     super(props);
     let id2LangMap = {};
@@ -67,6 +71,9 @@ export default class SubmitForm extends React.Component {
       endpoint({...conf, data})
         .then((res) => {
           this.props.setSubId(res.data.id)
+          // Send submission -> signal polling
+          if (this.props.startPolling)
+            this.props.startPolling()
         })
         .catch((err) => {
           if (err.response && err.response.data && err.response.data.detail) {
@@ -147,3 +154,11 @@ export default class SubmitForm extends React.Component {
     )
   }
 };
+
+let wrapped = SubmitForm;
+const mapDispatchToProps = dispatch => {
+  return {
+    startPolling: () => dispatch(startPolling()),
+  }
+}
+export default connect(null, mapDispatchToProps)(wrapped);

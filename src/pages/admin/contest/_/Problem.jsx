@@ -134,7 +134,7 @@ class Problem extends React.Component {
               <th style={{minWidth: "150px"}}>Problem Code</th>
               <th style={{minWidth: "15%"}}>Points</th>
               <th style={{whiteSpace: "nowrap"}} >
-                Cắn Test {this.clarifyPopup('Chấm bài ở chế độ ăn điểm từng test (oi). Nhưng thông thường chỉ với thiết lập Contest Format là đủ.')}
+                Cắn Test {this.clarifyPopup('Tick để chấm bài ở chế độ ăn điểm từng test (oi).')}
               </th>
               <th style={{whiteSpace: "nowrap"}} >
                 Pretested {this.clarifyPopup('Chỉ chấm với Pretest.')}

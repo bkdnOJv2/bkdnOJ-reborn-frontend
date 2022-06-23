@@ -33,17 +33,19 @@ div#contest-standing {
       // height: 50px;
       vertical-align: middle;
     }
-
-    div.acc-username {
-      max-width: 140px;
-      width: 100%;
-      font-weight: bold;
-      text-align: left;
-    }
-    div.acc-realname {
-      width: 100%;
-      font-size: 14px;
-      text-align: left;
+    div.user-container {
+      align-items: baseline;
+      div.acc-username {
+        max-width: 140px;
+        width: 100%;
+        font-weight: bold;
+        text-align: left;
+      }
+      div.acc-realname {
+        width: 100%;
+        font-size: 14px;
+        text-align: left;
+      }
     }
   }
 
@@ -52,6 +54,9 @@ div#contest-standing {
     overflow: hidden;
   }
   th.th-p-best, td.td-p-best {
+    height: 50px;
+
+    padding: 0; margin: 0;
     width: 70px !important;
     overflow: hidden;
   }
@@ -60,6 +65,10 @@ div#contest-standing {
     column-gap: 5px;
     font-size: 20px;
     font-weight: bold;
+  }
+
+  .frozen {
+    background-color: $blue-light-transparent;
   }
 
   .points {
@@ -83,10 +92,32 @@ div#contest-standing {
       // color: lightgreen;
     }
 
+    span.extra {
+      margin-left: 2px;
+      font-size: 12px;
+      color: black;
+      span.tries {
+      }
+      span.frozen_tries {
+        color: $blue-dark;
+      }
+    }
   }
   .time {
     width: 100%;
     overflow: hidden;
     font-size: 0.7rem;
+  }
+
+  .standing-lbl {
+    .standing-head {
+      font-family: $font-codeforces;
+      margin: 0;
+    }
+    span.frozen-time {
+      font-family: $font-codeforces;
+      font-size: 12px;
+    }
+    margin-bottom: 5px;
   }
 }

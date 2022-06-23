@@ -12,6 +12,10 @@ import submissionApi from 'api/submission';
 import SubmitForm from './SubmitForm';
 import './SubmitModal.scss'
 
+
+const __SUBMIT_MODAL_POLL_DELAY = 3000; // ms
+const __SUBMIT_MODAL_MAX_POLL_DURATION = 30 * 1000; // ms
+
 class SubmitModalResult extends React.Component {
   constructor(props) {
     super(props);
@@ -45,7 +49,8 @@ class SubmitModalResult extends React.Component {
     if (prevProps.subId !== this.props.subId) {
       this.setState({subId : this.props.subId},
         () => {
-          this.timer = setInterval(() => this.pollResult(), getPollDelay());
+          this.timer = setInterval(() => this.pollResult(), __SUBMIT_MODAL_POLL_DELAY);
+          setTimeout(() => clearInterval(this.timer), __SUBMIT_MODAL_MAX_POLL_DURATION);
         }
       )
     }

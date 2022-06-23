@@ -110,36 +110,37 @@ class General extends React.Component {
       <>
       <ErrorBox errors={this.state.errors} />
       <Form id="contest-general" onSubmit={(e) => this.formSubmitHandler(e)}>
+        <Row id="contest-id-row">
+          <Form.Label column="sm" lg={1} > ID </Form.Label>
+          <Col lg={3}> <Form.Control size="sm" type="text" placeholder="Contest id" id="id"
+                  value={data.id || ''} disabled readOnly
+          /></Col>
+
+          <Form.Label column="sm" lg={1} className="required"> Key </Form.Label>
+          <Col lg={7}> <Form.Control size="sm" type="text" placeholder="Contest key/shortname/code" id="key"
+                  value={data.key || ''} onChange={(e)=>this.inputChangeHandler(e)}
+          /></Col>
+        </Row>
+        <Row>
+          <Form.Label column="sm" lg={2} className="required"> Tên cuộc thi </Form.Label>
+          <Col> <Form.Control size="sm" type="text" placeholder="Contest Name" id="name"
+                  value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)}
+          /></Col>
+        </Row>
 
         <Accordion defaultActiveKey="-1">
           <Accordion.Item eventKey="-1" className="general">
             <Accordion.Header>Thiết lập chung</Accordion.Header>
             <Accordion.Body>
             <Row>
-              <Form.Label column="sm" lg={1} > ID </Form.Label>
-              <Col lg={1}> <Form.Control size="sm" type="text" placeholder="Contest id" id="id"
-                      value={data.id || ''} disabled readOnly
-              /></Col>
-
-              <Form.Label column="sm" lg={1} className="required"> Key </Form.Label>
-              <Col lg={2}> <Form.Control size="sm" type="text" placeholder="Contest key/shortname/code" id="key"
-                      value={data.key || ''} onChange={(e)=>this.inputChangeHandler(e)}
-              /></Col>
-              <Form.Label column="sm" lg={1} className="required"> Name </Form.Label>
-              <Col> <Form.Control size="sm" type="text" placeholder="Contest Name" id="name"
-                      value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)}
-              /></Col>
-            </Row>
-
-            <Row>
-              <Form.Label column="sm" md={2} className="required"> Start Time </Form.Label>
-              <Col md={4}> <Form.Control size="sm" type="datetime-local" id="start_time"
+              <Form.Label column="sm" lg={2} className="required"> Thời điểm bắt đầu </Form.Label>
+              <Col lg={4}> <Form.Control size="sm" type="datetime-local" id="start_time"
                       value={this.getTime('start_time') || ''}
                       onChange={(e)=>this.setTime(e.target.id, e.target.value)}
               /></Col>
 
-              <Form.Label column="sm" md={2} className="required"> End Time </Form.Label>
-              <Col md={4}> <Form.Control size="sm" type="datetime-local" id="end_time"
+              <Form.Label column="sm" lg={2} className="required"> Thời điểm kết thúc </Form.Label>
+              <Col lg={4}> <Form.Control size="sm" type="datetime-local" id="end_time"
                       value={this.getTime('end_time') || ''}
                       onChange={(e)=>this.setTime(e.target.id, e.target.value)}
               /></Col>
@@ -150,10 +151,9 @@ class General extends React.Component {
                 </sub>
               </Col>
             </Row>
-
-            <Row>
-              <Form.Label column="sm" md={3}> Time Limit (phút) </Form.Label>
-              <Col md={9}> <Form.Control size="sm" id="time_limit"
+            {/* <Row>
+              <Form.Label column="sm" lg={2}> Time Limit (phút) </Form.Label>
+              <Col lg={10}> <Form.Control size="sm" id="time_limit"
                       value={data.time_limit || ''} onChange={(e)=>this.inputChangeHandler(e)}
               />
               </Col>
@@ -164,7 +164,44 @@ class General extends React.Component {
                   Option này chủ yếu dành cho Virtual Participation (chưa triển khai).
                 </sub>
               </Col>
+            </Row> */}
+
+            <Row id="fronzen-settings">
+              <Form.Label column="sm" lg={3}> Đóng băng Kết quả? </Form.Label>
+              <Col lg={1}> <Form.Control size="sm" type="checkbox" id="enable_frozen"
+                      checked={data.enable_frozen || false}
+                      onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
+              /></Col>
+
+              <Form.Label column="sm" lg={3}> Thời điểm Đóng băng </Form.Label>
+              <Col lg={5}> <Form.Control size="sm" type="datetime-local" id="frozen_time"
+                      value={this.getTime('frozen_time') || ''}
+                      onChange={(e)=>this.setTime(e.target.id, e.target.value)}
+              /></Col>
+
+              <Col xl={12}>
+                <sub>
+                  Sau thời điểm đóng băng, thí sinh không thấy kết quả của submission của thí sinh khác,
+                  và bảng điểm sau sẽ không cập nhập kết quả. Thay đổi thời gian đóng băng mà không rejudge
+                  sẽ không cập nhập lại điểm và sub đang hiện trên bảng điểm.
+                  Hãy cân nhắc khi thay đổi nó trong lúc diễn ra contest.
+                  Thiết lập đóng băng hiện chỉ có tác dụng với <code>contest_format</code> ICPC.
+                </sub>
+              </Col>
             </Row>
+
+            <Row id="scoreboard-cache-settings">
+              <Form.Label column="sm" md={6}> Thời gian cache bảng điểm (giây) </Form.Label>
+              <Col > <Form.Control size="sm" type="number" id="scoreboard_cache_duration"
+                      value={data.scoreboard_cache_duration || 0}
+                      onChange={(e)=>this.setTime(e.target.id, e.target.value)}
+              /></Col>
+              <Col xl={12}><sub>
+                Thời gian mà hệ thống sẽ cache bảng điểm sau mỗi lần tính.
+                Nếu giá trị là <code>0</code> sẽ tắt caching.
+              </sub></Col>
+            </Row>
+
 
             <Row>
               <Form.Label column="sm" md={3}> Contest Format </Form.Label>
@@ -183,14 +220,14 @@ class General extends React.Component {
               </Col>
 
               <Form.Label column="sm" xl={12}> Contest Format Custom Config </Form.Label>
-              <Col> <Form.Control size="sm" xl={12} type="textarea" placeholder="JSON - Describe custom contest rules" id="format_config"
+              <Col> <Form.Control size="sm" xl={12} as="textarea" placeholder="JSON - Describe custom contest rules" id="format_config"
                       value={data.format_config || ''} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
 
             <Row>
               <Form.Label column="sm" xl={12}> Mô tả </Form.Label>
-              <Col> <Form.Control size="sm" xl={12} type="textarea" placeholder="Contest Description" id="description"
+              <Col> <Form.Control size="sm" xl={12} as="textarea" placeholder="Contest Description" id="description"
                       value={data.description || ''} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>

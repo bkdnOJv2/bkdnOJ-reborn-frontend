@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 
 import { SpinLoader, ErrorBox } from 'components';
 import submissionApi from 'api/submission';
@@ -11,6 +11,7 @@ import contestAPI from 'api/contest';
 // Helpers
 import { setTitle } from 'helpers/setTitle';
 import { getPollDelay } from 'helpers/polling';
+import { getLocalDateWithTimezone } from 'helpers/dateFormatter';
 
 // Assets
 import top1 from 'assets/common/atcoder_top1.png';
@@ -18,18 +19,39 @@ import top10 from 'assets/common/atcoder_top10.png';
 import top30 from 'assets/common/atcoder_top30.png';
 import top100 from 'assets/common/atcoder_top100.png';
 
+import {GiMeltingIceCube, GiIceCube} from 'react-icons/gi';
+import {AiOutlineEye} from 'react-icons/ai';
+
 // Contexts
 import ContestContext from 'context/ContestContext';
 
 // Styles
 import './ContestStanding.scss';
 
-const __STANDING_POLL_DELAY = 7000;
+const __STANDING_POLL_DELAY = 10000;
+
+const getClassNameFromPoint = (point, maxPoint) => {
+  let ptsClsName = '';
+  if (maxPoint > 0) {
+    const percent = Math.round(point / maxPoint * 100);
+
+    if (percent <= 25) ptsClsName="one-fourth";
+    else if (percent <= 50) ptsClsName="two-fourth";
+    else if (percent <= 75) ptsClsName="three-fourth";
+    else if (percent < 100) ptsClsName="fourth-fourth";
+    else ptsClsName="full-points";
+  }
+  return ptsClsName
+}
 
 class StandingItem extends React.Component {
   render() {
-    const {rowIdx, user, score, cumtime, is_disqualified, virtual, format_data} = this.props;
-    const { mapping } = this.props;
+    const {rowIdx, user,
+      score, cumtime, tiebreaker,
+      frozen_score, frozen_cumtime, frozen_tiebreaker,
+      is_disqualified, virtual, format_data
+    } = this.props;
+    const { mapping, isFrozen } = this.props;
 
     let best = Array( Object.keys(mapping).length ).fill(<></>);
     let data = JSON.parse(format_data);
@@ -40,31 +62,48 @@ class StandingItem extends React.Component {
         // this might not exists because admin of contest decide to delete them, but the contest data is still there
         if (!mapping[k]) return;
         const i = mapping[k].pos;
+        const problemMaxPoints = mapping[k].points;
 
-        const pts = mapping[k].points;
-        let ptsClsName = '';
-        if (pts > 0) {
-          const percent = Math.round(v.points / pts * 100);
-          if (percent <= 25) ptsClsName="one-fourth";
-          else if (percent <= 50) ptsClsName="two-fourth";
-          else if (percent <= 75) ptsClsName="three-fourth";
-          else if (percent < 100) ptsClsName="fourth-fourth";
-          else ptsClsName="full-points";
+        let points, cumtime, tiebreaker;
+        if (isFrozen) {
+          points = v.frozen_points; cumtime = v.frozen_cumtime; tiebreaker = v.frozen_tiebreaker;
+        } else {
+          points = v.points; cumtime = v.cumtime; tiebreaker = v.tiebreaker;
         }
 
+        const ptsClsName = getClassNameFromPoint(points, problemMaxPoints);
+
+        const attemptsDuringFrozen = (v.tries - v.frozen_tries);
+
         best[i] = (
-          <div className="flex-center-col">
-            <div className={`p-best-points points ${ptsClsName}`}>{
-              `${v.points}`
-            }</div>
+          <div className={`flex-center-col ` + (isFrozen ? "frozen" : "")}>
+            <div className={`p-best-points points ${ptsClsName}`}>
+              {`${points}`}
+              <span className="extra">(
+                <span className="tries">{v.frozen_tries}</span>
+                {(attemptsDuringFrozen > 0) &&
+                  <span className="frozen_tries">
+                    +{attemptsDuringFrozen}
+                  </span>
+                }
+              )</span>
+            </div>
+
             <div className="p-best-time text-truncate time">{
-              Math.floor(parseFloat(v.time))
+              Math.floor(parseFloat(v.frozen_cumtime))
             }</div>
           </div>
         )
       })
 
     const realname = `${user.first_name} ${user.last_name}`;
+
+    let showScore, showCumtime, showTiebreaker;
+    if (isFrozen) {
+      showScore = frozen_score; showCumtime = frozen_cumtime;
+    } else {
+      showScore = score; showCumtime = cumtime;
+    }
 
     return (
       <tr>
@@ -93,7 +132,7 @@ class StandingItem extends React.Component {
               <img style={{width: "100%", heigth: "100%"}} src="https://www.gravatar.com/avatar/HASH"></img>
               {/* <img className='img-fluid' src={user.avatar} alt="User Avatar"></img> */}
             </div>
-            <div className="flex-center-col">
+            <div className="flex-center-col user-container">
               <div className="acc-username text-truncate">{user.username}</div>
               {realname.length > 0 && realname !== ' ' && <div className="text-left acc-realname">{realname}</div>}
             </div>
@@ -103,10 +142,10 @@ class StandingItem extends React.Component {
         <td className="td-total">
           <div className="flex-center-col">
             <div className="p-best-points points">{
-              score
+              showScore
             }</div>
             <div className="p-best-time text-truncate time">{
-              cumtime
+              showCumtime
             }</div>
           </div>
         </td>
@@ -130,6 +169,9 @@ class ContestStanding extends React.Component {
       problems: null,
       standing: [],
 
+      isFrozen: true,
+      canBreakIce: false,
+
       loaded: false,
       errors: null,
 
@@ -141,18 +183,32 @@ class ContestStanding extends React.Component {
     }
   }
 
+  meltingIce() {
+    this.setState({ isFrozen: false, },
+      () => this.refetch());
+  }
+  freezingIce() {
+    this.setState({ isFrozen: true, },
+      () => this.refetch())
+  }
+
   refetch(polling=false) {
-    if (polling)
-      this.setState({ isPolling: true });
-    else
-      this.setState({ loaded: false, errors: null })
-    contestAPI.getContestStanding({key : this.state.contest.key})
+    if (polling) this.setState({ isPolling: true });
+    else this.setState({ loaded: false, errors: null })
+
+    const params = (this.state.isFrozen ? {view_full: 0} : {view_full: 1});
+
+    contestAPI.getContestStanding({key : this.state.contest.key, params})
     .then((res) => {
       this.setState({
         loaded: true,
         isPolling: false,
         standing: res.data.results,
         problems: res.data.problems,
+        frozenEnabled: res.data.is_frozen_enabled,
+        frozenTime: res.data.frozen_time,
+
+        canBreakIce: (res.data.can_break_ice || false),
       })
 
       let mapping = {}; // mapping here is a list of problems in the contest -> their id
@@ -168,12 +224,13 @@ class ContestStanding extends React.Component {
       this.setState({ id2idx : mapping })
     })
     .catch((err) => {
+      clearInterval(this.timer)
       this.setState({
-        isPollingOn: true,
+        isPollingOn: false,
         loaded: true,
-        errors: err,
+        errors: err.response.data,
       })
-      toast.error(`Standing not available. (${err.response.status})`, {
+      toast.error(`Standing not available. Disconnected. (${err.response.status})`, {
         toastId: "contest-standing-na",
       })
     })
@@ -203,11 +260,42 @@ class ContestStanding extends React.Component {
   }
 
   render() {
-    const { loaded, errors, problems, standing, isPollingOn, isPolling } = this.state;
+    const { loaded, errors,
+      problems, standing, frozenEnabled, frozenTime, isFrozen, canBreakIce,
+      isPollingOn, isPolling
+    } = this.state;
 
     return (
       <div className="wrapper-vanilla p-2" id="contest-standing">
-        <h4>Standing {isPolling && <SpinLoader size={18} margin="0 2px"/>} </h4>
+        <div className="standing-lbl">
+          <h4 className="standing-head">
+            Standing {isPolling && <SpinLoader size={18} margin="0 2px"/>}
+          </h4>
+          {frozenEnabled && (
+            (new Date() < new Date(frozenTime)
+              ? <span className="frozen-time">
+                Will be Frozen after {getLocalDateWithTimezone(frozenTime)}
+              </span>
+              : <span className="frozen-time">
+                Frozen since {getLocalDateWithTimezone(frozenTime)}
+              </span>)
+          )}
+          <div className="standing-options">
+            {canBreakIce &&
+              ( isFrozen ?
+                <Button  variant="light" className="btn-svg"
+                  onClick={() => this.meltingIce()}>
+                    <AiOutlineEye size={20}/> Peek..
+                </Button> :
+                <Button variant="dark" className="btn-svg"
+                  onClick={() => this.freezingIce()}>
+                    <GiIceCube size={20}/> Freeze!
+                </Button>
+              )
+            }
+          </div>
+        </div>
+
         { !loaded && <SpinLoader margin="40px"/> }
         { loaded && <>
           <ErrorBox errors={this.state.errors} />
@@ -227,7 +315,9 @@ class ContestStanding extends React.Component {
               {
                 standing.map((part, idx) => <StandingItem
                   key={`ct-st-row-${idx}`}
-                  mapping={this.state.id2idx} rowIdx={idx} {...part} />)
+                  mapping={this.state.id2idx} rowIdx={idx}
+                  isFrozen={isFrozen}
+                  {...part} />)
               }
             </tbody>
           </Table>

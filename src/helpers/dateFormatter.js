@@ -33,6 +33,13 @@ export function getHourMinuteSecond(date) {
         ("0" + d.getSeconds()).slice(-2);
 }
 
+export function getLocalDateWithTimezone(date) {
+    if (!date) return "N/A";
+    const d = new Date(date);
+    if (! isFinite(d)) return "N/A";
+    return d.toLocaleString() + ` (${date.substring(19)})`;
+}
+
 export default function dateFormatter(date, short=false) {
     if (!date) return "N/A";
     const d = new Date(date);

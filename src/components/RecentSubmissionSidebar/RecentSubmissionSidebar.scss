@@ -1,17 +1,13 @@
 @import 'global.scss';
 
 div#recent-submission-sidebar {
-  overflow: hidden !important;
   div.table-responsive {
-    overflow: hidden;
   }
 
   table {
+    overflow-y: scroll;
     td {
       font-weight: 100;
-    }
-    td.prod {
-      font-size: 12px;
     }
     th, td {
       width: auto;
@@ -19,15 +15,7 @@ div#recent-submission-sidebar {
       vertical-align: middle;
       word-break: keep-all;
 
-      &.subid {
-        min-width: 30px;
-      }
-      &.prob {
-        max-width: 20px;
-      }
-      &.verdict {
-        max-width: 40px;
-      }
+
       &.responsive-date {
         div.date {
           font-size: 10px;
@@ -38,38 +26,83 @@ div#recent-submission-sidebar {
         min-width: 50px;
       }
     }
-    @media (min-width: 768px) {
-      th.prob, td.prod {
-        max-width: fit-content;
-      }
-    }
 
     overflow: hidden !important;
-    margin: unset;
+    margin: 0;
+    padding: 0;
   }
 
-  .verdict {
-    font-weight: bold;
-    font-family: $font-codeforces;
+  td.info {
+    margin: 0; padding: 0;
 
-    &.ac > span {
-      color: $accepted !important;
-    }
+    div.info-wrapper {
+      display: inline-flex;
+      flex-direction: row;
 
-    &.wa > span, &.tle > span, &.mle > span, &.ole > span {
-      color: $not-accepted !important;
+      div.sub-wrapper {
+        max-width: max-content;
+        padding: 5px;
+        a#sub-id {
+          color: black;
+          font-size: 16px;
+          font-weight: bold;
+          max-width: max-content;
+        }
+        border-right: solid 1px $background-gray;
+      }
     }
-
-    &.ir > span, &.rte > span {
-      color: $runtime-error !important;
+    .prob-wrapper {
+      span.prob {
+        font-weight: bold;
+      }
     }
-
-    &.qu > span, &.g > span, &.p > span, &.sc > span {
-      color: $queued !important;
+    span.lang {
+      font-size: 12px;
     }
-
-    &.ie > span, &.ce > span {
-      color: $system-error !important;
-    }
+    // min-width: 100px;
   }
+
+  td.result {
+    margin: 0; padding: 0;
+
+    div.result-wrapper {
+      display: inline-flex;
+      flex-direction: row;
+      span.text {
+        flex: 1;
+        padding: 5px;
+        border-right: solid 1px $background-gray;
+      }
+      span.points {
+        max-width: max-content;
+        min-width: 30px;
+        font-size: 12px;
+      }
+    }
+    @import 'styles/SubmissionVerdict.scss';
+  }
+  // .verdict {
+  //   font-weight: 300;
+  //   font-family: $font-codeforces;
+
+  //   &.ac > span {
+  //     color: $accepted !important;
+  //   }
+
+  //   &.wa > span, &.tle > span, &.mle > span, &.ole > span {
+  //     color: $not-accepted !important;
+  //   }
+
+  //   &.ir > span, &.rte > span {
+  //     color: $runtime-error !important;
+  //   }
+
+  //   &.qu > span, &.g > span, &.p > span, &.sc > span {
+  //     color: $queued !important;
+  //   }
+
+  //   &.ie > span, &.ce > span {
+  //     color: $system-error !important;
+  //   }
+  // }
 }
