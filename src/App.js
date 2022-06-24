@@ -23,6 +23,7 @@ import {
   SubmissionList, SubmissionDetails, ProblemList,
   ProblemDetails, JudgeStatuses, Submit,
   ContestList, ContestApp, ContestStanding,
+  OrgList, OrgDetail,
 } from 'pages/user';
 
 import {
@@ -33,6 +34,7 @@ import {
   AdminContestList, AdminContestDetails, AdminContestNew,
   AdminApp
 } from 'pages/admin';
+
 
 import UserApp from 'pages/user/UserApp';
 import { setTitle } from 'helpers/setTitle';
@@ -139,10 +141,15 @@ class App extends React.Component {
           }
           <Route path="" element={<UserApp />}>
             <Route index path="/" element={<Content />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/sign-out" element={<SignOut />} />
             <Route path="/profile" element={<UserProfile />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            {
+              this.isAuthenticated() ? <>
+                <Route path="/sign-out" element={<SignOut />} />
+              </> : <>
+                <Route path="/sign-up" element={<SignUp />} />
+              </>
+            }
 
             {/* <Route path="/test/pdf" element={ <PDFViewer /> } /> */}
 
@@ -164,6 +171,15 @@ class App extends React.Component {
             } />
             <Route path="/submission/:id" element={
               <OneColumn mainContent={<SubmissionDetails />}
+              />
+            } />
+
+            <Route path="/org" element={
+              <OneColumn mainContent={<OrgList />}
+              />
+            } />
+            <Route path="/org/:slug" element={
+              <OneColumn mainContent={<OrgDetail/>}
               />
             } />
 

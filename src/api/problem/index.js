@@ -2,7 +2,7 @@ import axiosClient from "api/axiosClient";
 import axiosFormClient from 'api/axiosFormClient';
 import {getConnectionUrl} from 'api/urls';
 
-const getProblems = (params) => {
+const getProblems = ({ params }) => {
     return axiosClient.get('/problem/', (params && { params: {...params} }));
 }
 const createProblem = ({ params, data }) => {

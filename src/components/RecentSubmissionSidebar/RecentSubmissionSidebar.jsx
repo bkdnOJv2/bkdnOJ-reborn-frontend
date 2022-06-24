@@ -52,7 +52,7 @@ class RSubItem extends React.Component {
 
             <div className="flex-center-col prob-wrapper">
               <span className="prob">
-                <Link to={`${problem.shortname}`}>{problem.shortname}</Link>
+                <Link to={`/contest/${ckey}/problem/${problem.shortname}`}>{problem.shortname}</Link>
               </span>
               <span className="lang">{language}</span>
             </div>

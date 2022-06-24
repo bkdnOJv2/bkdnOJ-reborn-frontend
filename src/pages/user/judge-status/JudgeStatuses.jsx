@@ -86,7 +86,7 @@ class JudgeStatuses extends React.Component {
       loaded: false,
       errors: null,
     }
-    setTitle('Judge Status')
+    setTitle('Judges')
   }
 
   callApi(params) {
@@ -105,7 +105,7 @@ class JudgeStatuses extends React.Component {
       .catch((err) => {
         this.setState({
           loaded: true,
-          errors: ["Cannot fetch judge statuses. Please retry again."],
+          errors: err.response.data || "Cannot fetch judge statuses. Please retry again.",
         })
       })
   }

@@ -96,7 +96,9 @@ class SubListItem extends React.Component {
 
             {
               typeof(points) === 'number' ?
-                <div className="points-container available">
+                <div className="points-container available"
+                  data-toggle="tooltip" data-placement="right" title={`${points}/${max_points}`}
+                >
                   <span className="sub-points text-truncate">{points}</span>
                   <span className="prob-points text-truncate">{max_points}</span>
                 </div>
@@ -178,7 +180,7 @@ class SubmissionList extends React.Component {
         .catch((err) => {
           this.setState({
             loaded: true,
-            errors: ["Cannot fetch submissions at the moment."],
+            errors: err.response.data || "Cannot fetch problems at the moment.",
           })
         })
     }

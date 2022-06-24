@@ -87,7 +87,7 @@ class AdminProblemList extends React.Component {
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
-    problemApi.getProblems({page: params.page+1})
+    problemApi.getProblems({ params: {page: params.page+1,} })
       .then((res) => {
         this.setState({
           problems: res.data.results,
