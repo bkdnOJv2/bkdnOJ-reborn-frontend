@@ -53,6 +53,7 @@ class SubListItem extends React.Component {
       is_frozen,
       yourUsername,
     } = this.props;
+    const linkPrefix = this.props.contest ? `/contest/${this.props.contest.key}` : "";
 
     const verdict = (status === "D" ? result : status);
 
@@ -62,7 +63,7 @@ class SubListItem extends React.Component {
     return (
       <tr>
         <td className="text-truncate">
-          <Link to={`/submission/${id}`}>#{id}</Link>
+          <Link to={`${linkPrefix}/submission/${id}`}>#{id}</Link>
         </td>
 
         <td style={{minWidth: "100px"}}>{this.parseDate(date)}</td>
@@ -70,7 +71,7 @@ class SubListItem extends React.Component {
         <td className="general-info">
           <div className="general-info-container">
             <span className="problem text-truncate">
-              <Link to={`/problem/${problem.shortname}`}>{problem.title}</Link>
+              <Link to={`${linkPrefix}/problem/${problem.shortname}`}>{problem.title}</Link>
             </span>
             <span className="author text-truncate">
               <em>{`by `}
@@ -227,6 +228,7 @@ class SubmissionList extends React.Component {
                     this.state.count > 0
                       ? this.state.submissions.map((sub, idx) => <SubListItem
                           key={`sub-${sub.id}`}
+                          contest={this.context.contest}
                           rowid={idx} {...sub}
                           yourUsername={username}
                         />)

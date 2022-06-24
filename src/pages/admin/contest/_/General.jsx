@@ -185,7 +185,7 @@ class General extends React.Component {
                   và bảng điểm sau sẽ không cập nhập kết quả. Thay đổi thời gian đóng băng mà không rejudge
                   sẽ không cập nhập lại điểm và sub đang hiện trên bảng điểm.
                   Hãy cân nhắc khi thay đổi nó trong lúc diễn ra contest.
-                  Thiết lập đóng băng hiện chỉ có tác dụng với <code>contest_format</code> ICPC.
+                  Thiết lập đóng băng hiện chỉ có tác dụng với <code>contest_format</code> ICPC và IOI.
                 </sub>
               </Col>
             </Row>
@@ -207,15 +207,15 @@ class General extends React.Component {
               <Form.Label column="sm" md={3}> Contest Format </Form.Label>
               <Col md={9}>
                   <Form.Select aria-label={data.format_name}
-                    value={data.format_name || 'default'}
+                    value={data.format_name || 'icpc'}
                     onChange={e => this.inputChangeHandler(e)}
                     size="sm" id="format_name"
                     className="mb-1"
                   >
-                    <option value="default">Mặc định (tương tự ioi)</option>
+                    {/* <option value="default">Mặc định (tương tự ioi)</option> */}
                     <option value="icpc">ICPC</option>
-                    <option value="ioi16">IOI (sau 2016)</option>
-                    <option value="ioi">IOI (trước 2016)</option>
+                    <option value="ioi">IOI</option>
+                    {/* <option value="ioi16">IOI (sau 2016)</option> */}
                   </Form.Select>
               </Col>
 
@@ -231,20 +231,20 @@ class General extends React.Component {
                       value={data.description || ''} onChange={(e) => this.inputChangeHandler(e)}
               /></Col>
             </Row>
+
+            <Row>
+              <Form.Label column="sm" md={4}> Làm tròn điểm (đến số thập phân) </Form.Label>
+              <Col > <Form.Control size="sm" type="number" id="points_precision"
+                      value={data.points_precision || 6} onChange={(e)=>this.inputChangeHandler(e)}
+              />
+              </Col>
+            </Row>
           </Accordion.Body>
         </Accordion.Item>
 
-          <Accordion.Item eventKey="0" className="options">
+          {/* <Accordion.Item eventKey="0" className="options">
             <Accordion.Header>Lựa chọn thêm</Accordion.Header>
             <Accordion.Body>
-
-              <Row>
-                <Form.Label column="sm" md={4}> Làm tròn điểm (đến số thập phân) </Form.Label>
-                <Col > <Form.Control size="sm" type="number" id="points_precision"
-                        value={data.points_precision || 6} onChange={(e)=>this.inputChangeHandler(e)}
-                />
-                </Col>
-              </Row>
 
               <Row>
                 <Form.Label column="sm" xs={6}> Chấm bằng Pretest? </Form.Label>
@@ -262,7 +262,7 @@ class General extends React.Component {
                 /></Col>
               </Row>
             </Accordion.Body>
-          </Accordion.Item>
+          </Accordion.Item> */}
 
           <Accordion.Item eventKey="1" className="accessibility">
             <Accordion.Header>Quyền truy cập</Accordion.Header>

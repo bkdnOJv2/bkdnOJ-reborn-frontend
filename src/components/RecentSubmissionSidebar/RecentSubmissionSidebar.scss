@@ -54,6 +54,7 @@ div#recent-submission-sidebar {
     .prob-wrapper {
       span.prob {
         font-weight: bold;
+        font-size: 10px;
       }
     }
     span.lang {
@@ -74,8 +75,8 @@ div#recent-submission-sidebar {
         border-right: solid 1px $background-gray;
       }
       span.points {
-        max-width: max-content;
-        min-width: 30px;
+        max-width: 50px;
+        min-width: 20px;
         font-size: 12px;
       }
     }

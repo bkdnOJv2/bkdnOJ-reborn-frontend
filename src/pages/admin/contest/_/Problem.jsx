@@ -6,7 +6,10 @@ import {
 } from 'react-bootstrap';
 
 import contestAPI from 'api/contest';
+
 import {ErrorBox, SpinLoader} from 'components';
+
+import { qmClarify } from 'helpers/components';
 
 const INIT_CONT_PROBLEM = {
   points: 1,
@@ -14,6 +17,68 @@ const INIT_CONT_PROBLEM = {
   is_pretested: false,
   max_submissions: null,
 };
+
+class RejudgeButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      judgeInfo: null,
+      fetchingInfo: false,
+      confirmRejudge: false,
+    }
+  }
+
+  fetchRejudgeInfo() {
+    const data = { key: this.props.ckey, shortname: this.props.prob.shortname };
+    this.setState({fetchingInfo: true}, () => {
+      contestAPI.infoRejudgeContestProblem(data)
+      .then((res) => {
+        this.setState({ judgeInfo : res.data.msg }, () => {
+          let conf = window.confirm(res.data.msg + ' Proceed?');
+          this.setState({ confirmRejudge: conf })
+        })
+      })
+      .catch((err) => {
+        if (err.response.status === 400)
+          toast.error('No submissions to rejudge.')
+        else
+          toast.error('Cannot get rejudge info.')
+      })
+      .finally(() => this.setState({fetchingInfo: false}))
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.confirmRejudge === false && this.state.confirmRejudge === true) {
+      const data = { key: this.props.ckey, shortname: this.props.prob.shortname };
+      contestAPI.rejudgeContestProblem(data)
+        .then((res) => toast.success(`OK Rejudging ${this.props.prob.shortname}.`))
+        .catch((err) => toast.error('Cannot rejudge at the moment.'))
+    }
+  }
+
+  clickHandler(e) {
+    e.preventDefault();
+    if (!this.props.prob.id) return;
+    if (this.state.confirmRejudge) {
+      alert('Please refresh if you want to re-rejudge this problem.');
+      return;
+    }
+    this.fetchRejudgeInfo();
+  }
+
+  render() {
+    const { fetchingInfo, confirmRejudge } = this.state;
+    const {prob} = this.props;
+
+    return(
+      <Link to="#" onClick={(e)=>this.clickHandler(e)}
+          style={!!prob.id && confirmRejudge ? {color: "gray"} : {}}>
+          { fetchingInfo ? <SpinLoader margin="0"/> : <span>Rejudge</span> }
+      </Link>
+    )
+  }
+}
 
 class Problem extends React.Component {
   constructor(props) {
@@ -28,6 +93,7 @@ class Problem extends React.Component {
   }
 
   refetch() {
+    this.setState({ errors: null })
     contestAPI.getContestProblems({key: this.state.ckey})
     .then((res) => {
       this.setState({
@@ -134,14 +200,16 @@ class Problem extends React.Component {
               <th style={{minWidth: "150px"}}>Problem Code</th>
               <th style={{minWidth: "15%"}}>Points</th>
               <th style={{whiteSpace: "nowrap"}} >
-                Cắn Test {this.clarifyPopup('Tick để chấm bài ở chế độ ăn điểm từng test (oi).')}
+                Cắn Test {this.clarifyPopup('Tick nếu cho phép người dùng ăn điểm theo số test đúng. '+
+                          'Mặc định không tick làm bài làm nhận 0đ nếu có ít nhất một test sai.')}
               </th>
-              <th style={{whiteSpace: "nowrap"}} >
+              {/* <th style={{whiteSpace: "nowrap"}} >
                 Pretested {this.clarifyPopup('Chỉ chấm với Pretest.')}
-              </th>
-              <th style={{whiteSpace: "nowrap"}} >
+              </th> */}
+              {/* <th style={{whiteSpace: "nowrap"}} >
                 Max Subs {this.clarifyPopup('Giới hạn số lần nộp bài tối đa cho phép. Để trống nếu cho phép nộp không giới hạn.')}
-              </th>
+              </th> */}
+              <th>Rejudge {qmClarify("Chấm lại các Submissions của Problem trong Contest này.")}</th>
               <th></th>
               {/* <th >
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Actions</Link>
@@ -169,18 +237,26 @@ class Problem extends React.Component {
                 <td> <Form.Control size="sm" type="checkbox" id="partial" checked={prob.partial || false}
                                 onChange={(e) => this.problemChangeHandler(ridx, e, {isCheckbox: true})} />
                 </td>
-                <td> <Form.Control size="sm" type="checkbox" id="is_pretested" checked={prob.is_pretested || false}
+                {/* <td> <Form.Control size="sm" type="checkbox" id="is_pretested" checked={prob.is_pretested || false}
                                 onChange={(e) => this.problemChangeHandler(ridx, e, {isCheckbox: true})} />
-                </td>
-                <td> <Form.Control size="sm" type="number" id="max_submissions" value={prob.max_submissions || ''}
+                </td> */}
+                {/* <td> <Form.Control size="sm" type="number" id="max_submissions" value={prob.max_submissions || ''}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
-                </td>
+                </td> */}
+
+                <td><RejudgeButton ridx={ridx} prob={prob} ckey={this.state.ckey} /></td>
+
                 <td><Link to="#" onClick={(e) => {
                   e.preventDefault()
+                  if (!prob.id) {
+                    this.setState({problems: problems.filter((_, i) => i !== ridx) })
+                    return;
+                  }
+
                   let conf = window.confirm('CHÚ Ý: Xóa một đối tượng ContestProblem có sẵn sẽ '+
-                    'gây ảnh hưởng đến những ContestSubmission và ContestParticipation tương ứng, nhất là khi Contest đang và đã diễn ra. '+
-                    'Hãy suy xét lựa chọn đổi thứ tự chúng thông qua Order thay vì xóa đi tạo lại một Problem. Một khi nhấn SAVE, sẽ không '+
-                    'thể khôi phục lại những tài nguyên tương ứng.')
+                    'gây ảnh hưởng đến những tài nguyên khác, nhất là khi Contest đang và đã diễn ra. '+
+                    'Hãy suy xét lựa chọn đổi thứ tự chúng thông qua Order thay vì xóa đi tạo lại một Problem. '+
+                    'Ở phiên bản hiện tại, một khi nhấn SAVE, sẽ không thể khôi phục lại những gì đã mất.')
                   if (conf) this.setState({problems: problems.filter((_, i) => i !== ridx) })
                 }}>Delete</Link>
                 </td></tr>

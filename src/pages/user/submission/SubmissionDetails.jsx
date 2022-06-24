@@ -1,22 +1,30 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Row, Col, Table } from 'react-bootstrap';
-import { FaWrench } from 'react-icons/fa';
+
+// Assets
+import { FaWrench, FaSyncAlt } from 'react-icons/fa';
 import { VscError } from 'react-icons/vsc';
 
+// Services
 import submissionAPI from 'api/submission';
+
+// Componenets
 import { SpinLoader, ErrorBox } from 'components';
 import { CodeEditor } from 'components/CodeEditor';
 
+// Helpers
 import { withParams } from 'helpers/react-router'
 import { parseTime, parseMem } from 'helpers/textFormatter';
 import { setTitle } from 'helpers/setTitle'
 
-import { getPollDelay } from 'helpers/polling';
 import { shouldStopPolling } from 'constants/statusFilter';
 
 import './SubmissionDetails.scss';
+
+const __SUBMISSION_DETAIL_POLL_DELAY = 3000;
 
 class SubmissionTestCase extends React.Component {
   render() {
@@ -77,6 +85,24 @@ class SubmissionDetails extends React.Component {
         this.setState({ loaded: true })
       })
   }
+  rejudge() {
+    submissionAPI.adminRejudgeSubmission({id: this.state.id})
+      .then((res) => {
+        toast.success('OK Rejudging.');
+        this.setState({ loaded: false, errors: null,
+          data: {
+            status: ".",
+          },
+        }, () => {
+            this.fetch();
+            if (! shouldStopPolling(this.state.data.status))
+              this.timer = setInterval(() => this.pollResult(), __SUBMISSION_DETAIL_POLL_DELAY);
+          })
+      })
+      .catch((err) => {
+        toast.error(`Cannot rejudge this problem (${err.status.code})`)
+      })
+  }
 
   pollResult() {
     if (shouldStopPolling(this.state.data.status) || !!this.state.errors) {
@@ -89,7 +115,7 @@ class SubmissionDetails extends React.Component {
   componentDidMount() {
     this.fetch();
     if (! shouldStopPolling(this.state.data.status))
-      this.timer = setInterval(() => this.pollResult(), getPollDelay());
+      this.timer = setInterval(() => this.pollResult(), __SUBMISSION_DETAIL_POLL_DELAY);
   }
 
   componentWillUnmount() {
@@ -140,26 +166,39 @@ class SubmissionDetails extends React.Component {
             </>
           }{
             loaded && !errors && <>
-              <div className="general info-subsection">
-                {
-                  (!!this.user && this.user.is_staff) &&
-                  <div>
+              {
+                (!!this.user && this.user.is_staff) && <>
+                  <div className="admin-panel info-subsection">
                     <h5>Admin Panel</h5>
-                    <Row>
-                    <Col >
-                      <Link to="#" className="btn" style={{color: "red"}}
-                        onClick={() => this.setState({redirectUrl: `/admin/submission/${this.state.id}`})}>
-                        Admin <FaWrench size={12}/>
-                      </Link>
-                    </Col>
+                    <Row className="">
+                      <Col >
+                        <Link to="#" className="btn" style={{color: "red"}}
+                          onClick={() => this.setState({redirectUrl: `/admin/submission/${this.state.id}`})}>
+                          Admin <FaWrench size={12}/>
+                        </Link>
+                        <Link to="#" className="btn" style={{color: "red"}}
+                          onClick={() => this.rejudge()}>
+                          Rejudge <FaSyncAlt size={12}/>
+                        </Link>
+                      </Col>
+                    </Row>
+                    <Row className="">
+                      <Col> <span><strong>Rejudge Date: </strong>
+                        { data.rejudged_date ? (new Date(data.rejudged_date)).toLocaleString() : "n/a" }
+                      </span></Col>
+                      <Col> <span><strong>Judged On: </strong>
+                        { data.judged_on ? data.judged_on.name : "n/a" }
+                      </span></Col>
                     </Row>
                   </div>
-                }
-                <h5>General</h5>
+                </>
+              }
+              <div className="general info-subsection">
+                <h5 className="subsection">General</h5>
                 {
                   data.contest_object && <Col >
                     <span><strong>{`This submission was made in contest `}</strong>
-                      <Link to={`/contest/problem`}>
+                      <Link to={`/contest/${data.contest_object}`}>
                         { data.contest_object }
                       </Link>
                     </span>

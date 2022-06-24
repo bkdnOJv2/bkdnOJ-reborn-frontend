@@ -46,7 +46,6 @@ class Participation extends React.Component {
   refetch(params={page: 0}) {
     this.setState({loaded: false, errors: null})
     let prms = {page : params.page+1}
-    console.log(prms)
 
     if (this.state.virtual) prms.virtual = this.state.virtual;
 

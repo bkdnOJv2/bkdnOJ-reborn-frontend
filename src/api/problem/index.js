@@ -2,7 +2,7 @@ import axiosClient from "api/axiosClient";
 import axiosFormClient from 'api/axiosFormClient';
 import {getConnectionUrl} from 'api/urls';
 
-const getProblems = ({ params }) => {
+const getProblems = (params) => {
     return axiosClient.get('/problem/', (params && { params: {...params} }));
 }
 const createProblem = ({ params, data }) => {
@@ -14,6 +14,13 @@ const getProblemDetails = ({shortname}) => {
 }
 const submitToProblem = ({shortname, data}) => {
     return axiosClient.post(`/problem/${shortname}/submit/`, JSON.stringify(data));
+}
+
+const infoRejudgeProblem = ({shortname, params}) => {
+    return axiosClient.get(`/problem/${shortname}/rejudge/`, params && { params: {...params} });
+}
+const rejudgeProblem = ({shortname, data}) => {
+    return axiosClient.post(`/problem/${shortname}/rejudge/`, JSON.stringify(data));
 }
 
 const adminOptionsProblemDetails = ({shortname}) => {
@@ -51,6 +58,10 @@ const problemAPI = {
     getProblemDetails,
 
     submitToProblem,
+
+    infoRejudgeProblem,
+    rejudgeProblem,
+
     adminOptionsProblemDetails,
 
     adminPostProblemFromZip,

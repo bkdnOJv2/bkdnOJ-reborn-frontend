@@ -52,46 +52,42 @@ class StandingItem extends React.Component {
       is_disqualified, virtual, format_data
     } = this.props;
     const { mapping, isFrozen } = this.props;
-    console.log(isFrozen)
 
     let best = Array( Object.keys(mapping).length ).fill(<></>);
     let data = JSON.parse(format_data);
     if (data && data.constructor === Object)
       Object.keys(data).forEach((k) => {
-        const v = data[k]; // => {'time': ..., 'points': ...}
+        const prob_data = data[k]; // => {'time': ..., 'points': ...}
 
         // this might not exists because admin of contest decide to delete them, but the contest data is still there
         if (!mapping[k]) return;
+
         const i = mapping[k].pos;
         const problemMaxPoints = mapping[k].points;
 
-        let points, cumtime, tiebreaker;
-        if (isFrozen) {
-          points = v.frozen_points; cumtime = v.frozen_cumtime; tiebreaker = v.frozen_tiebreaker;
-        } else {
-          points = v.points; cumtime = v.cumtime; tiebreaker = v.tiebreaker;
-        }
+        const { points, sub_time, tries, tries_after_frozen } = prob_data;
 
         const ptsClsName = getClassNameFromPoint(points, problemMaxPoints);
 
-        const attemptsDuringFrozen = (v.tries - v.frozen_tries);
-
         best[i] = (
-          <div className={`flex-center-col ` + ((isFrozen && attemptsDuringFrozen > 0) ? "frozen" : "")}>
+          <div className={`flex-center-col ` + ((tries_after_frozen > 0) ? "frozen" : "")}>
             <div className={`p-best-points points ${ptsClsName}`}>
               {`${points}`}
-              <span className="extra">(
-                <span className="tries">{v.frozen_tries}</span>
-                {(attemptsDuringFrozen > 0) &&
-                  <span className="frozen_tries">
-                    +{attemptsDuringFrozen}
-                  </span>
-                }
-              )</span>
+              {
+                (!!tries || !!tries_after_frozen ) &&
+                <span className="extra">(
+                  <span className="tries">{tries}</span>
+                  {(tries_after_frozen > 0) &&
+                    <span className="frozen_tries">
+                      +{tries_after_frozen}
+                    </span>
+                  }
+                )</span>
+              }
             </div>
 
             <div className="p-best-time text-truncate time">{
-              Math.floor(parseFloat(v.frozen_cumtime))
+              sub_time
             }</div>
           </div>
         )

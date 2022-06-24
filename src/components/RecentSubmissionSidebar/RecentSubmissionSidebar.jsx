@@ -36,7 +36,7 @@ class RSubItem extends React.Component {
   }
 
   render() {
-    const {id, problem, language, points, user, status, result, time, memory, date} = this.props;
+    const {id, ckey, problem, language, points, user, status, result, time, memory, date} = this.props;
     const verdict = (status === "D" ? result : status);
 
     const max_points = problem.points;
@@ -47,12 +47,12 @@ class RSubItem extends React.Component {
           <div className="info-wrapper">
 
             <div className="sub-wrapper">
-              <Link id="sub-id" to={`/submission/${id}`}>#{id}</Link>
+              <Link id="sub-id" to={`/contest/${ckey}/submission/${id}`}>#{id}</Link>
             </div>
 
             <div className="flex-center-col prob-wrapper">
               <span className="prob">
-                <Link to={`problem/${problem.shortname}`}>{problem.shortname}</Link>
+                <Link to={`${problem.shortname}`}>{problem.shortname}</Link>
               </span>
               <span className="lang">{language}</span>
             </div>
@@ -66,7 +66,7 @@ class RSubItem extends React.Component {
             </span>
             <div className={`flex-center-col`}>
               {typeof(points) === 'number'
-                ? <><span className={`points verdict ${verdict.toLowerCase()}`}>{points}</span>
+                ? <><span className={`points verdict ${verdict.toLowerCase()} text-truncate`}>{points}</span>
                   <span className="points">pts</span></>
                 : "n/a"}
             </div>
@@ -132,7 +132,6 @@ class RecentSubmissionSidebar extends React.Component {
       clearInterval(this.timer)
       return;
     }
-    console.log('Polling..')
     this.refetch(true);
   }
 
@@ -207,7 +206,7 @@ class RecentSubmissionSidebar extends React.Component {
                 </> }
                 { this.state.count > 0 &&
                   subs.map((sub, idx) => <RSubItem
-                    key={`recent-sub-${sub.id}`} rowid={idx} {...sub} />) }
+                    key={`recent-sub-${sub.id}`} rowid={idx} ckey={this.state.contest && this.state.contest.key} {...sub} />) }
                 </>
               }
             </tbody>

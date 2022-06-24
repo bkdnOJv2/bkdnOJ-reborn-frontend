@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, Tabs, Tab } from 'react-bootstrap';
 
-import { FaRegTrashAlt, FaGlobe } from 'react-icons/fa';
+import { FaRegTrashAlt, FaGlobe, FaSyncAlt } from 'react-icons/fa';
 
 import problemAPI from 'api/problem';
 import { SpinLoader, ErrorBox } from 'components';
@@ -16,6 +16,66 @@ import TestDataDetails from './_/TestDataDetails';
 import TestcaseDetails from './_/TestcaseDetails';
 
 import './AdminProblemDetails.scss';
+
+class RejudgeButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      judgeInfo: null,
+      fetchingInfo: false,
+      confirmRejudge: false,
+    }
+  }
+
+  fetchRejudgeInfo() {
+    const data = { shortname: this.props.shortname };
+    this.setState({fetchingInfo: true}, () => {
+      problemAPI.infoRejudgeProblem(data)
+      .then((res) => {
+        this.setState({ judgeInfo : res.data.msg }, () => {
+          let conf = window.confirm(res.data.msg + ' Proceed?');
+          this.setState({ confirmRejudge: conf })
+        })
+      })
+      .catch((err) => toast.error('Cannot get rejudge info.'))
+      .finally(() => this.setState({fetchingInfo: false}))
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.confirmRejudge === false && this.state.confirmRejudge === true) {
+      const data = { shortname: this.props.shortname };
+      problemAPI.rejudgeProblem(data)
+        .then((res) => toast.success(`OK Rejudging ${this.props.shortname}.`))
+        .catch((err) => toast.error('Cannot rejudge at the moment.'))
+    }
+  }
+
+  clickHandler(e) {
+    e.preventDefault();
+    if (this.state.confirmRejudge) {
+      alert('Please refresh if you want to re-rejudge this problem.');
+      return;
+    }
+    this.fetchRejudgeInfo();
+  }
+
+  render() {
+    const { fetchingInfo, confirmRejudge } = this.state;
+    const {prob} = this.props;
+
+    return(
+      <Button className="btn-svg" size="sm"
+        variant={!confirmRejudge ? "success" : "light"}
+        onClick={(e)=>this.clickHandler(e)}>
+          <FaSyncAlt/>
+          <span className="d-none d-md-inline">
+            {fetchingInfo ? <SpinLoader margin="0"/> : <>Rejudge</>}
+          </span>
+      </Button>
+    )
+  }
+}
 
 
 class AdminProblemDetails extends React.Component {
@@ -100,6 +160,9 @@ class AdminProblemDetails extends React.Component {
           { loaded && !errors && (
             <div className="panel-header">
               <span className="title-text">{`Problem | ${this.state.problemTitle}`}</span>
+              <span>
+                <RejudgeButton shortname={general.shortname}/>
+              </span>
               <span>
                 <Button className="btn-svg" size="sm" variant="dark"
                   onClick={()=>this.setState({ redirectUrl: `/problem/${this.shortname}` })}>

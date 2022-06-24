@@ -130,7 +130,6 @@ class ProblemDetails extends React.Component {
       return <Navigate to={`${this.state.redirectUrl}`} />
     }
     const {loaded, errors, data, contest} = this.state;
-    console.log(data)
 
     const isLoggedIn = !!this.user;
     const isInContest = !!contest;
