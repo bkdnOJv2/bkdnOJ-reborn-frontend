@@ -208,18 +208,29 @@ class ContestListItem extends React.Component {
                     spectate_allow ? <span className="d-inline-flex align-items-center">
                       <Link to={`/contest/${ckey}`}>{`Spectate >>`}</Link>
                     </span> :
-                    ( register_allow ? (
-                        is_registered ?
-                        <span className="d-inline-flex align-items-center">
-                          <Link to="#">{`Registered`}</Link>
-                        </span>
-                        : <span className="d-inline-flex align-items-center">
+                    ( ! is_registered ? (
+                        register_allow ? <span className="d-inline-flex align-items-center">
                           <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
                         </span>
+                        : <span className="d-inline-flex align-items-center">
+                          <span style={{color: "red"}}>Register is not Allowed.</span>
+                        </span>
                       ) : <span className="d-inline-flex align-items-center">
-                        <span style={{color: "red"}}>Register is not Allowed.</span>
+                        <Link to="#">{`Registered`}</Link>
                       </span>
                     )
+                    // ( register_allow ? (
+                    //     is_registered ?
+                    //     <span className="d-inline-flex align-items-center">
+                    //       <Link to="#">{`Registered`}</Link>
+                    //     </span>
+                    //     : <span className="d-inline-flex align-items-center">
+                    //       <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
+                    //     </span>
+                    //   ) : <span className="d-inline-flex align-items-center">
+                    //     <span style={{color: "red"}}>Register is not Allowed.</span>
+                    //   </span>
+                    // )
                   )
                 }
                 { !user && <span className="d-inline-flex align-items-center">

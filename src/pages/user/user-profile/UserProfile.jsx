@@ -42,7 +42,7 @@ class UserProfile extends React.Component {
         profile: res.data,
         loaded: true,
       })
-      this.props.updateUser({...res.data.owner, avatar: res.data.avatar});
+      this.props.updateUser({...res.data.user, avatar: res.data.avatar});
       this.props.updateProfile({ ...res.data, });
     }).catch((err) => {
       console.log(err);
@@ -76,8 +76,8 @@ class UserProfile extends React.Component {
         <Row className="profile-content pt-3 pb-3">
           <Col md={3} className="flex-center-col">
             <img src={profile.avatar} className="avatar"
-                  alt={`User ${profile.owner.username}'s avatar`}/>
-            <h5 className='pt-2'>{profile.owner.username}</h5>
+                  alt={`User ${profile.user.username}'s avatar`}/>
+            <h5 className='pt-2'>{profile.user.username}</h5>
           </Col>
 
           <Col md={9} className="text-left tabs-wrapper">

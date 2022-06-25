@@ -27,6 +27,7 @@ import ContestContext from 'context/ContestContext';
 
 // Styles
 import './ContestStanding.scss';
+import 'styles/Ratings.scss';
 
 const __STANDING_POLL_DELAY = 10000;
 
@@ -70,7 +71,7 @@ class StandingItem extends React.Component {
         const ptsClsName = getClassNameFromPoint(points, problemMaxPoints);
 
         best[i] = (
-          <div className={`flex-center-col ` + ((tries_after_frozen > 0) ? "frozen" : "")}>
+          <div className={`flex-center-col points-container ` + ((tries_after_frozen > 0) ? "frozen" : ptsClsName)}>
             <div className={`p-best-points points ${ptsClsName}`}>
               {`${points}`}
               {
@@ -93,7 +94,12 @@ class StandingItem extends React.Component {
         )
       })
 
-    const realname = `${user.first_name} ${user.last_name}`;
+    let realname = "";
+    [user.first_name, user.last_name].forEach((st) => {
+      if (!st) return;
+      if (realname) realname += " ";
+      realname += st;
+    })
 
     let showScore, showCumtime, showTiebreaker;
     if (isFrozen) {
@@ -130,8 +136,10 @@ class StandingItem extends React.Component {
               {/* <img className='img-fluid' src={user.avatar} alt="User Avatar"></img> */}
             </div>
             <div className="flex-center-col user-container">
-              <div className="acc-username text-truncate">{user.username}</div>
-              {realname.length > 0 && realname !== ' ' && <div className="text-left acc-realname">{realname}</div>}
+              <div className="acc-username text-truncate">
+                <p className={`${user.rank_class} username`}>{user.username}</p>
+              </div>
+              {realname.length > 0 && <div className="text-left acc-realname">{realname}</div>}
             </div>
           </div>
         </td>

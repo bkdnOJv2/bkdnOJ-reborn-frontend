@@ -67,8 +67,11 @@ div#contest-standing {
     font-weight: bold;
   }
 
-  .frozen {
+  .points-container.frozen {
     background-color: $blue-light-transparent;
+  }
+  .points-container.full-points {
+    background-color: $green-light-transparent;
   }
 
   .points {

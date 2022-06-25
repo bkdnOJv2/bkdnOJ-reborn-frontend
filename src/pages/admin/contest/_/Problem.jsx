@@ -73,7 +73,7 @@ class RejudgeButton extends React.Component {
 
     return(
       <Link to="#" onClick={(e)=>this.clickHandler(e)}
-          style={!!prob.id && confirmRejudge ? {color: "gray"} : {}}>
+          style={!prob.id || confirmRejudge ? {color: "gray"} : {}}>
           { fetchingInfo ? <SpinLoader margin="0"/> : <span>Rejudge</span> }
       </Link>
     )
@@ -167,7 +167,6 @@ class Problem extends React.Component {
                 const v2 = isNaN(p2.order) ? 9999 : p2.order;
                 return (v1 < v2 ? -1 : 0);
               })
-              console.log(probs)
               this.setState({problems: probs})
             }}>Sắp xếp theo Order</Button>
           </div>

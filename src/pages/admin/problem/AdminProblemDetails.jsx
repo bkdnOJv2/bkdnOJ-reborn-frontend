@@ -29,6 +29,7 @@ class RejudgeButton extends React.Component {
 
   fetchRejudgeInfo() {
     const data = { shortname: this.props.shortname };
+    console.log(10)
     this.setState({fetchingInfo: true}, () => {
       problemAPI.infoRejudgeProblem(data)
       .then((res) => {
@@ -37,7 +38,12 @@ class RejudgeButton extends React.Component {
           this.setState({ confirmRejudge: conf })
         })
       })
-      .catch((err) => toast.error('Cannot get rejudge info.'))
+      .catch((err) => {
+        let msg = `Cannot get rejudge info. ${err.response.status}`;
+        if (err.response.data.detail)
+          msg =  err.response.data.detail;
+        toast.error(msg)
+      })
       .finally(() => this.setState({fetchingInfo: false}))
     })
   }
@@ -161,7 +167,7 @@ class AdminProblemDetails extends React.Component {
             <div className="panel-header">
               <span className="title-text">{`Problem | ${this.state.problemTitle}`}</span>
               <span>
-                <RejudgeButton shortname={general.shortname}/>
+                <RejudgeButton shortname={general.shortname} setErrors={(e)=>this.setState({errors: e})}/>
               </span>
               <span>
                 <Button className="btn-svg" size="sm" variant="dark"

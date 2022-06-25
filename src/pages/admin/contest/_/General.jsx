@@ -98,8 +98,8 @@ class General extends React.Component {
         this.props.navigate(`/admin/contest/${results.data.key}`);
       else this.props.refetch();
     }).catch((err) => {
-      toast.error(`Update Failed. ${err.response.status}`)
-      this.setState({ errors: err.response.data })
+      toast.error(`Update Failed. (${err.response.status})`)
+      this.setState({ errors: {errors: err.response.data} })
     })
   }
 
@@ -193,7 +193,7 @@ class General extends React.Component {
             <Row id="scoreboard-cache-settings">
               <Form.Label column="sm" md={6}> Thời gian cache bảng điểm (giây) </Form.Label>
               <Col > <Form.Control size="sm" type="number" id="scoreboard_cache_duration"
-                      value={data.scoreboard_cache_duration || 0}
+                      value={data.scoreboard_cache_duration}
                       onChange={(e)=>this.inputChangeHandler(e)}
               /></Col>
               <Col xl={12}><sub>

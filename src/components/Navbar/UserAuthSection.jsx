@@ -48,8 +48,8 @@ const mapDispatchToProps = dispatch => {
 class AuthorizedMenu extends React.Component {
     componentDidMount() {
         profileClient.fetchProfile().then((res) => {
-            __ls_set_auth_user(res.data.owner);
-            this.props.updateUser({...res.data.owner, avatar: res.data.avatar});
+            __ls_set_auth_user(res.data.user);
+            this.props.updateUser({...res.data.user, avatar: res.data.avatar});
             this.props.updateProfile({...res.data});
             this.props.updateContest(res.data.current_contest);
         }).catch((err) => {

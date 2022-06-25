@@ -1,0 +1,53 @@
+@import 'global.scss';
+// RATING_CLASS = ['rate-newbie', 'rate-pupil', 'rate-specialist', 'rate-expert', 'rate-candidate-master', 'rate-master',
+//                 'rate-international-master', 'rate-grandmaster', 'rate-international-grandmaster',
+//                 'rate-legendary-grandmaster']
+
+p.username {
+  margin: 0; padding: 0;
+  display: inline-block;
+  color: $base;
+  font-weight: 100;
+
+  &.rate-newbie {
+    color: gray !important;
+  }
+  &.rate-pupil {
+    color: green !important;
+  }
+  &.rate-specialist {
+    color:#00b0b0 !important;
+  }
+  &.rate-expert {
+    color: blue !important;
+  }
+  &.rate-candidate-master {
+    color: purple !important;
+  }
+  &.rate-master {
+    color: #FF8C00 !important;
+  }
+  &.rate-international-master {
+    color: #FF8C00 !important;
+    &::first-letter {
+      text-decoration: underline;
+    }
+  }
+  &.rate-grandmaster {
+    color: red !important;
+  }
+  &.rate-international-grandmaster {
+    color: red !important;
+    &::first-letter {
+      text-decoration: underline;
+      // font-weight: bold;
+    }
+  }
+  &.rate-legendary-grandmaster {
+    color: red !important;
+    &::first-letter {
+      color: black !important;
+      text-decoration: underline;
+    }
+  }
+}
