@@ -7,37 +7,45 @@ p.username {
   margin: 0; padding: 0;
   display: inline-block;
   color: $base;
-  font-weight: 100;
 
   &.rate-newbie {
     color: gray !important;
+    font-weight: bold;
   }
   &.rate-pupil {
     color: green !important;
+    font-weight: bold;
   }
   &.rate-specialist {
     color:#00b0b0 !important;
+    font-weight: bold;
   }
   &.rate-expert {
     color: blue !important;
+    font-weight: bold;
   }
   &.rate-candidate-master {
     color: purple !important;
+    font-weight: bold;
   }
   &.rate-master {
     color: #FF8C00 !important;
+    font-weight: bold;
   }
   &.rate-international-master {
     color: #FF8C00 !important;
+    font-weight: bold;
     &::first-letter {
       text-decoration: underline;
     }
   }
   &.rate-grandmaster {
     color: red !important;
+    font-weight: bold;
   }
   &.rate-international-grandmaster {
     color: red !important;
+    font-weight: bold;
     &::first-letter {
       text-decoration: underline;
       // font-weight: bold;
@@ -45,6 +53,7 @@ p.username {
   }
   &.rate-legendary-grandmaster {
     color: red !important;
+    font-weight: bold;
     &::first-letter {
       color: black !important;
       text-decoration: underline;

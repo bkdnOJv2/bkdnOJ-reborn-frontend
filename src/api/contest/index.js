@@ -64,6 +64,13 @@ const getContestProblemSubmission = ({ key, shortname, id }) => {
     return axiosClient.get(`/contest/${key}/problem/${shortname}/submission/${id}/`);
 }
 
+const infoRateContest = ({key}) => {
+    return axiosClient.get(`/contest/${key}/rate/`, );
+}
+const rateContest = ({key, data}) => {
+    return axiosClient.post(`/contest/${key}/rate/`, data);
+}
+
 const createContest = ({data}) => {
     return axiosClient.post(`/contest/`, data);
 }
@@ -92,6 +99,9 @@ const contestAPI = {
 
     // Rejudge
     infoRejudgeContestProblem, rejudgeContestProblem,
+
+    // Rating
+    infoRateContest, rateContest,
 
     getContestProblemSubmissions, getContestProblemSubmission,
 

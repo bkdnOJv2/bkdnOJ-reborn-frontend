@@ -16,8 +16,8 @@ export default class CodeEditor extends React.Component {
 
   getAceMode() {
     return (
-      !!modesByName[this.props.ace] 
-      ? this.props.ace 
+      !!modesByName[this.props.ace]
+      ? this.props.ace
       : FALLBACK_ACE_MODE)
   }
 

@@ -207,8 +207,8 @@ class SubmissionDetails extends React.Component {
                 <Row>
                   <Col >
                     <span><strong>Author:</strong>
-                      <Link to={`/user/${data.user.owner.username}`}>
-                        { data.user.owner.username }
+                      <Link to={`/user/${data.user.user.username}`}>
+                        { data.user.user.username }
                       </Link>
                     </span>
                   </Col>

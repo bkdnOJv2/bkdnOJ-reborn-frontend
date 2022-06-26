@@ -15,72 +15,84 @@ div#recent-submission-sidebar {
       vertical-align: middle;
       word-break: keep-all;
 
-
       &.responsive-date {
         div.date {
           font-size: 10px;
+          word-break: keep-all;
         }
         div.time {
           font-size: 12px;
+          word-break: keep-all;
         }
-        min-width: 50px;
+        width: fit-content;
       }
     }
 
     overflow: hidden !important;
-    margin: 0;
-    padding: 0;
+
+    margin: 0; padding: 0;
   }
 
   td.info {
-    margin: 0; padding: 0;
+    padding: 0 0.3rem;
+    width: fit-content;
 
-    div.info-wrapper {
+    .prob-wrapper {
+      width: 100%;
       display: inline-flex;
       flex-direction: row;
+      justify-content: space-evenly;
+
+      .prob {
+        font-weight: bold;
+        font-size: 14px;
+        max-width: fit-content;
+      }
+
+      a#sub-id {
+        color: black;
+        font-size: 14px;
+        font-weight: bold;
+        max-width: max-content;
+      }
+    }
+
+    .other-wrapper {
+      width: 100%;
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+
+      font-size: 12px;
 
       div.sub-wrapper {
+        display: inline-flex;
+        flex-direction: row;
+
+        column-gap: 5px;
         max-width: max-content;
         padding: 5px;
-        a#sub-id {
-          color: black;
-          font-size: 14px;
-          font-weight: bold;
-          max-width: max-content;
-        }
-        border-right: solid 1px $background-gray;
       }
-    }
-    .prob-wrapper {
-      span.prob {
-        font-weight: bold;
+
+      div.lang-wrapper {
         font-size: 10px;
       }
+
+      div.text-wrapper {
+        width: fit-content;
+      }
+
+      div.points-wrapper {
+        max-width: 50px;
+        min-width: 20px;
+      }
+
+      @import 'styles/SubmissionVerdict.scss';
     }
-    span.lang {
-      font-size: 12px;
-    }
-    // min-width: 100px;
   }
 
   td.result {
     margin: 0; padding: 0;
-
-    div.result-wrapper {
-      display: inline-flex;
-      flex-direction: row;
-      span.text {
-        flex: 1;
-        padding: 5px;
-        border-right: solid 1px $background-gray;
-      }
-      span.points {
-        max-width: 50px;
-        min-width: 20px;
-        font-size: 12px;
-      }
-    }
-    @import 'styles/SubmissionVerdict.scss';
   }
   // .verdict {
   //   font-weight: 300;

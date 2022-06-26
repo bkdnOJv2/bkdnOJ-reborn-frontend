@@ -45,30 +45,28 @@ class RSubItem extends React.Component {
       <tr>
         <td className="info">
           <div className="info-wrapper">
+            <div className="flex-center-col">
+              <div className="prob-wrapper">
+                <Link id="sub-id" to={`/contest/${ckey}/submission/${id}`}>#{id}</Link>
+                |
+                <Link className="prob text-truncate-rv"
+                  to={`/contest/${ckey}/problem/${problem.shortname}`}>{problem.shortname}</Link>
+              </div>
 
-            <div className="sub-wrapper">
-              <Link id="sub-id" to={`/contest/${ckey}/submission/${id}`}>#{id}</Link>
-            </div>
+              <div className="other-wrapper">
+                <span className="lang-wrapper">
+                  {language}
+                </span>
+                |
+                <span className={`text-wrapper verdict ${verdict.toLowerCase()}`}>
+                  {verdict}
+                </span>
 
-            <div className="flex-center-col prob-wrapper">
-              <span className="prob">
-                <Link to={`/contest/${ckey}/problem/${problem.shortname}`}>{problem.shortname}</Link>
-              </span>
-              <span className="lang">{language}</span>
-            </div>
-          </div>
-        </td>
-
-        <td className={`result verdict ${verdict.toLowerCase()}`} >
-          <div className="result-wrapper">
-            <span className={`text verdict ${verdict.toLowerCase()}`}>
-              {verdict}
-            </span>
-            <div className={`flex-center-col`}>
-              {typeof(points) === 'number'
-                ? <><span className={`points verdict ${verdict.toLowerCase()} text-truncate`}>{points}</span>
-                  <span className="points">pts</span></>
-                : "n/a"}
+                {typeof(points) === 'number'
+                  ? <>|<span className={`points verdict ${verdict.toLowerCase()} text-truncate`}>{`${points} pts`}</span></>
+                  : "n/a"
+                }
+              </div>
             </div>
           </div>
         </td>
@@ -187,13 +185,8 @@ class RecentSubmissionSidebar extends React.Component {
           <Table responsive hover size="sm" striped bordered className="rounded">
             <thead>
               <tr>
-                {/* <th className="subid">#</th>
-                <th className="text-truncate prob">Problem</th>
-                <th className="text-truncate verdict">Result</th>
-                <th className="text-truncate responsive-date">Date</th> */}
                 <th className="subid">Info</th>
-                <th className="text-truncate result">Result</th>
-                <th className="text-truncate responsive-date">When</th>
+                <th className="responsive-date">When</th>
               </tr>
             </thead>
             <tbody>

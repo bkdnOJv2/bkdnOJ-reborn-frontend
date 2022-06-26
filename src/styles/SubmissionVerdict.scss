@@ -3,6 +3,7 @@
 .verdict {
   font-weight: 600;
   font-family: $font-codeforces;
+  cursor: help;
 
   &.ac {
     color: $accepted !important;

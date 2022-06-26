@@ -29,7 +29,6 @@ class RejudgeButton extends React.Component {
 
   fetchRejudgeInfo() {
     const data = { shortname: this.props.shortname };
-    console.log(10)
     this.setState({fetchingInfo: true}, () => {
       problemAPI.infoRejudgeProblem(data)
       .then((res) => {

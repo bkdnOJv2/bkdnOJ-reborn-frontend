@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 
-import { SpinLoader, ErrorBox } from 'components';
+import { SpinLoader, ErrorBox, UserCard } from 'components';
 import submissionApi from 'api/submission';
 import contestAPI from 'api/contest';
 
@@ -20,6 +20,7 @@ import top30 from 'assets/common/atcoder_top30.png';
 import top100 from 'assets/common/atcoder_top100.png';
 
 import {GiMeltingIceCube, GiIceCube} from 'react-icons/gi';
+import { FaUniversity } from 'react-icons/fa';
 import {AiOutlineEye} from 'react-icons/ai';
 
 // Contexts
@@ -94,13 +95,6 @@ class StandingItem extends React.Component {
         )
       })
 
-    let realname = "";
-    [user.first_name, user.last_name].forEach((st) => {
-      if (!st) return;
-      if (realname) realname += " ";
-      realname += st;
-    })
-
     let showScore, showCumtime, showTiebreaker;
     if (isFrozen) {
       showScore = frozen_score; showCumtime = frozen_cumtime;
@@ -116,32 +110,21 @@ class StandingItem extends React.Component {
               {rowIdx+1}
             </div>
             {
-              (rowIdx === 0) ? <img src={top1} alt="Atcoder Top 1 Icon"/> : ''
+              (rowIdx === 0) ? <img src={top1} alt="Top 1 Icon"/> : ''
             }
             {
-              (0 < rowIdx && rowIdx < 10) ? <img src={top10} alt="Atcoder Top 10 Icon"/> : ''
+              (0 < rowIdx && rowIdx < 10) ? <img src={top10} alt="Top 10 Icon"/> : ''
             }
             {
-              (10 <= rowIdx && rowIdx < 30) ? <img src={top30} alt="Atcoder Top 30 Icon"/> : ''
+              (10 <= rowIdx && rowIdx < 30) ? <img src={top30} alt="Top 30 Icon"/> : ''
             }
             {
-              (30 <= rowIdx && rowIdx < 100) ? <img src={top100} alt="Atcoder Top 100 Icon"/> : ''
+              (30 <= rowIdx && rowIdx < 100) ? <img src={top100} alt="Top 100 Icon"/> : ''
             }
           </div>
         </td>
         <td className="td-participant">
-          <div className="flex-center participant-container" style={{justifyContent: "center"}}>
-            <div className="avatar-container">
-              <img style={{width: "100%", heigth: "100%"}} src="https://www.gravatar.com/avatar/HASH"></img>
-              {/* <img className='img-fluid' src={user.avatar} alt="User Avatar"></img> */}
-            </div>
-            <div className="flex-center-col user-container">
-              <div className="acc-username text-truncate">
-                <p className={`${user.rank_class} username`}>{user.username}</p>
-              </div>
-              {realname.length > 0 && <div className="text-left acc-realname">{realname}</div>}
-            </div>
-          </div>
+          <UserCard displayMode={this.props.displayMode} user={user}/>
         </td>
 
         <td className="td-total">
@@ -174,18 +157,15 @@ class ContestStanding extends React.Component {
       problems: null,
       standing: [],
 
-      isFrozen: true,
-      canBreakIce: false,
-      iceBroken: false,
+      isFrozen: true, canBreakIce: false, iceBroken: false,
 
-      loaded: false,
-      errors: null,
+      displayMode: 'user',
 
-      contest: null,
-      user: null,
+      loaded: false, errors: null,
 
-      isPollingOn: true,
-      isPolling: false,
+      contest: null, user: null,
+
+      isPollingOn: true, isPolling: false,
     }
   }
 
@@ -209,13 +189,16 @@ class ContestStanding extends React.Component {
       this.setState({
         loaded: true,
         isPolling: false,
+
         standing: res.data.results,
         problems: res.data.problems,
+
         frozenEnabled: res.data.is_frozen_enabled,
         frozenTime: res.data.frozen_time,
         isFrozen: res.data.is_frozen,
-
         canBreakIce: (res.data.can_break_ice || false),
+
+        scoreboardCache: res.data.scoreboard_cache_duration,
       })
 
       let mapping = {}; // mapping here is a list of problems in the contest -> their id
@@ -261,6 +244,11 @@ class ContestStanding extends React.Component {
         this.timer = setInterval(() => this.refetch(true), __STANDING_POLL_DELAY);
       });
     }
+
+    if (this.state.scoreboardCache !== prevState.scoreboardCache) {
+      clearInterval(this.timer);
+      this.timer = setInterval(() => this.refetch(true), Math.max(this.state.scoreboardCache, __STANDING_POLL_DELAY));
+    }
   }
   componentWillUnmount(){
     clearInterval(this.timer);
@@ -269,8 +257,9 @@ class ContestStanding extends React.Component {
   render() {
     const { loaded, errors,
       problems, standing, frozenEnabled, frozenTime, isFrozen,
-      iceBroken, canBreakIce,
-      isPollingOn, isPolling
+      canBreakIce, displayMode,
+      scoreboardCache,
+      iceBroken, isPollingOn, isPolling
     } = this.state;
 
     return (
@@ -287,7 +276,12 @@ class ContestStanding extends React.Component {
               : <span className="frozen-time">
                 Frozen since {getLocalDateWithTimezone(frozenTime)}
               </span>)
-          )}
+          )}{
+            scoreboardCache && <span className="frozen-time">
+              Scoreboard will be updated for every {scoreboardCache} second(s).
+            </span>
+          }
+
           <div className="standing-options">
             {canBreakIce &&
               ( !iceBroken ?
@@ -300,6 +294,15 @@ class ContestStanding extends React.Component {
                     <GiIceCube size={20}/> Freeze!
                 </Button>
               )
+            }
+            {
+              displayMode==='user'? <Button variant="light" className="btn-svg"
+                                    onClick={() => this.setState({displayMode: "org"})}>
+                  <FaUniversity size={20}/> Show
+              </Button> : <Button variant="dark" className="btn-svg"
+                          onClick={() => this.setState({displayMode: "user"})}>
+                <FaUniversity size={20}/> Hide
+              </Button>
             }
           </div>
         </div>
@@ -324,7 +327,7 @@ class ContestStanding extends React.Component {
                 standing.map((part, idx) => <StandingItem
                   key={`ct-st-row-${idx}`}
                   mapping={this.state.id2idx} rowIdx={idx}
-                  isFrozen={isFrozen}
+                  isFrozen={isFrozen} displayMode={displayMode}
                   {...part} />)
               }
             </tbody>

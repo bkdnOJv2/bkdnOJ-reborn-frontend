@@ -75,6 +75,15 @@ div.wrapper-vanilla {
   border-radius: 0.25rem !important;
 }
 
+.text-truncate-rv {
+  vertical-align: middle;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  direction: rtl;
+  width: 100%;
+}
+
 ::-webkit-scrollbar {
   height: 12px;
   width: 12px;

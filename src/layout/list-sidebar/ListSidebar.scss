@@ -10,6 +10,7 @@
   .side-bar {
     display: flex;
     flex-direction: column;
+    padding-left: 0;
 
     .side-component {
       margin: 10px 0;
@@ -45,13 +46,6 @@
         font-weight: bold;
       }
 
-      a {
-        text-decoration: underline;
-        &:hover {
-          color: $blue-dark;
-        }
-      }
-
       div {
         display: flex;
         flex-direction: column;
@@ -77,20 +71,20 @@
     overflow: hidden;
 
     transition: 0.3s;
-    padding-top: 60px;
+    padding-top: 20px;
 
-    a {
-      padding: 8px;
-      text-decoration: none;
-      font-size: 20px;
-      display: block;
-      transition: .3s;
-      color: $sub-dark;
+    // a {
+    //   padding: 8px;
+    //   text-decoration: none;
+    //   font-size: 20px;
+    //   display: block;
+    //   transition: .3s;
+    //   color: $sub-dark;
 
-      &:hover {
-        color: $sub;
-      }
-    }
+    //   &:hover {
+    //     color: $sub;
+    //   }
+    // }
 
     .offcanvasCloseBtn-wrapper {
       position: absolute;
