@@ -234,7 +234,7 @@ class ProblemDetails extends React.Component {
                   // TODO: cached this after first load so it doesn't hit the server everytime the user toggle doc type.
                   this.state.probStatementType === 'pdf' &&
                   <div className="problem-pdf shadow">
-                    {/* <object data={`${this.state.data.pdf}`} type="application/pdf">
+                    {/* <object data={`${data.pdf}`} type="application/pdf">
                       <iframe title="problem-pdf-iframe"
                         src={`https://docs.google.com/viewer?url=${this.state.data.pdf}&embedded=true`}>
                       </iframe>

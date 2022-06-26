@@ -39,7 +39,7 @@ class AboutTab extends React.Component {
             <Col className="text-right p-0">
             <span className="disp-org d-inline-flex text-truncate" style={{alignItems: "center"}}>
               <span>from</span>
-              <Link to="/org/${profile.organization.slug}">{profile.organization.name}</Link>
+              <Link to={`/org/${profile.organization.slug}`}>{profile.organization.name}</Link>
               <FaUniversity/>
             </span>
             </Col>

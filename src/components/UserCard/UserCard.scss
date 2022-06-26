@@ -13,6 +13,7 @@ div.participant-container {
     }
     vertical-align: middle;
   }
+
   div.user-container {
     align-items: baseline;
     width: calc(100% - 50px);
@@ -23,6 +24,7 @@ div.participant-container {
       max-width: 140px;
       width: 100%;
       text-align: left;
+      cursor: help;
     }
 
     div.acc-realname {
@@ -36,6 +38,7 @@ div.participant-container {
       font-size: 12px;
       font-weight: bold;
       text-align: left;
+      cursor: help;
     }
   }
 }

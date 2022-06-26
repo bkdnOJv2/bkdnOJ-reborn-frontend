@@ -277,7 +277,7 @@ class ContestStanding extends React.Component {
                 Frozen since {getLocalDateWithTimezone(frozenTime)}
               </span>)
           )}{
-            scoreboardCache && <span className="frozen-time">
+            (scoreboardCache>0) && <span className="frozen-time">
               Scoreboard will be updated for every {scoreboardCache} second(s).
             </span>
           }
