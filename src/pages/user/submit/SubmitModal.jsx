@@ -140,6 +140,7 @@ export default class SubmitModal extends React.Component {
           className="submit-modal"
           backdrop="static"
           keyboard={false}
+          size="lg"
         >
         <Modal.Header >
           <Modal.Title>

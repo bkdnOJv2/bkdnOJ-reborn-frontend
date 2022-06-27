@@ -46,7 +46,7 @@ CodeEditor.propTypes = {
 const styles = {
   ace: {
     width: "100%",
-    maxHeight: "300px",
+    // maxHeight: "300px",
     overflow: "auto",
   }
 }

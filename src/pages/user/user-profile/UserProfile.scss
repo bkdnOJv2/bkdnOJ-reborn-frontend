@@ -45,15 +45,11 @@ div.user-profile-container {
     // Tabs
     div.about-wrapper {
         div.name-and-org {
-            div.row {padding: 0}
-            // display: inline-flex;
-            width: 100%;
-
-            span.full-name {
+            .full-name {
                 flex: 1;
                 font-size: 1.25rem;
             }
-            span.disp-org {
+            .disp-org {
                 display: inline-flex;
                 column-gap: 5px;
                 align-items: center;
@@ -64,6 +60,14 @@ div.user-profile-container {
                         font-weight: bold;
                     }
                 }
+            }
+        }
+        div.details {
+            p.switch-view {
+                margin: 0; padding: 0;
+                font-size: 12px;
+                line-height: 14px;
+                font-style: italic;
             }
         }
     }

@@ -36,7 +36,7 @@ export default class Header extends React.Component {
                 </Container>
 
 
-                <Modal show={this.state.show} onHide={() => this.handleClose()}>
+                <Modal show={this.state.show} onHide={() => this.handleClose()} centered>
                     <Modal.Header>
                     <Modal.Title className="flex-center">
                         <VscBug/> Bugs Season!
@@ -49,7 +49,7 @@ export default class Header extends React.Component {
                         🐞 Để báo cáo bugs, tạo <strong>New Issue</strong> tại <a href="https://github.com/BKDN-University/bkdnOJ-v2">Github này</a> và
                         đính kèm ảnh/video bug, mô tả bug, nêu những bước để tái hiện bug đó. Xin cảm ơn các bạn đã chung tay giúp cho bkdnOJ-v2 hoàn thiện hơn.
                         <br/>
-                        <sub style={{float: "right"}}>🐞 "All your bugs are belong to us!"</sub>
+                        <sub style={{float: "right"}}>🐞 "All your bugs belong to us!"</sub>
                     </Modal.Body>
                     <Modal.Footer>
                     <Button variant="secondary" onClick={() => this.handleClose()}>

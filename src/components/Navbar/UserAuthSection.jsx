@@ -2,16 +2,22 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { Nav, NavDropdown } from 'react-bootstrap';
+import { Nav, NavDropdown, Modal, Button } from 'react-bootstrap';
 import { Link, Navigate } from 'react-router-dom';
 
+// Components
+import SwitchOrgModal from 'components/SwitchOrgModal';
+
+// Assets
 import { AiOutlineForm, AiOutlineLogin, AiOutlineLogout, AiOutlineProfile } from 'react-icons/ai';
 import { GrUserAdmin } from 'react-icons/gr';
+import { FaGlobe } from 'react-icons/fa';
 
+// Services
 import authClient from 'api/auth';
 import profileClient from 'api/profile';
 
-import { getAdminPageUrl } from 'api/urls';
+// Redux
 import { updateUser, clearUser } from 'redux/User/actions'
 import { updateProfile, clearProfile } from 'redux/Profile/actions'
 import { updateContest, clearContest } from 'redux/Contest/actions'
@@ -19,6 +25,7 @@ import { updateContest, clearContest } from 'redux/Contest/actions'
 import { __ls_get_auth_user, __ls_remove_credentials,
         __ls_set_auth_user, } from 'helpers/localStorageHelpers';
 
+// Helpers
 import { log } from 'helpers/logger';
 
 
@@ -46,6 +53,16 @@ const mapDispatchToProps = dispatch => {
 /* Redux ------------- */
 
 class AuthorizedMenu extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            switchOrgModalShow: false,
+        }
+    }
+    setSwitchOrgModalShow(mode) {
+        this.setState({ switchOrgModalShow: mode });
+    }
+
     componentDidMount() {
         profileClient.fetchProfile().then((res) => {
             __ls_set_auth_user(res.data.user);
@@ -110,6 +127,11 @@ class AuthorizedMenu extends React.Component {
                         Sign Out
                     </NavDropdown.Item>
                 </NavDropdown>
+
+                <button id="switch-org-btn" onClick={()=>this.setSwitchOrgModalShow(true)} >
+                    <FaGlobe/>
+                </button>
+                <SwitchOrgModal show={this.state.switchOrgModalShow} setShow={(b)=>this.setSwitchOrgModalShow(b)}/>
             </>
         )
     }
@@ -155,4 +177,5 @@ class UserAuthSection extends React.Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserAuthSection);
+let wrapped = UserAuthSection;
+export default connect(mapStateToProps, mapDispatchToProps)(wrapped);

@@ -63,7 +63,7 @@ export default class GeneralDetails extends React.Component {
           <Form.Label column="sm" sm={3}> Author </Form.Label>
           <Col >
             <Form.Control size="sm" type="text" id="author"
-              value={data.user.owner.username}  readOnly
+              value={data.user.user.username}  readOnly
             />
           </Col>
         </Row>

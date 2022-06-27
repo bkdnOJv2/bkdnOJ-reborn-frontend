@@ -1,23 +1,25 @@
 import React from 'react';
+import { Navigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { updateUser, clearUser } from 'redux/User/actions';
 import { updateProfile } from 'redux/Profile/actions';
 
-import { Link } from 'react-router-dom';
 import { Row, Col, Tabs, Tab } from 'react-bootstrap';
 
+import profileClient from 'api/profile';
+
+// Assets
 import { FaUniversity } from 'react-icons/fa';
 
-import profileClient from 'api/profile';
+// Helpers
 import { log } from 'helpers/logger';
 
-import SpinLoader from 'components/SpinLoader/SpinLoader';
+import {SpinLoader} from 'components';
 
 import './UserProfile.scss';
 import { __ls_set_auth_user, __ls_get_access_token } from 'helpers/localStorageHelpers';
 import { setTitle } from 'helpers/setTitle';
-import { Navigate } from 'react-router-dom';
 
 import { AboutTab, } from './_';
 

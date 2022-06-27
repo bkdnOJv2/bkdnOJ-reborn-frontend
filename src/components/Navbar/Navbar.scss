@@ -29,10 +29,11 @@
             }
         }
 
+        //
         .navbar-user-auth {
             flex: 1;
             .nav-link {
-                margin-right: 10px;
+                margin-right: 5px;
                 border-radius: 4px;
                 line-height: 10px;
                 border: solid 1px $base;
@@ -46,8 +47,8 @@
 
                 color: $base;
 
-                padding-left: 5px;
-                padding-right: 5px;
+                padding-left: 7px;
+                padding-right: 7px;
 
                 &#fake {
                     margin-right: 5px;
@@ -60,6 +61,25 @@
                 position: absolute;
                 left: -450%;
             }
+        }
+        button#switch-org-btn {
+            margin-right: 5px;
+            border-radius: 4px;
+            line-height: 10px;
+            border: solid 1px $base;
+            background: rgb(255, 255, 255);
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(240, 240, 240, 1) 70%,
+                rgb(228, 228, 228) 100%
+            );
+
+            color: $base;
+            cursor: pointer;
+
+            padding-left: 5px;
+            padding-right: 5px;
         }
     }
 

@@ -53,19 +53,19 @@ class StandingItem extends React.Component {
       frozen_score, frozen_cumtime, frozen_tiebreaker,
       is_disqualified, virtual, format_data
     } = this.props;
-    const { mapping, isFrozen } = this.props;
+    const { probMapping, orgMapping, isFrozen } = this.props;
 
-    let best = Array( Object.keys(mapping).length ).fill(<></>);
+    let best = Array( Object.keys(probMapping).length ).fill(<></>);
     let data = JSON.parse(format_data);
     if (data && data.constructor === Object)
       Object.keys(data).forEach((k) => {
         const prob_data = data[k]; // => {'time': ..., 'points': ...}
 
         // this might not exists because admin of contest decide to delete them, but the contest data is still there
-        if (!mapping[k]) return;
+        if (!probMapping[k]) return;
 
-        const i = mapping[k].pos;
-        const problemMaxPoints = mapping[k].points;
+        const i = probMapping[k].pos;
+        const problemMaxPoints = probMapping[k].points;
 
         const { points, sub_time, tries, tries_after_frozen } = prob_data;
 
@@ -124,7 +124,7 @@ class StandingItem extends React.Component {
           </div>
         </td>
         <td className="td-participant">
-          <UserCard displayMode={this.props.displayMode} user={user}/>
+          <UserCard displayMode={this.props.displayMode} user={user} organization={orgMapping[user.organization]}/>
         </td>
 
         <td className="td-total">
@@ -153,7 +153,9 @@ class ContestStanding extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id2idx: {},
+      probId2idx: {},
+      orgMapping: {},
+
       problems: null,
       standing: [],
 
@@ -192,6 +194,7 @@ class ContestStanding extends React.Component {
 
         standing: res.data.results,
         problems: res.data.problems,
+        organizations: res.data.organizations,
 
         frozenEnabled: res.data.is_frozen_enabled,
         frozenTime: res.data.frozen_time,
@@ -201,6 +204,7 @@ class ContestStanding extends React.Component {
         scoreboardCache: res.data.scoreboard_cache_duration,
       })
 
+      // Contest - Problems mapping
       let mapping = {}; // mapping here is a list of problems in the contest -> their id
       let uniq=0;
       res.data.problems.forEach( (prob) => {
@@ -211,7 +215,14 @@ class ContestStanding extends React.Component {
         }
         uniq++;
       })
-      this.setState({ id2idx : mapping })
+      this.setState({ probId2idx : mapping })
+
+      // Contest - Organization mapping
+      mapping = {}; // mapping here is a list of problems in the contest -> their id
+      res.data.organizations.forEach( (org) => {
+        mapping[org.slug] = org;
+      })
+      this.setState({ orgMapping : mapping })
     })
     .catch((err) => {
       clearInterval(this.timer)
@@ -326,7 +337,9 @@ class ContestStanding extends React.Component {
               {
                 standing.map((part, idx) => <StandingItem
                   key={`ct-st-row-${idx}`}
-                  mapping={this.state.id2idx} rowIdx={idx}
+                  orgMapping={this.state.orgMapping}
+                  probMapping={this.state.probId2idx}
+                  rowIdx={idx}
                   isFrozen={isFrozen} displayMode={displayMode}
                   {...part} />)
               }

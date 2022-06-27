@@ -172,7 +172,7 @@ class ProblemList extends React.Component {
                   onPageChange={this.handlePageClick}
                   forcePage={this.state.currPage}
                   pageLabelBuilder={(page) => `[${page}]`}
-                  pageRangeDisplayed={3}
+                  pageRangeDisplayed={5}
                   pageCount={this.state.pageCount}
                   renderOnZeroPageCount={null}
                   previousLabel={null}

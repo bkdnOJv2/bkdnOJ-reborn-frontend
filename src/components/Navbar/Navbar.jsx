@@ -8,7 +8,7 @@ import BTNavbar from 'react-bootstrap/Navbar';
 import icon from 'assets/images/bkdnoj-favicon-noring.png';
 import './Navbar.scss'
 
-import RDUserAuthSection from './UserAuthSection';
+import UserAuthSection from './UserAuthSection';
 
 export default class Navbar extends React.Component {
     render() {
@@ -21,7 +21,7 @@ export default class Navbar extends React.Component {
                     </BTNavbar.Brand>
 
                     <Nav className="navbar-user-auth d-flex flex-row justify-content-end d-md-none">
-                        <RDUserAuthSection />
+                        <UserAuthSection />
                     </Nav>
 
                     <BTNavbar.Toggle aria-controls="basic-navbar-nav" />
@@ -43,7 +43,7 @@ export default class Navbar extends React.Component {
                     </BTNavbar.Collapse>
 
                     <Nav className="navbar-user-auth flex-row justify-content-end d-none d-md-flex">
-                        <RDUserAuthSection />
+                        <UserAuthSection />
                     </Nav>
                 </Container>
             </BTNavbar>
