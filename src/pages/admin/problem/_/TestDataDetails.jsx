@@ -291,9 +291,10 @@ export default class TestDataDetails extends React.Component {
               <Accordion.Body className="p-1">
                 <p><code>custom-checker</code>
                   sử dụng cho những bài có nhiều đáp án, cần phải có một cách để kiểm tra đáp án của thí sinh là đúng.
-                  Đây dành cho các checker được viết bằng <code>Python 3</code>. Kèm theo file này vào trường <code>Custom Checker</code>.
+                  Đây là lựa chọn dành cho các checker được viết bằng <code>Python 3</code>, Hãy upload file này vào trường <code>Custom Checker</code>.
                 </p>
-                <p>Tham khảo checker sau cho bài <a href="/admin/problem/SUM42"><code>SUM42</code></a>.
+                <p>Nhìn chung, checker Py3 sẽ có một hàm <code>check</code> sẽ được gọi bởi máy chấm, và trả về các đối tượng
+                  <code>CheckerResult</code> báo rằng Đúng/Sai. Tham khảo checker sau cho bài <a href="/admin/problem/SUM42"><code>SUM42</code></a>.
                   Bài này yêu cầu thí sinh in ra <code>n</code> cặp số nguyên có tổng là <code>42</code>.
                 </p>
                 <pre><code>
@@ -342,13 +343,17 @@ export default class TestDataDetails extends React.Component {
             <Accordion.Item eventKey="9" className="custom-checker-c++-help">
               <Accordion.Header>Custom Checker: C++ (17)</Accordion.Header>
               <Accordion.Body className="p-1">
-                <p>Tương tự như trên, máy chấm sẽ compile checker trước và cache nó để thực hiện checking. Một số tham số có thể truyền vào
+                <p><code>custom-checker</code>
+                  sử dụng cho những bài có nhiều đáp án, cần phải có một cách để kiểm tra đáp án của thí sinh là đúng.
+                  Đây là lựa chọn dành cho các checker được viết bằng <code>C++17</code>, Hãy upload file này vào trường <code>Custom Checker</code>.
+                </p>
+                <p>Máy chấm sẽ compile checker trước và cache nó để thực hiện checking. Một số tham số có thể truyền vào
                   <code>args</code> như sau:
                   <ul>
-                    <li><code>time_limit</code>: Giới hạn thời gian chạy cho checker. Hệ thống đặt thêm <code>+2s</code> cho checker.
-                      Mặc định: <code>env['generator_time_limit']</code>
+                    <li><code>time_limit</code>: Giới hạn thời gian chạy cho checker. Hệ thống đặt thêm +2s cho checker.
+                      Mặc định: <code>env['generator_time_limit']</code> (của môi trường máy chấm)
                     </li>
-                    <li><code>memory_limit</code>: Giới hạn memory cho checker. Mặc định: <code>env['generator_memory_limit']</code>
+                    <li><code>memory_limit</code>: Giới hạn memory cho checker. Mặc định: <code>env['generator_memory_limit']</code> (của môi trường máy chấm)
                     </li>
                     <li><code>feedback</code>: Nếu là <code>true</code>, hiển thị stdout của checker như là feedback từng testcase.
                       Mặc định: <code>true</code>
@@ -359,8 +364,9 @@ export default class TestDataDetails extends React.Component {
                   </ul>
                 </p>
                 <p>
-                  Nhìn chung, chương trình sẽ nhận 3 tham số theo thứ tự <code>input_file,output_file,judge_file</code>.
-                  Nếu chương trình trả về 0, kết quả là AC. Trả về 1, kết quả là WA. Trả về 7 cùng với một output ra stderr ở định dạng
+                  Nhìn chung, chương trình sẽ nhận 3 tham số theo thứ tự <code>input_file, participant_output_file, answer_file</code>,
+                  3 tham số này được truyền vào tự động bởi Máy chấm, người soạn đề không cần bận tâm về việc này.
+                  Nếu chương trình checker trả về 0, kết quả là AC. Trả về 1, kết quả là WA. Trả về 7 cùng với một output ra stderr ở định dạng
                   <code>points X</code> với <code>X</code> là một số nguyên, nghĩa là thí sinh được thưởng <code>X</code> điểm
                   cho case này. Tất cả mã còn lại gây ra IE.
                 </p>
@@ -385,6 +391,15 @@ export default class TestDataDetails extends React.Component {
         else __wa();
       }`}
                 </code></pre>
+                <p>
+                  Ta có thể kiểm tra checker tại local hoạt động hay không bằng cách compile nó và chạy lệnh sau
+                  rồi kiểm tra <code>exitcode</code> của checker.
+                </p>
+                <pre><code>
+      {`
+      g++ checker.cpp -o checker.exe
+      checker.exe 1.in my_output.txt 1.out
+      `}        </code></pre>
               </Accordion.Body>
             </Accordion.Item>
             </Accordion>

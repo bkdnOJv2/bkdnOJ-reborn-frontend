@@ -30,7 +30,7 @@ import ContestContext from 'context/ContestContext';
 import './ContestStanding.scss';
 import 'styles/Ratings.scss';
 
-const __STANDING_POLL_DELAY = 10000;
+const __STANDING_POLL_DELAY = 5000;
 
 const getClassNameFromPoint = (point, maxPoint) => {
   let ptsClsName = '';
@@ -231,7 +231,7 @@ class ContestStanding extends React.Component {
         loaded: true,
         errors: err.response.data,
       })
-      toast.error(`Standing not available. Disconnected. (${err.response.status})`, {
+      toast.error(`Standing not available at the moment. Disconnected. (${err.response.status})`, {
         toastId: "contest-standing-na",
       })
     })
@@ -247,19 +247,18 @@ class ContestStanding extends React.Component {
     const { user } = this.props;
     const { contest } = this.context;
     if (!contest) return; // skip if no contest
+
     if (prevState.contest !== contest || prevState.user !== user) {
       this.setState({ user, contest }, () => {
         setTitle(`${contest.name} | Standing`)
         this.refetch()
-        clearInterval(this.timer);
-        this.timer = setInterval(() => this.refetch(true), __STANDING_POLL_DELAY);
       });
     }
 
-    if (this.state.scoreboardCache !== prevState.scoreboardCache) {
-      clearInterval(this.timer);
-      this.timer = setInterval(() => this.refetch(true), Math.max(this.state.scoreboardCache, __STANDING_POLL_DELAY));
-    }
+    let pollDelay = (this.state.scoreboardCache*1000 || __STANDING_POLL_DELAY);
+    pollDelay = Math.max(pollDelay, __STANDING_POLL_DELAY);
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.refetch(true), pollDelay);
   }
   componentWillUnmount(){
     clearInterval(this.timer);
@@ -279,26 +278,28 @@ class ContestStanding extends React.Component {
           <h4 className="standing-head">
             Standing {isPolling && <SpinLoader size={18} margin="0 2px"/>}
           </h4>
-          {frozenEnabled && (
+          <div className="flex-center-col standing-notice">
+          {
+            (scoreboardCache>0) && <span className="frozen-time">
+              Scoreboard is cached for every {scoreboardCache} second(s), it will take a while for your submissions to appear here.
+            </span>
+          }{frozenEnabled && (
             (new Date() < new Date(frozenTime)
               ? <span className="frozen-time">
-                Will be Frozen after {getLocalDateWithTimezone(frozenTime)}
+                Will be Frozen after {getLocalDateWithTimezone(frozenTime)}.
               </span>
               : <span className="frozen-time">
-                Frozen since {getLocalDateWithTimezone(frozenTime)}
+                Frozen since {getLocalDateWithTimezone(frozenTime)}.
               </span>)
-          )}{
-            (scoreboardCache>0) && <span className="frozen-time">
-              Scoreboard will be updated for every {scoreboardCache} second(s).
-            </span>
-          }
+          )}
+          </div>
 
           <div className="standing-options">
             {canBreakIce &&
               ( !iceBroken ?
                 <Button  variant="light" className="btn-svg"
                   onClick={() => this.meltingIce()}>
-                    <AiOutlineEye size={20}/> Peek..
+                    <AiOutlineEye size={20}/> Peek
                 </Button> :
                 <Button variant="dark" className="btn-svg"
                   onClick={() => this.freezingIce()}>

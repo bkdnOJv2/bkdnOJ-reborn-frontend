@@ -19,19 +19,29 @@ import { toast } from 'react-toastify';
 // Styles
 import 'styles/ClassicPagination.scss';
 import './List.scss';
+import { FaUniversity } from 'react-icons/fa';
 
 class OrgItem extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
-    const { name, performance_points, member_count } = this.props.org;
+    const { slug, name, logo_url, suborg_count, member_count } = this.props.org;
 
     return (
-      <tr key={`org-${this.props.org.slug}`}>
+      <tr key={`org-${slug}`}>
+        <td className="org-i">
+          <div className="org-img-wrapper">
+            {
+              logo_url ? <img id="org-img" src={logo_url}/>
+              : <FaUniversity size={40}/>
+            }
+          </div>
+          <span className="org-slug">{slug}</span>
+        </td>
         <td className="org-name">{name}</td>
-        <td className="points">{performance_points}</td>
-        <td className="member">{member_count}</td>
+        <td className="suborg_count">{suborg_count}</td>
+        <td className="member_count">{member_count}</td>
       </tr>
     )
   }
@@ -51,7 +61,7 @@ class OrgList extends React.Component {
     }
   }
 
-  refetch(params={page: 1}) {
+  refetch(params={page: 0}) {
     orgAPI.getOrgs({
       params: {page: params.page+1}
     })
@@ -69,7 +79,10 @@ class OrgList extends React.Component {
     })
   }
 
-  componentDidMount() { this.refetch() }
+  componentDidMount() {
+    setTitle("Organizations");
+    this.refetch();
+  }
   handlePageClick = (event) => {
     this.refetch({page: event.selected});
   }
@@ -84,9 +97,10 @@ class OrgList extends React.Component {
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Points</th>
-              <th>Member</th>
+              <th>#</th>
+              <th>Tên tổ chức</th>
+              <th>Số tổ chức con</th>
+              <th>Số thành viên</th>
             </tr>
           </thead>
           <tbody>

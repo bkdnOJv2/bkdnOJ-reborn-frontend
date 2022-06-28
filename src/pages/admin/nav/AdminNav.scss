@@ -120,9 +120,9 @@ ul.admin-nav {
   }
 
   @media (max-width: 768px) {
-    width: 6rem !important;
+    min-width: 6rem !important;
   }
   @media (min-width: 769px) {
-    width: 190px !important;
+    min-width: 160px !important;
   }
 }

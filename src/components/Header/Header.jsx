@@ -46,7 +46,7 @@ export default class Header extends React.Component {
                         🐞 Đây là phiên bản thử nghiệm của bkdnOJ v2.0 vẫn trong quá trình phát triển nên chắc chắn sẽ tồn tại bugs nhiều hình thái, đôi khi rất quái gở.
                         Mong nhận được sự thông cảm của mọi người.
                         <br/> <br/>
-                        🐞 Để báo cáo bugs, tạo <strong>New Issue</strong> tại <a href="https://github.com/BKDN-University/bkdnOJ-v2">Github này</a> và
+                        🐞 Để báo cáo bugs, tạo <strong>New Issue</strong> tại <a href={github}>Github này</a> và
                         đính kèm ảnh/video bug, mô tả bug, nêu những bước để tái hiện bug đó. Xin cảm ơn các bạn đã chung tay giúp cho bkdnOJ-v2 hoàn thiện hơn.
                         <br/>
                         <sub style={{float: "right"}}>🐞 "All your bugs belong to us!"</sub>

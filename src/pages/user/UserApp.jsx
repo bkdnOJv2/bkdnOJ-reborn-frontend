@@ -12,7 +12,7 @@ export default class UserApp extends React.Component {
       <>
         <Header />
         <Navbar />
-        <SubHeader />
+        {/* <SubHeader /> */}
 
         <div className="content-wrapper">
           {/* <ScrollToTop /> */}

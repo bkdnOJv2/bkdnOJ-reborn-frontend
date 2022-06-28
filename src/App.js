@@ -153,7 +153,7 @@ class App extends React.Component {
 
             {/* <Route path="/test/pdf" element={ <PDFViewer /> } /> */}
 
-            <Route path="/problem" element={
+            <Route path="/problems" element={
               <OneColumn mainContent={<ProblemList />}
               />
             } />
@@ -165,7 +165,7 @@ class App extends React.Component {
               element={<ListSidebar mainContent={<Submit />} />}
             /> */}
 
-            <Route path="/submission" element={
+            <Route path="/submissions" element={
               <OneColumn mainContent={<SubmissionList />}
               />
             } />
@@ -174,7 +174,7 @@ class App extends React.Component {
               />
             } />
 
-            <Route path="/org" element={
+            <Route path="/orgs" element={
               <OneColumn mainContent={<OrgList />}
               />
             } />
@@ -184,7 +184,7 @@ class App extends React.Component {
             } />
 
             {/* ---------------------- CONTEST --------------------------- */}
-            <Route path="/contest" element={
+            <Route path="/contests" element={
               <OneColumn mainContent={<ContestList />}
               />
             } />
@@ -230,7 +230,7 @@ class App extends React.Component {
             </Route>
 
 
-            <Route path="/judge-status" element={
+            <Route path="/status" element={
               <OneColumn mainContent={<JudgeStatuses />}/>
             } />
 

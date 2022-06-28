@@ -2,8 +2,10 @@ import React from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
+
 import { updateUser, clearUser } from 'redux/User/actions';
 import { updateProfile } from 'redux/Profile/actions';
+import { updateMyOrg } from 'redux/MyOrg/actions';
 
 import { Row, Col, Tabs, Tab } from 'react-bootstrap';
 
@@ -36,23 +38,33 @@ class UserProfile extends React.Component {
 
   fetch() {
     const profile = this.state.profile;
-    // Sometimes the Token hasn't been set yet, so it causes profile
-    // to not properly loaded.
-    // We waited for 2s...
-    setTimeout(() => profileClient.fetchProfile().then((res) => {
-      this.setState({
-        profile: res.data,
-        loaded: true,
+
+    setTimeout(() => profileClient.fetchProfile()
+      .then((res) => {
+        this.setState({
+          profile: res.data,
+          loaded: true,
+        })
+        this.props.updateUser({...res.data.user, avatar: res.data.avatar});
+        this.props.updateProfile({ ...res.data, });
+        this.props.updateMyOrg({
+          memberOf: res.data.member_of,
+          adminOf: res.data.admin_of,
+          selectedOrg: res.data.organization,
+        })
+      }).catch((err) => {
+        console.log(err);
       })
-      this.props.updateUser({...res.data.user, avatar: res.data.avatar});
-      this.props.updateProfile({ ...res.data, });
-    }).catch((err) => {
-      console.log(err);
-    }), 1000); // TODO: remove this number
+    , 1000);
+    // ISSUE:
+    // Sometimes the Token hasn't been set yet, so it causes profile
+    // to not properly load.
+    // We waited for 1s...
   }
 
   componentDidMount() {
     this.fetch();
+    setTimeout(()=>this.setState({ reloginNoticeShow: true }), 5000);
   }
 
   render() {
@@ -61,8 +73,12 @@ class UserProfile extends React.Component {
       return (
         <div className="user-profile-container shadow rounded">
           <h4 className="title">Loading</h4>
-          <div className="loading-wrapper flex-center">
+          <div className="loading-wrapper flex-center-col">
             <SpinLoader className="user-profile spinloading" size={30} margin="0"/>
+            {
+              this.state.reloginNoticeShow &&
+                <em className="p-2">Hãy thử Đăng nhập lại nếu Loading mất quá nhiều thời gian.</em>
+            }
           </div>
         </div>
       )
@@ -105,6 +121,9 @@ const mapStateToProps = state => {
   return {
     user: state.user.user,
     profile: state.profile.profile,
+
+    myOrg: state.myOrg,
+    selectedOrg: state.myOrg.selectedOrg,
   }
 }
 
@@ -113,6 +132,8 @@ const mapDispatchToProps = dispatch => {
     updateUser: (user) => dispatch(updateUser({user: user})),
     updateProfile: (profile) => dispatch(updateProfile({profile: profile})),
     clearUser: () => dispatch(clearUser()),
+
+    updateMyOrg: ({ memberOf, adminOf, selectedOrg }) => dispatch(updateMyOrg({ memberOf, adminOf, selectedOrg })),
   }
 }
 

@@ -8,7 +8,8 @@
 
   #admin-content-wrapper {
     flex-grow: 1;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     align-content: start;
 
     #admin-topbar {
@@ -40,8 +41,9 @@
     #admin-panel-container {
       // margin-top: 30px;
       // margin-bottom: 30px;
-      padding-top: 30px;
-      padding-bottom: 30px;
+      // padding-top: 30px;
+      // padding-bottom: 30px;
+      padding: 20px;
       overflow: auto;
     }
   }
