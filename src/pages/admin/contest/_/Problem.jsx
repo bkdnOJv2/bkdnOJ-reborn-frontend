@@ -2,14 +2,21 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import {
-  Form, Row, Col, Table, Button
+  Form, Row, Col, Table, Button, Modal
 } from 'react-bootstrap';
+import AsyncSelect from 'react-select/async';
 
 import contestAPI from 'api/contest';
 
-import {ErrorBox, SpinLoader} from 'components';
+import {ErrorBox, SpinLoader, DropdownTreeNoRerender} from 'components';
+import {
+  FaQuestionCircle, FaRegPlusSquare, FaRegSave,
+  FaSortAmountDownAlt, FaSortNumericDown, FaRedo
+
+} from 'react-icons/fa';
 
 import { qmClarify } from 'helpers/components';
+import problemAPI from 'api/problem';
 
 const INIT_CONT_PROBLEM = {
   points: 1,
@@ -80,6 +87,120 @@ class RejudgeButton extends React.Component {
   }
 }
 
+const ProblemSelectLabel = (props) => {
+  const {shortname, title} = props;
+  return (
+    <div className="problem-choice text-left d-flex flex-column" style={{
+      fontSize: "14px", maxWidth: "300px",
+      focus: {
+        opacity: "50%",
+      }
+    }}>
+      <span>
+        <span className="rounded bg-dark text-light pl-1 pr-1 mr-1">title</span>
+        {title}
+      </span>
+      <span style={{fontSize: "10px"}}>{shortname}</span>
+    </div>
+  );
+}
+
+
+class ProblemSelect extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  async loadOptions(val) {
+    return problemAPI.getProblems({params: {search: val, ordering: "-modified"}})
+    .then((res) => {
+      let data = res.data.results.map((prob) => ({
+        value: prob.shortname,
+        label: ProblemSelectLabel(prob),
+        prob: prob,
+      }));
+      return data;
+    })
+  }
+
+  render() {
+    const {prob} = this.props;
+    return(
+      <>
+        <AsyncSelect
+          cacheOptions
+          defaultOptions
+          placeholder="Type here.."
+          loadOptions={(val)=>this.loadOptions(val)}
+          onChange={(sel)=>this.props.onChange(sel.prob)}
+          value = {{
+            value: prob.shortname,
+            label: ProblemSelectLabel({shortname: prob.shortname, title: prob.title}),
+          }}
+          styles={{
+            menu: () => ({
+              zIndex: 50,
+              position: "fixed",
+              backgroundColor: "#fff",
+            }),
+            valueContainer: () => ({
+              display: "flex",
+            })
+          }}
+        />
+      </>
+    )
+  }
+}
+
+
+
+class HelpModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { show: false }
+  }
+  render(){
+    return (
+      <>
+        <Button variant="light" onClick={()=>this.setState({show: true})} className="btn-svg">
+          <FaQuestionCircle/>
+        </Button>
+        <Modal show={this.state.show} onHide={()=>this.setState({show: false})}>
+          <Modal.Header>
+            <Modal.Title>Chú ý | Contest Problem</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Hệ thống phân biệt mỗi problem trong contest với nhau thông qua mã problem code (<code>shortname</code>).
+            Khi nhấn SAVE, client sẽ gửi mảng Problem chứa các <code>shortname</code> này lên hệ thống, lúc này, có 3 trường hợp sẽ xảy ra:
+            <ul>
+              <li>
+                Với các problem code đã tồn tại trong contest, hệ thống cập nhập các thuộc tính khác như điểm, order,...
+              </li>
+              <li>
+                Với các problem code chưa có trong contest, hệ thống tạo mới đối tượng ContestProblem.
+              </li>
+              <li>
+                Với các problem code có trong contest nhưng không có trong dữ liệu gửi lên, hệ thống sẽ xóa chúng.
+              </li>
+            </ul>
+            Như vậy, hệ thống chỉ xóa đối tượng ContestProblem cùng với các tài nguyên liên quan CHỈ KHI bạn nhấn Save mà
+            tại giao diện không có một Problem mà phía DB đang có. Chính vì thế, một contest có phần Problems chỉnh sửa bởi
+            nhiều người có thể gây ra mâu thuẫn đáng tiếc. Nhìn chung, tốt nhất không nên đổi/xóa Problem khi Contest đang diễn ra.
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="dark" onClick={()=>this.setState({show: false})}>
+              OK
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    )
+  }
+}
+
+
+
 class Problem extends React.Component {
   constructor(props) {
     super(props);
@@ -120,9 +241,23 @@ class Problem extends React.Component {
   // ---------
   problemChangeHandler(idx, e, params={}) {
     const problems = this.state.problems;
-    let prob = problems[idx];
+    let prob = {...problems[idx]};
 
     const isCheckbox = params.isCheckbox || false;
+    const isRawObject = params.rawObject || false;
+
+    if (isRawObject) {
+      let valid = true;
+      problems.forEach((p,i) => {
+        if (i === idx) return;
+        if (p.shortname === e.shortname) {
+          alert('Problem này đã tồn tại trong contest!')
+          valid = false;
+        }
+      })
+      if (!valid) return;
+      prob = {...prob, shortname: e.shortname, title: e.title};
+    } else
     if (!isCheckbox) {
       if (e.target.id === 'order')
         prob[e.target.id] = parseInt(e.target.value)
@@ -130,20 +265,23 @@ class Problem extends React.Component {
         prob[e.target.id] = e.target.value
     } else prob[e.target.id] = !prob[e.target.id]
 
+    console.log(prob)
+
     this.setState({
-      problems: problems.map( (p) => p===prob.id?prob:p )
+      problems: problems.map( (p, arridx) => arridx===idx?prob:p )
     })
   }
 
   // -------- Form Submit
   formSubmitHandler(e) {
     e.preventDefault();
+
     let conf = window.confirm('Bạn có chắc chắn với thay đổi này?')
     if (conf)
       contestAPI.updateContestProblems({key: this.state.ckey, data: this.state.problems})
       .then((res) => {
         toast.success('OK Updated.')
-        // this.refetch();
+        this.refetch();
       })
       .catch((err) => {
         console.log(err)
@@ -168,19 +306,25 @@ class Problem extends React.Component {
                 return (v1 < v2 ? -1 : 0);
               })
               this.setState({problems: probs})
-            }}>Sắp xếp theo Order</Button>
+            }} className="btn-svg">
+                <FaSortAmountDownAlt size={14}/> <span className="d-none d-sm-inline">Sắp xếp theo</span><span>Order</span>
+            </Button>
           </div>
           <div className="border d-inline-flex p-1">
             <Button size="sm" variant="dark" onClick={() => {
               let probs = problems.slice() // Copy array
               for (let i=0; i<problems.length; i++) probs[i].order = i
               this.setState({problems : probs})
-            }}>Tự đánh số Order từ trên xuống</Button>
+            }} className="btn-svg">
+              <FaSortNumericDown size={14}/> <span className="d-none d-sm-inline">Tự đánh số Order</span><span className="d-inline d-sm-none">Đánh số</span>
+            </Button>
           </div>
           <div className="border d-inline-flex p-1">
             <Button size="sm" variant="dark" onClick={() => {
               this.setState({errors: null}); this.refetch()
-            }}>Reset</Button>
+            }} className="btn-svg">
+              <FaRedo size={14}/> <span className="d-inline">Refresh</span>
+            </Button>
           </div>
         </div>
 
@@ -196,11 +340,17 @@ class Problem extends React.Component {
                   'Ngoài ra, hệ thống sử dụng giá trị Order để sinh ra nhãn (problem A, problem B,...).')}
               </th>
 
-              <th style={{minWidth: "150px"}}>Problem Code</th>
+              <th style={{minWidth: "200px"}}>Problem</th>
               <th style={{minWidth: "15%"}}>Points</th>
-              <th style={{whiteSpace: "nowrap"}} >
-                Cắn Test {this.clarifyPopup('Tick nếu cho phép người dùng ăn điểm theo số test đúng. '+
-                          'Mặc định không tick làm bài làm nhận 0đ nếu có ít nhất một test sai.')}
+              <th >
+                <span className="d-none d-lg-inline" >
+                  Điểm thành phần
+                </span>
+                <span className="d-inline d-lg-none" >
+                  ĐTP
+                </span>
+                {this.clarifyPopup('Cho phép điểm thành phần: cho phép người dùng ăn điểm theo số test đúng. '+
+                          'Mặc định không tick: Nhận 0đ nếu có ít nhất một test sai.')}
               </th>
               {/* <th style={{whiteSpace: "nowrap"}} >
                 Pretested {this.clarifyPopup('Chỉ chấm với Pretest.')}
@@ -208,7 +358,7 @@ class Problem extends React.Component {
               {/* <th style={{whiteSpace: "nowrap"}} >
                 Max Subs {this.clarifyPopup('Giới hạn số lần nộp bài tối đa cho phép. Để trống nếu cho phép nộp không giới hạn.')}
               </th> */}
-              <th>Rejudge {qmClarify("Chấm lại các Submissions của Problem trong Contest này.")}</th>
+              <th>Rejudge{qmClarify("Chấm lại các Submissions của Problem trong Contest này.")}</th>
               <th></th>
               {/* <th >
                 <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Actions</Link>
@@ -222,15 +372,21 @@ class Problem extends React.Component {
             loaded && problems.length === 0 && <tr><td colSpan={99}><em>No problems added yet.</em></td></tr>
           }{
             loaded && problems.length > 0 && problems.map((prob, ridx) =>
-              <tr key={`ct-pr-${ridx}`}><td>
-                <Form.Control size="sm" type="number" id="order" value={isNaN(prob.order) ? '' : prob.order}
+              <tr key={`ct-pr-${ridx}`}>
+                <td style={{maxWidth: "50px"}}>
+                  <Form.Control size="sm" type="number" id="order"
+                                value={isNaN(prob.order) ? '' : prob.order}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
-                <td style={{minWidth: "150px"}}>
-                  <Form.Control size="sm" type="text" id="shortname" value={prob.shortname || ''}
-                                onChange={(e) => this.problemChangeHandler(ridx, e)} />
+                <td >
+                  {/* <Form.Control size="sm" type="text" id="shortname" value={prob.shortname || ''}
+                                onChange={(e) => this.problemChangeHandler(ridx, e)} /> */}
+                    <ProblemSelect
+                      prob={{...prob}}
+                      onChange={(val) => this.problemChangeHandler(ridx, val, {rawObject: true})} />
                 </td>
-                <td> <Form.Control size="sm" type="number" id="points" value={prob.points || ''}
+                <td style={{maxWidth: "50px"}}>
+                  <Form.Control size="sm" type="number" id="points" value={prob.points || ''}
                                 onChange={(e) => this.problemChangeHandler(ridx, e)} />
                 </td>
                 <td> <Form.Control size="sm" type="checkbox" id="partial" checked={prob.partial || false}
@@ -266,14 +422,22 @@ class Problem extends React.Component {
         </div>
 
         <Row className="mt-2">
-          <Col xs={8}></Col>
-          <Col sm={2}>
-            <Button size="sm" variant="dark" style={{width: "100%"}}
-              onClick={() => this.setState({ problems: problems.concat({...INIT_CONT_PROBLEM}) })}> Add </Button>
+          <Col className="d-inline-flex" >
+            <HelpModal/>
           </Col>
-          <Col sm={2}>
-            <Button size="sm" variant="danger" style={{width: "100%"}}
-              onClick={(e) => this.formSubmitHandler(e)}> Save </Button>
+
+          <Col xs={8} className="d-inline-flex flex-row-reverse" >
+            <Button size="sm" variant="danger" className="ml-1 mr-1 btn-svg"
+              onClick={(e) => this.formSubmitHandler(e)}
+            >
+              <FaRegSave size={16}/> <span className="d-none d-sm-inline">Save</span>
+            </Button>
+
+            <Button size="sm" variant="dark" className="ml-1 mr-1 btn-svg"
+              onClick={() => this.setState({ problems: problems.concat({...INIT_CONT_PROBLEM}) })}
+            >
+              <FaRegPlusSquare size={16}/> <span className="d-none d-sm-inline">Add</span>
+            </Button>
           </Col>
         </Row>
       </div>

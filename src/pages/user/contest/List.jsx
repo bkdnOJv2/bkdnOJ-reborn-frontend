@@ -392,11 +392,12 @@ class ContestList extends React.Component {
   render() {
     const {pastContests, errors, loaded, count} = this.state;
     return (
+      <>
       <div className="contest-table wrapper-vanilla">
         <NPContestList {...this.props} />
-
-        <hr className="m-2" />
-
+      </div>
+      <hr className="m-2" />
+      <div className="contest-table wrapper-vanilla">
         <div className="past-contest">
           <h4>Past Contests</h4>
           <ErrorBox errors={errors} />
@@ -444,6 +445,7 @@ class ContestList extends React.Component {
           }
         </div>
       </div>
+      </>
     )
   }
 }

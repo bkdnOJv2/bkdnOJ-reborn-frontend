@@ -16,7 +16,7 @@ import 'styles/ClassicPagination.scss';
 
 class SubmissionListItem extends React.Component {
   render() {
-    const { id, date, time, memory, status, result, user, 
+    const { id, date, time, memory, status, result, user,
       contest_object, problem } = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
 
@@ -37,8 +37,8 @@ class SubmissionListItem extends React.Component {
         <td className="text-truncate" style={{maxWidth: "100px"}}>
           {
             !!contest_object
-            ? <Link to={`/admin/contest/${contest_object.id}`}>
-                {contest_object.id}
+            ? <Link to={`/admin/contest/${contest_object}`}>
+                {contest_object}
               </Link>
             : "None"
           }

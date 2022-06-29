@@ -76,12 +76,13 @@ class SwitchOrgModal extends React.Component {
       >
         <Modal.Header>
           <Modal.Title id="switch-org-modal">
-            Đổi tư cách hiển thị
+            Change Organization
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="flex-center-col">
           <p>
-            Bạn đang xem với tư cách là thành viên của:
+            {/* Bạn đang xem với tư cách là thành viên của: */}
+            You are viewing as a member of organization:
           </p>
 
           {/* <DropdownTreeSelect data={data} mode="radioSelect"
@@ -91,14 +92,17 @@ class SwitchOrgModal extends React.Component {
             onChange={(a,b)=>this.onChangeHandler(a,b)}
           />
 
-          <p>
-            Đổi thiết lập bên trên để có thể xem các tài nguyên mà chỉ
-            chia sẻ riêng tư cho một số tổ chức nhất định.
-          </p>
+          <em>
+            {/* Đổi thiết lập bên trên để có thể xem các tài nguyên mà chỉ
+            chia sẻ riêng tư cho một số tổ chức nhất định. */}
+            Change the above settings will allow you to view other resources
+            those are shared only to other organizations.
+          </em>
 
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={()=>setShow(false)}>Close</Button>
+          <Button variant="dark" onClick={()=>setShow(false)}>Change</Button>
+          <Button variant="secondary" onClick={()=>setShow(false)}>Cancle</Button>
         </Modal.Footer>
       </Modal>
   )}

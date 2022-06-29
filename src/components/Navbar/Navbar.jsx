@@ -31,16 +31,17 @@ export default class Navbar extends React.Component {
                         <BTNavbar.Collapse id="basic-navbar-nav">
                             <Nav className="">
                                 {/* <Nav.Link href="#post">Post</Nav.Link> */}
-                                <Nav.Link as={Link} to="/problems">Problem</Nav.Link>
-                                <Nav.Link as={Link} to="/submissions">Submission</Nav.Link>
+                                {/* <Nav.Link as={Link} to="/problems">Problem</Nav.Link>
+                                <Nav.Link as={Link} to="/submissions">Submission</Nav.Link> */}
+
+                                <NavDropdown title="Practice" id="practice-nav-dropdown">
+                                    <NavDropdown.Item as={Link} to="/problems">Problem</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/submissions">Submission</NavDropdown.Item>
+                                </NavDropdown>
+
                                 <Nav.Link as={Link} to="/contests">Contest</Nav.Link>
                                 <Nav.Link as={Link} to="/orgs">Organization</Nav.Link>
                                 <Nav.Link as={Link} to="/status">Status</Nav.Link>
-                                {/* <NavDropdown title="Contest" id="basic-nav-dropdown">
-                                    <NavDropdown.Item href="#action/3.1">Upcoming</NavDropdown.Item>
-                                    <NavDropdown.Item href="#action/3.2">Ongoing</NavDropdown.Item>
-                                    <NavDropdown.Item href="#action/3.3">Past</NavDropdown.Item>
-                                </NavDropdown> */}
                                 {/* <Nav.Link href="#user">User</Nav.Link> */}
                             </Nav>
                         </BTNavbar.Collapse>

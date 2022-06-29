@@ -37,7 +37,7 @@ class RateButton extends React.Component {
         let msg = `Cannot get Rating info. (${err.response.status})`;
         if (err.response.data.detail)
           msg =  err.response.data.detail;
-        toast.error(msg, {toastId: "contest-cant-rate"})
+        toast.error(msg, {toastId: `contest-cant-rate-${msg}`})
       })
       .finally(() => this.setState({fetchingInfo: false}))
     })
@@ -68,7 +68,7 @@ class RateButton extends React.Component {
       <Button className="btn-svg" size="sm"
         variant={!confirmRate ? "success" : "light"}
         onClick={(e)=>this.clickHandler(e)}>
-          <FaChartLine/>
+          <FaChartLine size={16}/>
           <span className="d-none d-md-inline">
             {fetchingInfo ? <SpinLoader margin="0"/> : <>
               Rate?
@@ -145,13 +145,13 @@ class AdminContestDetails extends React.Component {
               <span>
                 <Button className="btn-svg" size="sm" variant="dark"
                   onClick={()=>this.setState({ redirectUrl: `/contest/${this.key}` })}>
-                    <FaGlobe/><span className="d-none d-md-inline">View on Site</span>
+                    <FaGlobe size={16}/><span className="d-none d-md-inline">View on Site</span>
                 </Button>
               </span>
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
-                    <FaRegTrashAlt/><span className="d-none d-md-inline">Delete</span>
+                    <FaRegTrashAlt size={16}/><span className="d-none d-md-inline">Delete</span>
                 </Button>
               </span>
             </div>

@@ -1,7 +1,7 @@
 {
   "name": "bkdnoj",
   "homepage": "",
-  "version": "0.5.0",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {
     "@react-pdf-viewer/core": "^3.3.2",
@@ -32,6 +32,7 @@
     "react-redux": "^7.2.8",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.0",
+    "react-select": "^5.3.2",
     "react-toastify": "^8.2.0",
     "redux": "^4.1.2",
     "redux-persist": "^6.0.0",

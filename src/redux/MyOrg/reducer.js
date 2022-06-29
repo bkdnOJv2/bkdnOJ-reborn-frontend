@@ -13,6 +13,7 @@ const INITIAL_STATE = {
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
+    console.log(state)
     switch (action.type) {
         case UPDATE_SELECT:
             return {
@@ -24,14 +25,12 @@ const reducer = (state = INITIAL_STATE, action) => {
                 ...state,
                 memberOf: action.memberOf,
                 adminOf: action.adminOf,
-                selectedOrg: action.selectedOrg,
+                selectedOrg: action.selectedOrg || state.selectedOrg,
             };
         case CLEAR:
             return {
                 ...state,
-                memberOf: [],
-                adminOf: [],
-                selectedOrg: INITIAL_SELECTED_ORG,
+                ...INITIAL_STATE,
             };
         default:
             return state;

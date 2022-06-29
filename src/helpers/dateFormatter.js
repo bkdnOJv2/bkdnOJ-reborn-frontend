@@ -37,7 +37,9 @@ export function getLocalDateWithTimezone(date) {
     if (!date) return "N/A";
     const d = new Date(date);
     if (! isFinite(d)) return "N/A";
-    return d.toLocaleString() + ` (${date.substring(19)})`;
+
+    const datelen = date.length;
+    return d.toLocaleString() + ` (${date.substring(datelen-6)})`;
 }
 
 export default function dateFormatter(date, short=false) {

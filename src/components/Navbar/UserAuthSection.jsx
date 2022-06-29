@@ -21,6 +21,7 @@ import profileClient from 'api/profile';
 import { updateUser, clearUser } from 'redux/User/actions'
 import { updateProfile, clearProfile } from 'redux/Profile/actions'
 import { updateContest, clearContest } from 'redux/Contest/actions'
+import { clearMyOrg } from 'redux/MyOrg/actions';
 
 import { __ls_get_auth_user, __ls_remove_credentials,
         __ls_set_auth_user, } from 'helpers/localStorageHelpers';
@@ -45,6 +46,7 @@ const mapDispatchToProps = dispatch => {
 
     updateProfile: (profile) => dispatch(updateProfile({ profile })),
     clearProfile: () => dispatch(clearProfile()),
+    clearMyOrg: () => dispatch(clearMyOrg()),
 
     updateContest: (contest) => dispatch(updateContest({ contest })),
     clearContest: () => dispatch( clearContest() ),
@@ -78,6 +80,7 @@ class AuthorizedMenu extends React.Component {
         authClient.signOut()
         .then((res) => {
             this.props.clearUser();
+            this.props.clearProfile();
             toast.success("See you later!");
         })
         .catch((err) => {

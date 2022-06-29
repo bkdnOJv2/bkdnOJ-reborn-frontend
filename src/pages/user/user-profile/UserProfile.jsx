@@ -50,9 +50,13 @@ class UserProfile extends React.Component {
         this.props.updateMyOrg({
           memberOf: res.data.member_of,
           adminOf: res.data.admin_of,
-          selectedOrg: res.data.organization,
+          // selectedOrg: res.data.organization,
         })
       }).catch((err) => {
+        this.setState({
+          loaded: true,
+          errors: err.response.data,
+        })
         console.log(err);
       })
     , 1000);
@@ -83,6 +87,7 @@ class UserProfile extends React.Component {
         </div>
       )
     }
+
     if (!profile) {
       toast.error("Please log-in again.")
       return <Navigate to="/sign-in"></Navigate>

@@ -17,7 +17,7 @@ export const updateSelectedOrg = ({ selectedOrg }) => {
     };
 };
 
-export const clearProfile = () => {
+export const clearMyOrg = () => {
     return {
         type: CLEAR,
     };

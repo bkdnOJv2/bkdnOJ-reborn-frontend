@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
+
 // import { FaPaperPlane } from 'react-icons/fa';
+import { GiTrophyCup } from 'react-icons/gi';
 
 import { SpinLoader, ErrorBox } from 'components';
 import submissionApi from 'api/submission';
@@ -50,7 +52,7 @@ class SubListItem extends React.Component {
   render() {
     const {
       id, problem, user, status, result, time, memory, date, points, language,
-      is_frozen,
+      contest_object, is_frozen,
       yourUsername,
     } = this.props;
     const linkPrefix = this.props.contest ? `/contest/${this.props.contest.key}` : "";
@@ -72,6 +74,11 @@ class SubListItem extends React.Component {
           <div className="general-info-container">
             <span className="problem text-truncate">
               <Link to={`${linkPrefix}/problem/${problem.shortname}`}>{problem.title}</Link>
+              {
+                contest_object && <span className="ml-1"
+                  data-toggle="tooltip" data-placement="right" title={`This submission was made in contest ${contest_object}`}
+                ><Link to={`/contest/${contest_object}`}>(<GiTrophyCup />{contest_object})</Link></span>
+              }
             </span>
             <span className="author text-truncate">
               <em>{`by `}
