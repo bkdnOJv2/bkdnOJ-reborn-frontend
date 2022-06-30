@@ -4,19 +4,18 @@ import { Link } from 'react-router-dom';
 import {
   Form, Row, Col, Table, Button, Modal
 } from 'react-bootstrap';
-import AsyncSelect from 'react-select/async';
 
 import contestAPI from 'api/contest';
 
 import {ErrorBox, SpinLoader, DropdownTreeNoRerender} from 'components';
+import ProblemSelect from 'components/SelectSingle/Problem'
+
 import {
   FaQuestionCircle, FaRegPlusSquare, FaRegSave,
   FaSortAmountDownAlt, FaSortNumericDown, FaRedo
-
 } from 'react-icons/fa';
 
 import { qmClarify } from 'helpers/components';
-import problemAPI from 'api/problem';
 
 const INIT_CONT_PROBLEM = {
   points: 1,
@@ -86,75 +85,6 @@ class RejudgeButton extends React.Component {
     )
   }
 }
-
-const ProblemSelectLabel = (props) => {
-  const {shortname, title} = props;
-  return (
-    <div className="problem-choice text-left d-flex flex-column" style={{
-      fontSize: "14px", maxWidth: "300px",
-      focus: {
-        opacity: "50%",
-      }
-    }}>
-      <span>
-        <span className="rounded bg-dark text-light pl-1 pr-1 mr-1">title</span>
-        {title}
-      </span>
-      <span style={{fontSize: "10px"}}>{shortname}</span>
-    </div>
-  );
-}
-
-
-class ProblemSelect extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  async loadOptions(val) {
-    return problemAPI.getProblems({params: {search: val, ordering: "-modified"}})
-    .then((res) => {
-      let data = res.data.results.map((prob) => ({
-        value: prob.shortname,
-        label: ProblemSelectLabel(prob),
-        prob: prob,
-      }));
-      return data;
-    })
-  }
-
-  render() {
-    const {prob} = this.props;
-    return(
-      <>
-        <AsyncSelect
-          cacheOptions
-          defaultOptions
-          placeholder="Type here.."
-          loadOptions={(val)=>this.loadOptions(val)}
-          onChange={(sel)=>this.props.onChange(sel.prob)}
-          value = {{
-            value: prob.shortname,
-            label: ProblemSelectLabel({shortname: prob.shortname, title: prob.title}),
-          }}
-          styles={{
-            menu: () => ({
-              zIndex: 50,
-              position: "fixed",
-              backgroundColor: "#fff",
-            }),
-            valueContainer: () => ({
-              display: "flex",
-            })
-          }}
-        />
-      </>
-    )
-  }
-}
-
-
-
 class HelpModal extends React.Component {
   constructor(props) {
     super(props);
@@ -198,8 +128,6 @@ class HelpModal extends React.Component {
     )
   }
 }
-
-
 
 class Problem extends React.Component {
   constructor(props) {
@@ -264,8 +192,6 @@ class Problem extends React.Component {
       else
         prob[e.target.id] = e.target.value
     } else prob[e.target.id] = !prob[e.target.id]
-
-    console.log(prob)
 
     this.setState({
       problems: problems.map( (p, arridx) => arridx===idx?prob:p )

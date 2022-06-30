@@ -8,6 +8,9 @@ import problemAPI from 'api/problem';
 import { withNavigation } from 'helpers/react-router';
 import { SpinLoader, FileUploader, RichTextEditor } from 'components';
 
+import UserMultiSelect from 'components/SelectMulti/User';
+import OrgMultiSelect from 'components/SelectMulti/Org';
+
 class GeneralDetails extends React.Component {
   constructor(props) {
     super(props);
@@ -145,9 +148,6 @@ class GeneralDetails extends React.Component {
               <Row>
                 <Form.Label column="sm" lg={12}> Problem Statement </Form.Label>
                 <Col className="pb-2">
-                  {/* <Form.Control size="sm" lg={12} style={{height: "200px"}}
-                      as="textarea" placeholder="Problem Statement" id="content"
-                      value={data.content} onChange={(e) => this.inputChangeHandler(e)} */}
                   <RichTextEditor value={data.content || ""} onChange={(v) => this.setContent(v)}
                     enableEdit={true}
                   />
@@ -174,21 +174,27 @@ class GeneralDetails extends React.Component {
             <Accordion.Body>
               <Row>
                 <Form.Label column="sm" sm={3} className="required"> Authors </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="authors" id="authors"
-                        value={JSON.stringify(data.authors)} disabled
-                /></Col>
+                <Col>
+                  <UserMultiSelect id="authors"
+                    value={data.authors || []} onChange={(arr)=>this.setState({ data: { ...data, authors: arr } })}
+                  />
+                </Col>
               </Row>
               <Row>
                 <Form.Label column="sm" sm={3}> Collaborators </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="collaborators" id="collaborators"
-                        value={JSON.stringify(data.collaborators)} disabled
-                /></Col>
+                <Col>
+                  <UserMultiSelect id="collaborators"
+                    value={data.collaborators || []} onChange={(arr)=>this.setState({ data: { ...data, collaborators: arr } })}
+                  />
+                </Col>
               </Row>
               <Row>
                 <Form.Label column="sm" sm={3}> Reviewers </Form.Label>
-                <Col> <Form.Control size="sm" type="text" placeholder="reviewers" id="reviewers"
-                        value={JSON.stringify(data.reviewers)} disabled
-                /></Col>
+                <Col>
+                  <UserMultiSelect id="reviewers"
+                    value={data.reviewers || []} onChange={(arr)=>this.setState({ data: { ...data, reviewers: arr } })}
+                  />
+                </Col>
               </Row>
 
               <Row>
@@ -207,7 +213,7 @@ class GeneralDetails extends React.Component {
               </Row>
 
               <Row>
-                <Form.Label column="sm" sm={3}> Chỉ Công khai cho các Tổ chức  </Form.Label>
+                <Form.Label column="sm" sm={3}> Chỉ Công khai cho Tổ chức  </Form.Label>
                 <Col sm={9}>
                   <Form.Control size="sm" type="checkbox" id="is_organization_private"
                     checked={data.is_organization_private} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
@@ -215,13 +221,14 @@ class GeneralDetails extends React.Component {
                 </Col>
 
                 <Form.Label column="sm" sm={3}> Tổ chức </Form.Label>
-                <Col sm={9}> <Form.Control size="sm" type="text" placeholder="organizations" id="organizations"
-                        value={JSON.stringify(data.organizations)} disabled
-                /></Col>
+                <Col sm={9}>
+                  <OrgMultiSelect id="organizations"
+                    value={data.organizations || []} onChange={(arr)=>this.setState({ data: { ...data, organizations: arr } })}
+                  />
+                </Col>
 
                 <Col xl={12}><sub>
-                  Nếu có tick và problem đang công khai, chỉ thành viên của tổ chức được thêm mới thấy và nộp bài được.
-                  Nếu không tick và đang công khai, mọi User đều thấy và nộp bài được.
+                  Nếu có tick, mọi thành viên của tổ chức sẽ thấy và submit được, mọi admin của tổ chức sẽ edit được.
                 </sub></Col>
               </Row>
               <Row>

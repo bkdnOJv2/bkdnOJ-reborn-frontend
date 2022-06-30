@@ -32,7 +32,7 @@ class ProblemDetails extends React.Component {
     const { shortname } = this.props.params;
     this.shortname = shortname;
     this.state = {
-      data: undefined, loaded: false, errors: null, shortname: shortname,
+      data: null, loaded: false, errors: null, shortname: shortname,
       redirectUrl: null,
       submitFormShow: false,
 
@@ -265,7 +265,7 @@ class ProblemDetails extends React.Component {
 let wrappedPD = ProblemDetails;
 wrappedPD = withParams(wrappedPD);
 const mapStateToProps = state => {
-    return { user : state.user.user }
+  return { user : state.user.user }
 }
 wrappedPD = connect(mapStateToProps, null)(wrappedPD);
 export default wrappedPD;

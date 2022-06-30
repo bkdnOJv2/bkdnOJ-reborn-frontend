@@ -44,6 +44,7 @@
       // margin-bottom: 30px;
       // padding-top: 30px;
       // padding-bottom: 30px;
+      min-height: 90vh;
       padding: 20px;
       overflow: auto;
     }
@@ -70,9 +71,9 @@
         line-height: 1;
       }
 
-      * {
-        width: 100%;
-      }
+      // * {
+      //   width: 100%;
+      // }
     }
 
     input::placeholder {
@@ -154,40 +155,45 @@
     }
   }
 
-  .accordion-item {
-    border: solid 1px $background-gray;
-    margin: 2px 0;
+  .accordion {
+    width: 100%;
 
-    .accordion-header {
-      margin: unset;
-      color: $base !important;
-      font-size: 14px;
+    .accordion-item {
+      border: solid 1px $background-gray;
+      margin: 2px 0;
+
+      .accordion-header {
+        margin: unset;
+        color: $base !important;
+        font-size: 14px;
+      }
+      button {
+        width: 100%;
+        text-align: left;
+        border: unset;
+        background-color: $background-gray;
+      }
+      p, ul {
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
     }
-    button {
+
+    .accordion-button {
       width: 100%;
-      text-align: left;
-      border: unset;
-      background-color: $background-gray;
+      color: $base;
+      &::before {
+        content: "•";
+        padding-right: 1rem;
+      }
+      &::after {
+        content: '+';
+        float: right;
+      }
     }
-    p, ul {
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-  }
-
-  .accordion-button {
-    color: $base;
-    &::before {
-      content: "•";
-      padding-right: 1rem;
-    }
-    &::after {
-      content: '+';
+    .accordion-button:not(.collapsed)::after {
+      content: 'x';
       float: right;
     }
-  }
-  .accordion-button:not(.collapsed)::after {
-    content: 'x';
-    float: right;
   }
 }

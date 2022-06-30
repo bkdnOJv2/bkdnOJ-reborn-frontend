@@ -1,8 +1,8 @@
 import axiosClient from "api/axiosClient";
 import axiosFormClient from "api/axiosFormClient";
 
-const getUsers = (params) => {
-    return axiosClient.get('/user/', (params && { params: {...params} }));
+const getUsers = ({ params }) => {
+    return axiosClient.get('/users/', (params && { params: {...params} }));
 }
 const getUser = ({id}) => {
     return axiosClient.get(`/user/${id}/`);

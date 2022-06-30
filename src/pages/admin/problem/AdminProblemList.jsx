@@ -55,19 +55,20 @@ class ProblemListItem extends React.Component {
   }
 }
 
-const INITIAL_SEARCH_FILTER = {
+export const PROBLEM_INITIAL_FILTER = {
   'search': "",
-  'is_public': "False",
+  'is_public': "",
+  'is_organization_private': "",
+  'partial': "",
+  'short_circuit': "",
   'ordering': "-created",
 };
 
 class AdminProblemList extends React.Component {
-
-
   constructor(props) {
     super(props);
     this.state = {
-      searchData: INITIAL_SEARCH_FILTER,
+      searchData: PROBLEM_INITIAL_FILTER,
 
       problems: [],
       count: 0,

@@ -8,7 +8,9 @@ import {AiOutlinePlusCircle, AiOutlineArrowRight,
   AiOutlineForm, } from 'react-icons/ai';
 
 import { SpinLoader, ErrorBox } from 'components';
+import Filter from './Filter';
 import contestAPI from 'api/contest';
+
 import { setTitle } from 'helpers/setTitle';
 import { getYearMonthDate, getHourMinuteSecond } from 'helpers/dateFormatter';
 
@@ -16,6 +18,16 @@ import './List.scss'
 import 'styles/ClassicPagination.scss';
 
 const CLASSNAME = 'Contest';
+
+export const INITIAL_FILTER = {
+  'search': "",
+  'is_visible': "",
+  'is_private_contest': "",
+  'enable_frozen': "",
+  'format_name': "",
+  'contest_format': "",
+  'ordering': "-end_time",
+};
 
 class ContestListItem extends React.Component {
   formatDateTime(date) {
@@ -85,6 +97,8 @@ class AdminContestList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      searchData: {...INITIAL_FILTER},
+
       contests: [],
       selectChk: [],
       currPage: 0,
@@ -112,7 +126,7 @@ class AdminContestList extends React.Component {
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
-    contestAPI.getAllContests({page: params.page+1})
+    contestAPI.getAllContests({page: params.page+1, ...this.state.searchData})
       .then((res) => {
         this.setState({
           contests: res.data.results,
@@ -135,6 +149,11 @@ class AdminContestList extends React.Component {
 
   componentDidMount() {
     this.callApi({page: this.state.currPage});
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.searchData !== this.state.searchData) {
+      this.callApi({page: this.state.currPage});
+    }
   }
 
   handlePageClick = (event) => {
@@ -187,80 +206,83 @@ class AdminContestList extends React.Component {
     const { submitting } = this.state;
 
     return (
-      <div className="admin admin-contests wrapper-vanilla">
-      {/* Options for Admins: Create New,.... */}
-      <div className="admin-options">
-        <div className="border d-inline-flex p-1" >
-          <Button size="sm"
-            variant="dark" className="btn-svg" disabled={submitting}
-            onClick={(e) => this.setState({ redirectUrl: 'new' })}
-          >
-            <AiOutlinePlusCircle />
-            <span className="d-none d-md-inline-flex">Add (Form)</span>
-            <span className="d-inline-flex d-md-none">
-              <AiOutlineArrowRight/>
-              <AiOutlineForm />
-            </span>
-          </Button>
+      <div className="admin admin-contests">
+        {/* Options for Admins: Create New,.... */}
+        <div className="admin-options wrapper-vanilla m-0 mb-1">
+          <div className="border d-inline-flex p-1" >
+            <Button size="sm"
+              variant="dark" className="btn-svg" disabled={submitting}
+              onClick={(e) => this.setState({ redirectUrl: 'new' })}
+            >
+              <AiOutlinePlusCircle />
+              <span className="d-none d-md-inline-flex">Add (Form)</span>
+              <span className="d-inline-flex d-md-none">
+                <AiOutlineArrowRight/>
+                <AiOutlineForm />
+              </span>
+            </Button>
+          </div>
+
+          <div className="flex-center">
+            <div className="admin-note text-center mb-1">
+              {
+                submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span>
+              }
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Place for displaying information about admin actions  */}
-      <div className="admin-note text-center mb-1">
-        {
-          submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span>
-        }
-      </div>
+        {/* Problem List */}
+        <div className="admin-table contest-table wrapper-vanilla">
+          <Filter searchData={this.state.searchData} setSearchData={(d)=>this.setState({searchData: d})}/>
 
-      {/* Problem List */}
-      <div className="admin-table contest-table">
-        <h4>Contest List</h4>
-        <ErrorBox errors={this.state.errors} />
-        <Table responsive hover size="sm" striped bordered className="rounded">
-          <thead>
-            <tr>
-              <th >#</th>
-              <th style={{maxWidth: "10%"}}>Key</th>
-              <th style={{minWidth: "20%", maxWidth: "20%"}}>Name</th>
-              <th style={{minWidth: "15%"}}>Start</th>
-              <th style={{minWidth: "15%"}}>End</th>
-              <th >Visible?</th>
-              <th >Rated?</th>
-              <th >Format</th>
-              <th >
-                <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              this.state.loaded === false
-                ? <tr><td colSpan="9"><SpinLoader margin="10px" /></td></tr>
-                : this.state.contests.map((sub, idx) => <ContestListItem
-                    key={`cont-${sub.id}`}
-                    rowidx={idx} ckey={sub.key} {...sub}
-                    selectChk={this.state.selectChk[idx]}
-                    onSelectChkChange={() => this.selectChkChangeHandler(idx)}
-                  />)
-            }
-          </tbody>
-        </Table>
-        {
-          this.state.loaded === false
-            ? <SpinLoader margin="0" />
-            : <span className="classic-pagination">Page: <ReactPaginate
-                breakLabel="..."
-                onPageChange={this.handlePageClick}
-                forcePage={this.state.currPage}
-                pageLabelBuilder={(page) => `[${page}]`}
-                pageRangeDisplayed={3}
-                pageCount={this.state.pageCount}
-                renderOnZeroPageCount={null}
-                previousLabel={null}
-                nextLabel={null}
-                /></span>
-        }
-      </div>
+          <h4>Contest List</h4>
+          <ErrorBox errors={this.state.errors} />
+          <Table responsive hover size="sm" striped bordered className="rounded">
+            <thead>
+              <tr>
+                <th >#</th>
+                <th style={{maxWidth: "10%"}}>Key</th>
+                <th style={{minWidth: "20%", maxWidth: "20%"}}>Name</th>
+                <th style={{minWidth: "15%"}}>Start</th>
+                <th style={{minWidth: "15%"}}>End</th>
+                <th >Visible?</th>
+                <th >Rated?</th>
+                <th >Format</th>
+                <th >
+                  <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                this.state.loaded === false
+                  ? <tr><td colSpan="9"><SpinLoader margin="10px" /></td></tr>
+                  : this.state.contests.map((sub, idx) => <ContestListItem
+                      key={`cont-${sub.id}`}
+                      rowidx={idx} ckey={sub.key} {...sub}
+                      selectChk={this.state.selectChk[idx]}
+                      onSelectChkChange={() => this.selectChkChangeHandler(idx)}
+                    />)
+              }
+            </tbody>
+          </Table>
+          {
+            this.state.loaded === false
+              ? <SpinLoader margin="0" />
+              : <span className="classic-pagination">Page: <ReactPaginate
+                  breakLabel="..."
+                  onPageChange={this.handlePageClick}
+                  forcePage={this.state.currPage}
+                  pageLabelBuilder={(page) => `[${page}]`}
+                  pageRangeDisplayed={3}
+                  pageCount={this.state.pageCount}
+                  renderOnZeroPageCount={null}
+                  previousLabel={null}
+                  nextLabel={null}
+                  /></span>
+          }
+        </div>
       </div>
     )
   }
