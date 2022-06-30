@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { VscAccount, VscOrganization, VscListOrdered, VscFileCode, VscServer 
+import { VscAccount, VscOrganization, VscListOrdered, VscFileCode, VscServer
   } from 'react-icons/vsc';
 import { GiTrophyCup } from 'react-icons/gi';
 
@@ -25,43 +25,43 @@ export default class AdminNav extends React.Component {
         <hr className="sidebar-divider "/>
 
         <li className='nav-item'>
-          <Link to='user' className='nav-link'>
+          <Link to='users' className='nav-link'>
             <VscAccount className='icon'/>
             Users
           </Link>
         </li>
         <li className='nav-item'>
-          <Link to='organization' className='nav-link'>
+          <Link to='orgs' className='nav-link'>
             <VscOrganization className='icon'/>
             Organizations
           </Link>
         </li>
 
         <li className='nav-item'>
-          <Link to='problem' className='nav-link'>
+          <Link to='problems' className='nav-link'>
             <VscListOrdered className='icon'/>
             Problems
           </Link>
         </li>
         <li className='nav-item'>
-          <Link to='contest' className='nav-link'>
+          <Link to='contests' className='nav-link'>
             <GiTrophyCup className='icon'/>
             Contests
           </Link>
         </li>
         <li className='nav-item'>
-          <Link to='submission' className='nav-link'>
+          <Link to='submissions' className='nav-link'>
             <VscFileCode className='icon'/>
             Submissions
           </Link>
         </li>
         <li className='nav-item'>
-          <Link to='judge' className='nav-link'>
+          <Link to='judges' className='nav-link'>
             <VscServer className='icon'/>
             Judges
           </Link>
         </li>
-      </ul> 
+      </ul>
     )
   }
 }

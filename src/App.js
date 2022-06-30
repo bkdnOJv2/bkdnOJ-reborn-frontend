@@ -32,6 +32,7 @@ import {
   AdminSubmissionList, AdminSubmissionDetails,
   AdminJudgeList, AdminJudgeDetails, AdminJudgeNew,
   AdminContestList, AdminContestDetails, AdminContestNew,
+  AdminOrgList, AdminOrgDetails,
   AdminApp
 } from 'pages/admin';
 
@@ -80,7 +81,7 @@ class App extends React.Component {
                   </div>
                 }/>
 
-                <Route path="user" element={
+                <Route path="users" element={
                   <OneColumn mainContent={<AdminUserList />} />
                 }/>
                 <Route path="user/:id" element={
@@ -90,7 +91,14 @@ class App extends React.Component {
                   <OneColumn mainContent={<AdminUserNew />} />
                 }/>
 
-                <Route path="problem" element={
+                <Route path="orgs" element={
+                  <OneColumn mainContent={<AdminOrgList />} />
+                }/>
+                <Route path="org/:slug" element={
+                  <OneColumn mainContent={<AdminOrgDetails />} />
+                }/>
+
+                <Route path="problems" element={
                   <OneColumn mainContent={<AdminProblemList />} />
                 }/>
                 <Route path="problem/new" element={
@@ -100,7 +108,7 @@ class App extends React.Component {
                   <OneColumn mainContent={<AdminProblemDetails />} />
                 }/>
 
-                <Route path="submission" element={
+                <Route path="submissions" element={
                   <OneColumn mainContent={<AdminSubmissionList />} />
                 }/>
                 <Route path="submission/new" element={
@@ -110,7 +118,7 @@ class App extends React.Component {
                   <OneColumn mainContent={<AdminSubmissionDetails />} />
                 }/>
 
-                <Route path="contest" element={
+                <Route path="contests" element={
                   <OneColumn mainContent={<AdminContestList />} />
                 }/>
                 <Route exact path="contest/new" element={
@@ -120,7 +128,7 @@ class App extends React.Component {
                   <OneColumn mainContent={<AdminContestDetails />} />
                 }/>
 
-                <Route path="judge" element={
+                <Route path="judges" element={
                   <OneColumn mainContent={<AdminJudgeList />} />
                 }/>
                 <Route path="judge/new" element={

@@ -54,8 +54,8 @@ export default class GeneralDetails extends React.Component {
         </Row>
         <Row>
           <Form.Label column="sm" sm={3}> Contest </Form.Label>
-          <Col> <Form.Control size="sm" type="text" placeholder="Contest ID" id="contest"
-                  value={data.contest_object ? data.contest_object.id : "None"} disabled readOnly
+          <Col> <Form.Control size="sm" type="text" placeholder="Contest key" id="contest"
+                  value={data.contest_object ? data.contest_object.key : "None"} disabled readOnly
           /></Col>
         </Row>
 
@@ -111,7 +111,7 @@ export default class GeneralDetails extends React.Component {
         <Row>
           <Form.Label column="sm" lg={3}> Source </Form.Label>
           <Col>
-            <Form.Control lg={12} type="textarea" size="sm"
+            <Form.Control lg={12} as="textarea" size="md"
               id="source" defaultValue={data.source} disabled readOnly />
           </Col>
         </Row>
@@ -123,9 +123,9 @@ export default class GeneralDetails extends React.Component {
           <sub>**Chưa thể chỉnh sửa.</sub>
         </Col>
         <Col >
-          <Button variant="dark" size="sm" type="submit" disabled>
+          {/* <Button variant="dark" size="sm" type="submit" disabled>
             No Op
-          </Button>
+          </Button> */}
         </Col>
       </Row>
       </Form>

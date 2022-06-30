@@ -138,7 +138,7 @@ class AdminContestDetails extends React.Component {
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && !!errors && <span>Something went wrong.</span>}
           { loaded && !errors && <div className="panel-header">
-              <span className="title-text text-truncate">{`Viewing Contest | ${data.name}`}</span>
+              <span className="title-text text-truncate">{`Contest | ${data.name}`}</span>
               <span>
                 <RateButton ckey={this.key} setErrors={(e) => this.setState({errors: e})} />
               </span>
