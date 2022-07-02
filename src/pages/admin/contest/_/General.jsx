@@ -391,8 +391,8 @@ class General extends React.Component {
 
               <Row>
                 <Form.Label column="sm" > Rate For All </Form.Label>
-                <Col > <Form.Control size="sm" type="checkbox" id="rated_all"
-                        checked={data.rated_all || false}
+                <Col > <Form.Control size="sm" type="checkbox" id="rate_all"
+                        checked={data.rate_all || false}
                         onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
                 /></Col>
                 <Col xl={12}>
