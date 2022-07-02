@@ -88,10 +88,13 @@ class ContestApp extends React.Component {
     .catch((err) => {
       this.setState({
         loaded: true,
-        errors: err,
+        errors: err.response.data || ["Contest not available"],
       })
-      toast.error(`Contest is not available. (${err.response.status})`, {
+      let msg = (err.response.data && err.response.data.detail && err.response.data.detail) || `Contest is not available. (${err.response.status})`;
+
+      toast.error(msg, {
         toastId: "contest-na",
+        autoClose: false,
       })
       // this.props.navigate( -1, { replace: true } )
     })

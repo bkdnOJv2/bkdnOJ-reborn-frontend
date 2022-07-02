@@ -13,7 +13,7 @@ const INITIAL_STATE = {
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
-    console.log(state)
+    // console.log(state)
     switch (action.type) {
         case UPDATE_SELECT:
             return {

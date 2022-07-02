@@ -84,11 +84,11 @@ class App extends React.Component {
                 <Route path="users" element={
                   <OneColumn mainContent={<AdminUserList />} />
                 }/>
+                <Route path="users/new" element={
+                  <OneColumn mainContent={<AdminUserNew />} />
+                }/>
                 <Route path="user/:id" element={
                   <OneColumn mainContent={<AdminUserDetails />} />
-                }/>
-                <Route path="user/new" element={
-                  <OneColumn mainContent={<AdminUserNew />} />
                 }/>
 
                 <Route path="orgs" element={
@@ -149,8 +149,8 @@ class App extends React.Component {
           }
           <Route path="" element={<UserApp />}>
             <Route index path="/" element={<Content />} />
-            <Route path="/profile" element={<UserProfile />} />
             <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/profile" element={<UserProfile />} />
             {
               this.isAuthenticated() ? <>
                 <Route path="/sign-out" element={<SignOut />} />

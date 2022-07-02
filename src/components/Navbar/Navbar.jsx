@@ -51,7 +51,7 @@ export default class Navbar extends React.Component {
                         </Nav>
                     </Container>
                 </BTNavbar>
-                <SubHeader/>
+                {/* <SubHeader/> */}
             </div>
         )
     }

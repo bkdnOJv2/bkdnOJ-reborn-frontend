@@ -255,7 +255,9 @@ class General extends React.Component {
                   />
                 </Col>
                 <Col xl={12}>
-                  <sub>Đặc quyền Tác giả, sẽ được quyền xem và chỉnh sửa Contest. Tên tác giả sẽ được hiển thị công khai.</sub>
+                  <sub>Đặc quyền Tác giả, sẽ được quyền xem và chỉnh sửa Contest. Tên tác giả sẽ được hiển thị công khai.
+                    <span className="text-danger"><strong>*Cẩn thận!</strong> Bạn có thể mất quyền Edit Contest nếu bạn xóa bản thân khỏi danh sách Authors!</span>
+                  </sub>
                 </Col>
 
                 <Form.Label column="sm" md={2}> Collaborators </Form.Label>
@@ -414,11 +416,10 @@ class General extends React.Component {
         </Accordion>
 
         <Row>
-          <Col xs={9}>
-            <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
+          <Col xl={10}>
           </Col>
-          <Col xs={3}>
-            <Button variant="dark" size="sm" type="submit" >
+          <Col>
+            <Button variant="dark" size="sm" type="submit" className="w-100">
               Save
             </Button>
           </Col>

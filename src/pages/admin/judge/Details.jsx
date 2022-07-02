@@ -11,6 +11,7 @@ import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
 import './Details.scss';
+import { qmClarify } from 'helpers/components';
 
 const JUDGE_PROPS = ['name', 'auth_key', 'description', 'is_blocked']
 
@@ -36,7 +37,7 @@ class AdminJudgeDetails extends React.Component {
       }).catch((err) => {
         this.setState({
           loaded: true,
-          errors: err,
+          errors: {errors: err.response.data},
         })
       })
   }
@@ -75,8 +76,8 @@ class AdminJudgeDetails extends React.Component {
       const v = this.state.data[key];
       cleanedData[key] = v;
     })
-    console.log(cleanedData)
 
+    this.setState({ errors: null })
     judgeAPI.adminEditJudge({id, data: cleanedData})
     .then((res) => {
       toast.success(`OK Edited.`)
@@ -86,12 +87,13 @@ class AdminJudgeDetails extends React.Component {
       toast.error(`Cannot edit. (${err})`)
       const data = err.response.data;
       let errors = {...data}
-      if (data.detail) errors.general = data.detail
-      this.setState({ errors })
+      this.setState({ errors: { errors } })
     })
   }
 
   deleteObjectHandler() {
+    this.setState({ errors: null })
+
     let conf = window.confirm("Những bài đang chấm sẽ chuyển trạng thái thành IE và bị hủy chấm, "+
       "vì vậy hãy block máy chấm tối thiểu 1 phút để tránh hiện tượng này. Bạn có muốn xóa?");
     if (conf) {
@@ -102,6 +104,9 @@ class AdminJudgeDetails extends React.Component {
         })
         .catch((err) => {
           toast.error(`Cannot delete. (${err})`);
+          const data = err.response.data;
+          let errors = {...data}
+          this.setState({ errors: { errors } })
         })
     }
   }
@@ -117,7 +122,7 @@ class AdminJudgeDetails extends React.Component {
         <h4 className="judge-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
           { loaded && <div className="panel-header">
-              <span className="title-text">{`Viewing judge. ${data.name}`}</span>
+              <span className="title-text">{`Judge. ${data.name} |`}</span>
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
@@ -163,8 +168,7 @@ class AdminJudgeDetails extends React.Component {
                 /></Col>
                 <Form.Label column="sm" sm={4}>
                   <span className="d-inline" style={{whiteSpace: "nowrap"}}>
-                    Chặn máy chấm này
-                    <Link to="#" onClick={()=>alert('Máy chấm bị chặn sẽ không nhận submission nữa.')}>?</Link>
+                    Chặn máy chấm này{qmClarify('Máy chấm bị chặn sẽ không nhận submission nữa.')}
                   </span>
                 </Form.Label>
                 <Col sm={2}> <Form.Control size="sm" type="checkbox" id="is_blocked"
@@ -219,10 +223,9 @@ class AdminJudgeDetails extends React.Component {
 
               <Row>
                 <Col lg={10}>
-                  <sub>**Các thiết lập khác sẽ được thêm sau.</sub>
                 </Col>
                 <Col >
-                  <Button variant="dark" size="sm" type="submit" >
+                  <Button variant="dark" size="sm" type="submit" className="w-100">
                     Save
                   </Button>
                 </Col>

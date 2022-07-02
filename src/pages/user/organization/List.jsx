@@ -75,7 +75,7 @@ class OrgList extends React.Component {
       })
     })
     .catch((err) => {
-      this.setState({errors: err.response.data || "Cannot fetch Organizations at the moment."})
+      this.setState({loaded: true, errors: {errors: err.response.data} || "Cannot fetch Organizations at the moment."})
     })
   }
 

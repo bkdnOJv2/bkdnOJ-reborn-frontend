@@ -276,7 +276,7 @@ class NPContestList extends React.Component {
       .catch((err) => {
         this.setState({
           loaded: true,
-          errors: err.response.data || "Cannot fetch contests. Please retry again.",
+          errors: {errors: err.response.data} || ["Cannot fetch contests. Please retry again."],
         })
       })
   }
@@ -376,7 +376,7 @@ class ContestList extends React.Component {
       .catch((err) => {
         this.setState({
           loaded: true,
-          errors: ["Cannot fetch contests. Please retry again."],
+          errors: {errors: err.response.data} || ["Cannot fetch contests. Please retry again."],
         })
       })
   }

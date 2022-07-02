@@ -77,16 +77,18 @@ class ProblemList extends React.Component {
   callApi(params) {
     this.setState({loaded: false, errors: null})
 
-    let endpoint, data;
+    let endpoint, data, prms;
     if (this.state.contest) {
       endpoint = contestApi.getContestProblems
       data = { key: this.state.contest.key }
+      prms = {page: params.page+1, contest: this.state.contest.key}
     } else {
       endpoint = problemApi.getProblems
       data = {}
+      prms = {page: params.page+1,}
     }
 
-    endpoint({...data, params: {page: params.page+1,} })
+    endpoint({...data, params: prms })
       .then((res) => {
         this.setState({
           problems: res.data.results,

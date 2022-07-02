@@ -23,7 +23,7 @@ import './UserProfile.scss';
 import { __ls_set_auth_user, __ls_get_access_token } from 'helpers/localStorageHelpers';
 import { setTitle } from 'helpers/setTitle';
 
-import { AboutTab, } from './_';
+import { AboutTab, SettingTab } from './_';
 
 class UserProfile extends React.Component {
   constructor(props) {
@@ -38,6 +38,7 @@ class UserProfile extends React.Component {
 
   fetch() {
     const profile = this.state.profile;
+    this.setState({ profile: null, loaded: false })
 
     setTimeout(() => profileClient.fetchProfile()
       .then((res) => {
@@ -55,7 +56,7 @@ class UserProfile extends React.Component {
       }).catch((err) => {
         this.setState({
           loaded: true,
-          errors: err.response.data,
+          errors: {errors: err.response.data || ["Cannot authenticate."]},
         })
         console.log(err);
       })
@@ -68,7 +69,7 @@ class UserProfile extends React.Component {
 
   componentDidMount() {
     this.fetch();
-    setTimeout(()=>this.setState({ reloginNoticeShow: true }), 5000);
+    setTimeout(()=>this.setState({ reloginNoticeShow: true }), 7000);
   }
 
   render() {
@@ -89,6 +90,7 @@ class UserProfile extends React.Component {
     }
 
     if (!profile) {
+      this.props.clearUser()
       toast.error("Please log-in again.", {toastId: "profile-fetch-failed"})
       return <Navigate to="/sign-in"></Navigate>
     }
@@ -106,11 +108,11 @@ class UserProfile extends React.Component {
           <Col md={9} className="text-left tabs-wrapper">
             <Tabs defaultActiveKey="about" className="profile-tabs mb-3">
               <Tab eventKey="settings" title="Settings">
-                That thou hast her it is not all my grief, And yet it may be said I loved her dearly; That she hath thee is of my wailing chief, A loss in love that touches me more nearly. Loving offenders thus I will excuse ye: Thou dost love her, because thou know'st I love her; And for my sake even so doth she abuse me, Suffering my friend for my sake to approve her. If I lose thee, my loss is my love's gain, And losing her, my friend hath found that loss;
+                <SettingTab profile={profile} />
               </Tab>
-              <Tab eventKey="compete" title="Compete">
+              {/* <Tab eventKey="compete" title="Compete">
                 That thou hast her it is not all my grief, And yet it may be said I loved her dearly; That she hath thee is of my wailing chief, A loss in love that touches me more nearly. Loving offenders thus I will excuse ye: Thou dost love her, because thou know'st I love her; And for my sake even so doth she abuse me, Suffering my friend for my sake to approve her. If I lose thee, my loss is my love's gain, And losing her, my friend hath found that loss;
-              </Tab>
+              </Tab> */}
               <Tab eventKey="about" title="About">
                 <AboutTab profile={profile} />
               </Tab>

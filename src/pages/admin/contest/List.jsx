@@ -16,6 +16,7 @@ import { getYearMonthDate, getHourMinuteSecond } from 'helpers/dateFormatter';
 
 import './List.scss'
 import 'styles/ClassicPagination.scss';
+import { qmClarify } from 'helpers/components';
 
 const CLASSNAME = 'Contest';
 
@@ -45,17 +46,21 @@ class ContestListItem extends React.Component {
   }
 
   render() {
-    const { id, ckey, name, start_time, end_time, is_visible,
-      is_private, is_organization_private, is_rated, format_name } = this.props;
+    const { id, ckey, name, start_time, end_time,
+      published, is_visible, is_private, is_organization_private,
+      is_rated, format_name } = this.props;
     const {rowidx, selectChk, onSelectChkChange} = this.props;
+
+    const access_label = !published ? "PRIVATE" : (
+      is_visible ? (
+        (is_private || is_organization_private) ? "ALL/LIMITED" : "ALL"
+      ) : (
+        (is_private || is_organization_private) ? "LIMITED" : "PRIVATE"
+      )
+    );
 
     return (
       <tr>
-        <td className="text-truncate" >
-          <Link to={`/admin/contest/${ckey}`}>
-            {id}
-          </Link>
-        </td>
         <td className="text-truncate" >
           <Link to={`/admin/contest/${ckey}`}>
             {ckey}
@@ -72,13 +77,7 @@ class ContestListItem extends React.Component {
         <td className="text-truncate" >
           {this.formatDateTime(end_time)}
         </td>
-        <td>
-          {
-            is_visible ? (
-              (is_organization_private || is_private) ? "Orgs/Users" : "Public"
-            ) : "Private"
-          }
-        </td>
+        <td>{access_label}</td>
         <td>{is_rated ? "Yes" : "No"}</td>
         <td>{format_name}</td>
         {/* <td className="text-truncate" style={{maxWidth: "200px"}}>
@@ -240,14 +239,23 @@ class AdminContestList extends React.Component {
           <Table responsive hover size="sm" striped bordered className="rounded">
             <thead>
               <tr>
-                <th >#</th>
                 <th style={{maxWidth: "10%"}}>Key</th>
                 <th style={{minWidth: "20%", maxWidth: "20%"}}>Name</th>
                 <th style={{minWidth: "15%"}}>Start</th>
                 <th style={{minWidth: "15%"}}>End</th>
-                <th >Visible?</th>
-                <th >Rated?</th>
-                <th >Format</th>
+                <th >
+                  Quyền View/Quyền Join{qmClarify(
+                    "Những User có quyền Edit sẽ luôn thấy được tất cả dữ liệu của contest. Phía bên dưới mô tả quyền View (không đóng băng) cho những User còn lại:\n"+
+                    "* ALL: Tất cả User có thể Thấy và Đăng ký trước giờ, có thể Làm bài và Xem contest khi nó diễn ra.\n"+
+                    "* ALL/LIMITED: Tất cả User có thể Thấy và Xem contest nhưng chỉ một số cá nhân/tổ chức mới có thể Đăng ký và Làm bài. Nếu có chia sẻ cho tổ chức, Admin tổ chức có thể chỉnh sửa contest.\n"+
+                    "* LIMITED: Chỉ một số cá nhân/tổ chức mới có thể Thấy, Xem, Đăng ký và Làm bài. Nếu có chia sẻ cho tổ chức, Admin tổ chức có thể chỉnh sửa contest.\n"+
+                    "* PRIVATE: Không có ai ngoài 3 nhóm đặc quyền có thể thấy được contest."
+                  )}
+                </th>
+                <th >Rated{qmClarify("Contest có cho phép Tính điểm xếp hạng sau khi diễn ra hay không.")}</th>
+                <th >Format{qmClarify("Định dạng Contest, chỉ thay đổi cách tính penalty, thứ hạng và cách show bảng điểm, không thay đổi cách chấm mỗi bài.\n"+
+                    "* ICPC: Mỗi Problem, tất cả bài nộp trước bài nộp AC (full điểm) đầu tiên sẽ được tính vào penalty. Thứ hạng quyết định bởi: Điểm -> (Tổng Penalty + Tổng thời điểm nộp).\n"+
+                    "* IOI: Mỗi Problem, lấy bài nộp có điểm lớn nhất, có nhiều thì lấy bài nộp sớm nhất. Thứ hạng quyết định bởi: Điểm -> (Tổng Thời điểm nộp)")}</th>
                 <th >
                   <Link to="#" onClick={(e) => this.handleDeleteSelect(e)}>Delete</Link>
                 </th>

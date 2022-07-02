@@ -67,7 +67,6 @@ export default class ErrorBox extends React.Component {
   render() {
     var { errors } = this.state;
     if (!errors) return <></>
-    console.log(errors)
 
     if (typeof(errors) === 'string' || errors instanceof String) {
       errors = {general: errors}
@@ -84,7 +83,7 @@ export default class ErrorBox extends React.Component {
         strErrors.push(errors[key])
       } else
       if (errors[key] instanceof Array) {
-        strErrors.concat(errors[key])
+        // strErrors.concat(errors[key])
       } else
       if (
         typeof errors[key] === 'object' && !Array.isArray(errors[key]) &&

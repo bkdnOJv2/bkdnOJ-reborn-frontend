@@ -100,7 +100,7 @@ class SubmissionDetails extends React.Component {
           })
       })
       .catch((err) => {
-        toast.error(`Cannot rejudge this problem (${err.status.code})`)
+        toast.error(`Cannot rejudge. (${err.response.status})`)
       })
   }
 

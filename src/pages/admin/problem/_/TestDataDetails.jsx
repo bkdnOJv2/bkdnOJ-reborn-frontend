@@ -92,14 +92,10 @@ export default class TestDataDetails extends React.Component {
         toast.success("OK Updated.")
         this.props.forceRerender();
       }).catch((err) => {
-        console.log(err);
         this.setState({
-          errors: err.response.data,
+          errors: {errors: err.response.data || ["Cannot update problem data."]},
           submitting: false,
         })
-        if (this.props.setErrors) {
-          this.props.setErrors({errors: err.response.data})
-        }
       })
     })
   }

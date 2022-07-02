@@ -18,12 +18,17 @@ const adminGenUserFromCSV = ({formData}) => {
     return axiosFormClient.post(`/user/generate/csv/`, formData)
 }
 
+const adminResetPassword = ({id, data}) => {
+    return axiosClient.post(`/user/${id}/reset-password/`, data);
+}
+
 const userAPI = {
     getUsers,
     getUser,
     adminGenUserFromCSV,
     adminEditUser,
     adminDeleteUser,
+    adminResetPassword,
 }
 
 export default userAPI;

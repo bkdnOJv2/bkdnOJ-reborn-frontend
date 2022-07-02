@@ -32,14 +32,14 @@ class SubHeader extends React.Component {
             <div className='subheader expand-sm'>
                 <Container>
                     <div className='float-left'>
-                        <span className='left-padder d-none d-md-inline'>
+                        {/* <span className='left-padder d-none d-md-inline'>
                             {'Viewing As >>'}
                         </span>
                         {selectedOrg.slug
                             ? <div className="org-display org-uni"><FaUniversity size={14}/></div>
                             : <div className="org-display org-none"><FaGlobe size={14}/></div>
                         }
-                        <span>{selectedOrg.slug || "Global"}</span>
+                        <span>{selectedOrg.slug || "Global"}</span> */}
                     </div>
 
                     <div className='float-right'>

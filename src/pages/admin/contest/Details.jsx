@@ -9,7 +9,7 @@ import { General, Participation, Problem, Submission
 } from './_';
 
 import contestAPI from 'api/contest';
-import { SpinLoader } from 'components';
+import { SpinLoader, ErrorBox } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
@@ -100,7 +100,7 @@ class AdminContestDetails extends React.Component {
       }).catch((err) => {
         this.setState({
           loaded: true,
-          errors: err,
+          errors: {errors: err.response.data} || `Cannot load contest. (${err.response.status})`,
         })
       })
   }
@@ -135,32 +135,34 @@ class AdminContestDetails extends React.Component {
     return (
       <div className="admin contest-panel wrapper-vanilla">
         <h4 className="contest-title">
-          { !loaded && <span><SpinLoader/> Loading...</span>}
-          { loaded && !!errors && <span>Something went wrong.</span>}
-          { loaded && !errors && <div className="panel-header">
-              <span className="title-text text-truncate">{`Contest | ${data.name}`}</span>
-              <span>
-                <RateButton ckey={this.key} setErrors={(e) => this.setState({errors: e})} />
-              </span>
-              <span>
-                <Button className="btn-svg" size="sm" variant="dark"
-                  onClick={()=>this.setState({ redirectUrl: `/contest/${this.key}` })}>
-                    <FaGlobe size={16}/><span className="d-none d-md-inline">View on Site</span>
-                </Button>
-              </span>
-              <span>
-                <Button className="btn-svg" size="sm" variant="danger"
-                  onClick={()=>this.deleteObjectHandler()}>
-                    <FaRegTrashAlt size={16}/><span className="d-none d-md-inline">Delete</span>
-                </Button>
-              </span>
-            </div>
-          }
+          <div className="panel-header">
+            <span className="title-text text-truncate">{`Contest | ${this.key}`}
+              { !loaded && <span><SpinLoader/></span>}
+            </span>
+            { loaded && !errors && <>
+                <span>
+                  <RateButton ckey={this.key} setErrors={(e) => this.setState({errors: e})} />
+                </span>
+                <span>
+                  <Button className="btn-svg" size="sm" variant="dark"
+                    onClick={()=>this.setState({ redirectUrl: `/contest/${this.key}` })}>
+                      <FaGlobe size={16}/><span className="d-none d-md-inline">View on Site</span>
+                  </Button>
+                </span>
+                <span>
+                  <Button className="btn-svg" size="sm" variant="danger"
+                    onClick={()=>this.deleteObjectHandler()}>
+                      <FaRegTrashAlt size={16}/><span className="d-none d-md-inline">Delete</span>
+                  </Button>
+                </span>
+              </>
+            }
+          </div>
         </h4>
         <hr/>
         <div className="contest-details">
           { !loaded && <span><SpinLoader/> Loading...</span> }
-
+          <ErrorBox errors={this.state.errors} />
           { loaded && !errors && <>
           <Tabs defaultActiveKey="general" id="general" className="pl-2">
             <Tab eventKey="general" title="General">

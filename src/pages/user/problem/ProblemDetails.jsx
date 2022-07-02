@@ -75,9 +75,11 @@ class ProblemDetails extends React.Component {
     this.setState({loaded: false, errors: null})
 
     let endpoint, data, callback = (v) => {};
+    let prms = null;
     if (this.state.contest) {
       endpoint = contestAPI.getContestProblem
       data = { key: this.state.contest.key, shortname: this.shortname }
+      // prms = { contest: this.state.contest.key }
       callback = (res) => {
         this.setState({
           data: { ...res.data.problem_data, ...res.data } ,
@@ -97,7 +99,7 @@ class ProblemDetails extends React.Component {
       }
     }
 
-    endpoint({...data})
+    endpoint({...data, params: prms})
       .then((res) => {
         callback(res)
       })
@@ -138,6 +140,7 @@ class ProblemDetails extends React.Component {
     const isSuperuser = isLoggedIn && this.user.is_superuser;
 
     const pdfAvailable = !!(data && data.pdf);
+    const pdfExtraQuery = (contest ? `?contest=${contest.key}` : "");
 
     return (
       <div className="problem-info wrapper-vanilla">
@@ -240,7 +243,7 @@ class ProblemDetails extends React.Component {
                         src={`https://docs.google.com/viewer?url=${this.state.data.pdf}&embedded=true`}>
                       </iframe>
                     </object> */}
-                    <PDFViewer pdf={data.pdf} />
+                    <PDFViewer pdf={`${data.pdf}${pdfExtraQuery}`} />
                   </div>
                 }{
                   this.state.probStatementType === 'text' &&

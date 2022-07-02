@@ -50,11 +50,7 @@ class GeneralDetails extends React.Component {
   setTime(key, v) {
     let time = new Date(v)
     const data = this.state.data;
-    console.log(key, time.toISOString())
-    console.log('Before', data)
-    this.setState({ data : { ...data, [key]: time.toISOString() } },
-    () => console.log('After', data)
-    );
+    this.setState({ data : { ...data, [key]: time.toISOString() } });
   }
   setContent(v) {
     const {data} = this.state;
@@ -78,7 +74,6 @@ class GeneralDetails extends React.Component {
         data: sendData,
       })
     )
-    console.log(sendData)
 
     if (this.state.selectedPdf) {
       const formData = new FormData();
@@ -114,7 +109,6 @@ class GeneralDetails extends React.Component {
 
   render() {
     const {data} = this.state;
-    console.log(data);
     return (
       <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
         <Row className="options m-1 border">
@@ -187,6 +181,7 @@ class GeneralDetails extends React.Component {
                 </Col>
                 <Col xl={12}>
                   <sub>Đặc quyền Tác giả, Tác giả có thể thấy và edit được Problem. Tên sẽ hiển thị công khai.</sub>
+                  <sub className="text-danger"><strong> *Cẩn thận!</strong> Bạn có thể  mất quyền Edit problem này nếu bạn xóa bản thân ra khỏi danh sách Authors!</sub>
                 </Col>
               </Row>
               <Row>
@@ -241,8 +236,8 @@ class GeneralDetails extends React.Component {
                 </Col>
 
                 <Col xl={12}><sub>
-                  Chỉ có tác dụng nếu <strong>problem đang Công khai</strong>. Nếu có tick, những thành viên của Tổ chức được thêm và những Tổ chức con
-                  thấy được problem. Ngoài ra, những admin của tổ chức sẽ edit được problem.
+                  Chỉ có tác dụng nếu <strong>problem đang Công khai</strong>. Nếu <strong>có tick, chỉ những thành viên </strong>
+                  của Tổ chức được thêm và những Tổ chức con thấy được problem. Ngoài ra, những admin của tổ chức sẽ edit được problem.
                 </sub></Col>
               </Row>
               <Row>

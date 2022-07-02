@@ -6,7 +6,7 @@ import { Form, Row, Col, Button, Tabs, Tab } from 'react-bootstrap';
 import { FaGlobe, FaRedo, FaRegTrashAlt, FaChartLine } from 'react-icons/fa';
 
 import { SpinLoader, ErrorBox } from 'components';
-import { withParams } from 'helpers/react-router'
+import { withNavigation, withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
 import UserMultiSelect from 'components/SelectMulti/User';
@@ -67,11 +67,12 @@ class OrgDetail extends React.Component {
     .then((res) => {
       toast.success("OK Updated.")
       this.setState({ data: res.data, })
+      if (res.data.slug !== this.state.slug)
+        this.props.navigate(`/admin/org/${res.data.slug}`, {replace: true})
     })
     .catch((err) => {
       toast.error(`Cannot update (${err.response.status})`)
       this.setState({errors: {errors:err.response.data} || ['Cannot update organization information.']})
-      console.log(err)
     })
   }
 
@@ -142,7 +143,7 @@ class OrgDetail extends React.Component {
                         <Row>
                           <Form.Label column="sm" md={2} className="required "> Slug </Form.Label>
                           <Col > <Form.Control size="sm" type="text" placeholder="Slug" id="slug"
-                                  value={data.slug || ''} disabled readOnly required
+                                  value={data.slug || ''} onChange={(e)=>this.inputChangeHandler(e)} required
                           /></Col>
 
                           <Form.Label column="sm" md={2} className="required "> Shortname </Form.Label>
@@ -193,7 +194,7 @@ class OrgDetail extends React.Component {
                         <Row>
                           <Form.Label column="sm" xl={12} className="required"> About </Form.Label>
                           <Col>
-                            <Form.Control as="textarea" id="about"
+                            <Form.Control as="textarea" id="about" required
                               value={data.about || ''} onChange={(e)=>this.inputChangeHandler(e)}
                             />
                           </Col>
@@ -206,6 +207,11 @@ class OrgDetail extends React.Component {
                             <UserMultiSelect id="admins"
                               value={data.admins || []} onChange={(arr)=>this.setState({ data: { ...data, admins: arr } })}
                             />
+                          </Col>
+                          <Col xl={12}>
+                            <sub className="text-danger"><strong>*Cẩn thận!</strong> Bạn có thể  mất quyền Edit tổ chức này nếu bạn xóa bản thân ra khỏi danh sách Admins!
+                              Hãy đảm bảo bạn vẫn có thể Edit tổ chức lớn hơn.
+                            </sub>
                           </Col>
                         </Row>
 
@@ -292,4 +298,5 @@ class OrgDetail extends React.Component {
 
 let wrapped = OrgDetail;
 wrapped = withParams(wrapped);
+wrapped = withNavigation(wrapped);
 export default wrapped;

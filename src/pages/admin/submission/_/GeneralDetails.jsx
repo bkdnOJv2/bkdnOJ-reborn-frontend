@@ -55,7 +55,7 @@ export default class GeneralDetails extends React.Component {
         <Row>
           <Form.Label column="sm" sm={3}> Contest </Form.Label>
           <Col> <Form.Control size="sm" type="text" placeholder="Contest key" id="contest"
-                  value={data.contest_object ? data.contest_object.key : "None"} disabled readOnly
+                  value={data.contest_object ? data.contest_object : "None"} disabled readOnly
           /></Col>
         </Row>
 
@@ -88,7 +88,7 @@ export default class GeneralDetails extends React.Component {
           <Form.Label column="sm" sm={3}> Judged On </Form.Label>
           <Col >
             <Form.Control size="sm" type="text" id="judged_on"
-              value={data.judged_on || "N/A"}  readOnly
+              value={data.judged_on ? data.judged_on.name :  "N/A"}  readOnly
             />
           </Col>
         </Row>

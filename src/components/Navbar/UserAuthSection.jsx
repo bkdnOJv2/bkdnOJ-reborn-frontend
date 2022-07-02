@@ -131,10 +131,10 @@ class AuthorizedMenu extends React.Component {
                     </NavDropdown.Item>
                 </NavDropdown>
 
-                <button id="switch-org-btn" onClick={()=>this.setSwitchOrgModalShow(true)} >
+                {/* <button id="switch-org-btn" onClick={()=>this.setSwitchOrgModalShow(true)} >
                     <FaGlobe/>
                 </button>
-                <SwitchOrgModal show={this.state.switchOrgModalShow} setShow={(b)=>this.setSwitchOrgModalShow(b)}/>
+                <SwitchOrgModal show={this.state.switchOrgModalShow} setShow={(b)=>this.setSwitchOrgModalShow(b)}/> */}
             </>
         )
     }

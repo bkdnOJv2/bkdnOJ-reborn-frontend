@@ -25,7 +25,7 @@ class ProblemListItem extends React.Component {
     const {rowidx, selectChk, onSelectChkChange} = this.props;
 
     const visible = is_public ? (
-      is_organization_private ? "Orgs Only" : "Public"
+      is_organization_private ? "Orgs" : "Public"
     ) : "Private";
 
     return (
@@ -236,7 +236,7 @@ class AdminProblemList extends React.Component {
               </span>
             </Button>
           </div>
-          <div className="admin-note text-center mb-1">
+          <div className="admin-note flex-center text-center mb-1">
           {
             submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span>
           }
@@ -259,7 +259,7 @@ class AdminProblemList extends React.Component {
                 <th style={{width: "12%"}}>Points</th>
                 <th style={{width: "10%"}}>
                   Visible{qmClarify("Cho biết Problem này đang ở chế độ hiển thị nào.\n"+
-                              "* Public: mọi người đều thấy\n* Orgs: Một vài tổ chức thấy được.\n"+
+                              "* Public: mọi người đều thấy\n* Orgs: Chỉ một vài tổ chức thấy được.\n"+
                               "* Private: Chỉ các cá nhân được thêm mới thấy được.")}
                 </th>
                 <th style={{width: "10%"}}>
