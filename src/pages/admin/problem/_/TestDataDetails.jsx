@@ -3,6 +3,8 @@ import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
 import { Accordion, Button, Form, Row, Col } from 'react-bootstrap';
 import { ErrorBox, SpinLoader, FileUploader } from 'components'
+
+import {FaRegSave} from 'react-icons/fa';
 import {VscRefresh} from 'react-icons/vsc';
 
 import problemAPI from 'api/problem';
@@ -144,7 +146,7 @@ export default class TestDataDetails extends React.Component {
           <Col lg={10}>
               <Form.Select aria-label={data.checker} size="sm" value={data.checker}
                 id="checker" onChange={(e) => this.inputChangeHandler(e)}
-                className="mb-1"
+                className="mb-1 w-100"
               >
                 <option value="standard">Standard</option>
                 <option value="floats">Floats</option>
@@ -193,12 +195,12 @@ export default class TestDataDetails extends React.Component {
         </Row>
 
         <Row><Col lg={10}><sub></sub></Col>
-          <Col >
-          <Button variant="dark" size="sm" type="submit"
-            disabled={this.state.submitting}>
-              Save
-          </Button>
-          { this.state.submitting && <SpinLoader size={20} margin="auto 0 auto 15px" /> }
+          <Col className="justify-content-end">
+            <Button variant="dark" size="sm" type="submit" className="btn-svg "
+              disabled={this.state.submitting}>
+                <FaRegSave/> Save
+            </Button>
+            { this.state.submitting && <SpinLoader size={20} margin="auto 0 auto 15px" /> }
           </Col>
         </Row>
         <Row className="help-text checker-help">

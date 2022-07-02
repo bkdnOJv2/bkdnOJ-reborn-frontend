@@ -1,7 +1,10 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { Accordion, Form, Row, Col, Tabs, Tab, Button } from 'react-bootstrap';
+
 import { VscRefresh } from 'react-icons/vsc';
+import { FaRegSave } from 'react-icons/fa';
+
 import { toast } from 'react-toastify';
 
 import problemAPI from 'api/problem';
@@ -10,6 +13,7 @@ import { SpinLoader, FileUploader, RichTextEditor } from 'components';
 
 import UserMultiSelect from 'components/SelectMulti/User';
 import OrgMultiSelect from 'components/SelectMulti/Org';
+import { qmClarify } from 'helpers/components';
 
 class GeneralDetails extends React.Component {
   constructor(props) {
@@ -74,6 +78,8 @@ class GeneralDetails extends React.Component {
         data: sendData,
       })
     )
+    console.log(sendData)
+
     if (this.state.selectedPdf) {
       const formData = new FormData();
       formData.append("pdf", this.state.selectedPdf);
@@ -108,7 +114,7 @@ class GeneralDetails extends React.Component {
 
   render() {
     const {data} = this.state;
-    // console.log(data);
+    console.log(data);
     return (
       <Form id="problem-general" onSubmit={(e) => this.formSubmitHandler(e)}>
         <Row className="options m-1 border">
@@ -179,6 +185,9 @@ class GeneralDetails extends React.Component {
                     value={data.authors || []} onChange={(arr)=>this.setState({ data: { ...data, authors: arr } })}
                   />
                 </Col>
+                <Col xl={12}>
+                  <sub>Đặc quyền Tác giả, Tác giả có thể thấy và edit được Problem. Tên sẽ hiển thị công khai.</sub>
+                </Col>
               </Row>
               <Row>
                 <Form.Label column="sm" sm={3}> Collaborators </Form.Label>
@@ -186,6 +195,9 @@ class GeneralDetails extends React.Component {
                   <UserMultiSelect id="collaborators"
                     value={data.collaborators || []} onChange={(arr)=>this.setState({ data: { ...data, collaborators: arr } })}
                   />
+                </Col>
+                <Col xl={12}>
+                  <sub>Đặc quyền Cộng tác viên, Cộng tác viên có thể thấy và edit được Problem. Tên sẽ được ẩn khỏi công khai.</sub>
                 </Col>
               </Row>
               <Row>
@@ -195,25 +207,26 @@ class GeneralDetails extends React.Component {
                     value={data.reviewers || []} onChange={(arr)=>this.setState({ data: { ...data, reviewers: arr } })}
                   />
                 </Col>
+                <Col xl={12}>
+                  <sub>Đặc quyền Reviewer, Reviewer có thể thấy và nộp bài được.</sub>
+                </Col>
               </Row>
 
               <Row>
-                <Form.Label column="sm" sm={3}> Công khai </Form.Label>
+                <Form.Label column="sm" sm={3}> Công khai? </Form.Label>
                 <Col sm={9}>
                   <Form.Control size="sm" type="checkbox" id="is_public"
                     checked={data.is_public} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
                   />
                 </Col>
                 <Col xl={12}><sub>
-                  Nếu không tick, chỉ có những cá nhân được add thông qua Authors, Collaborators, Reviewers, và những
-                  cá nhân có đặc quyền mới truy cập được Problem.
-                  Nếu có tick, tùy thuộc vào trường bên dưới (Public to Organizations) mà cho phép mọi người hoặc chỉ
-                  cho tổ chức thấy và nộp bài.
+                  Công khai cho <strong>public hoặc cho các tổ chức</strong>. Nếu không tick, chỉ có 3 nhóm đặc quyền kể trên
+                  mới truy cập được problem.
                 </sub></Col>
               </Row>
 
               <Row>
-                <Form.Label column="sm" sm={3}> Chỉ Công khai cho Tổ chức  </Form.Label>
+                <Form.Label column="sm" sm={3}> Chỉ Công khai cho Tổ chức? </Form.Label>
                 <Col sm={9}>
                   <Form.Control size="sm" type="checkbox" id="is_organization_private"
                     checked={data.is_organization_private} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
@@ -228,7 +241,8 @@ class GeneralDetails extends React.Component {
                 </Col>
 
                 <Col xl={12}><sub>
-                  Nếu có tick, mọi thành viên của tổ chức sẽ thấy và submit được, mọi admin của tổ chức sẽ edit được.
+                  Chỉ có tác dụng nếu <strong>problem đang Công khai</strong>. Nếu có tick, những thành viên của Tổ chức được thêm và những Tổ chức con
+                  thấy được problem. Ngoài ra, những admin của tổ chức sẽ edit được problem.
                 </sub></Col>
               </Row>
               <Row>
@@ -237,7 +251,7 @@ class GeneralDetails extends React.Component {
                     <Form.Select aria-label={data.submission_visibility_mode}
                       value={data.submission_visibility_mode || ''}
                       onChange={(e) => this.inputChangeHandler(e)}
-                      size="sm" id="submission_visibility_mode" className="mb-1"
+                      size="sm" id="submission_visibility_mode" className="mb-1 w-100"
                     >
                       <option value="FOLLOW">Default (Chỉ thấy của bản thân)</option>
                       <option value="ALWAYS">User thấy tất cả Submission</option>
@@ -248,14 +262,14 @@ class GeneralDetails extends React.Component {
                 </Col>
 
                 <Col xl={12}><sub>
-                  Chính sách hiển thị chi tiết Submission của Problem này cho các User bình thường.
+                  Chính sách hiển thị chi tiết Submission của Problem này chỉ có tác dụng với các User mà có quyền view problem.
                 </sub></Col>
               </Row>
             </Accordion.Body>
           </Accordion.Item>
 
           <Accordion.Item eventKey="2" className="constraints-scoring">
-            <Accordion.Header>Rằng buộc và scoring</Accordion.Header>
+            <Accordion.Header>Rằng buộc và Tính điểm</Accordion.Header>
             <Accordion.Body>
               <Row>
                 <Form.Label column="sm" xs={4}> Time Limit (s)</Form.Label>
@@ -271,17 +285,10 @@ class GeneralDetails extends React.Component {
                 /></Col>
               </Row>
 
-              <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở bên ngoài contest (nộp ở trang Problem)</sub>
               <Row>
-                <Form.Label column="sm" xs={2}> Điểm </Form.Label>
-                <Col >
-                  <Form.Control size="sm" type="number" id="points"
-                    value={data.points} onChange={(e) => this.inputChangeHandler(e)}
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Form.Label column="sm" xs={6}> Dừng chấm nếu có test sai </Form.Label>
+                <Form.Label column="sm" xs={6}>
+                  ICPC{qmClarify("Dừng chấm bài nếu có một test cho kết quả sai. Option nên tick cho khi "+
+                                  "problem nằm trong contest ICPC, hoặc problem có nhiều test.")} </Form.Label>
                 <Col xs={6}>
                   <Form.Control size="sm" type="checkbox" id="short_circuit"
                     checked={data.short_circuit} onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})}
@@ -289,6 +296,16 @@ class GeneralDetails extends React.Component {
                 </Col>
                 <Col xl={12}>
                   <sub>Dừng chấm bài nếu submission cho ra một test cho kết quả không được chấp nhận.</sub>
+                </Col>
+              </Row>
+
+              <sub>Những thiết lập dưới đây chỉ có tác dụng khi nộp ở Practice</sub>
+              <Row>
+                <Form.Label column="sm" xs={2}> Điểm </Form.Label>
+                <Col >
+                  <Form.Control size="sm" type="number" id="points"
+                    value={data.points} onChange={(e) => this.inputChangeHandler(e)}
+                  />
                 </Col>
               </Row>
               <Row>
@@ -309,9 +326,9 @@ class GeneralDetails extends React.Component {
         <Row>
           <Col xl={10}>
           </Col>
-          <Col >
-            <Button variant="dark" size="sm" type="submit">
-              Save
+          <Col className="justify-content-end">
+            <Button variant="dark" size="sm" type="submit" className="btn-svg">
+              <FaRegSave/> Save
             </Button>
             { this.state.submitting && <SpinLoader size={20} margin="auto 0 auto 15px" /> }
           </Col>

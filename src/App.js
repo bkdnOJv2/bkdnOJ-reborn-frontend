@@ -121,7 +121,7 @@ class App extends React.Component {
                 <Route path="contests" element={
                   <OneColumn mainContent={<AdminContestList />} />
                 }/>
-                <Route exact path="contest/new" element={
+                <Route exact path="contests/new" element={
                   <OneColumn mainContent={<AdminContestNew />} />
                 }/>
                 <Route path="contest/:key" element={

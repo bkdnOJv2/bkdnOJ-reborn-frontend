@@ -25,7 +25,7 @@ export default class Filter extends React.Component {
     const data = this.state;
     return(
       <Form onSubmit={(e)=>(e.preventDefault())}>
-        <Accordion defaultActiveKey="0">
+        <Accordion defaultActiveKey="-1">
           <Accordion.Item eventKey="0" className="filter">
             <Accordion.Header>Search/Filter</Accordion.Header>
             <Accordion.Body>

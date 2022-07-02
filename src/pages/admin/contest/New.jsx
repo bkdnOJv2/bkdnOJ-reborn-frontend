@@ -67,7 +67,6 @@ class AdminContestNew extends React.Component {
       toast.error(`Cannot create. (${err.response.status})`)
       const data = err.response.data;
       let errors = {...data}
-      if (data.detail) errors.general = data.detail
       this.setState({ errors })
     })
   }

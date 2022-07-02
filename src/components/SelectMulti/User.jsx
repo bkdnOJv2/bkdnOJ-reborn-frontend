@@ -60,7 +60,7 @@ export default class UserMultiSelect extends React.Component {
 
           loadOptions={(val) => this.loadOptions(val)}
           onChange={(sel) => this.props.onChange(
-            sel.map((select)=>({...select.data}))
+              sel.map((select)=>({...select.data}))
           )}
 
           value = {

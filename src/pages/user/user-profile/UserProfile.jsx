@@ -89,7 +89,7 @@ class UserProfile extends React.Component {
     }
 
     if (!profile) {
-      toast.error("Please log-in again.")
+      toast.error("Please log-in again.", {toastId: "profile-fetch-failed"})
       return <Navigate to="/sign-in"></Navigate>
     }
 

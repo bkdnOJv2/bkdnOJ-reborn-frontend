@@ -74,6 +74,9 @@ div.rich-text-editor {
       div {
         display: block;
       }
+      textarea.w-md-editor-text-input {
+        width: 100%;
+      }
     }
 
     div.w-md-editor-bar {

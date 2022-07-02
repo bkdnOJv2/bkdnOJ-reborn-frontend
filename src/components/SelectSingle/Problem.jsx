@@ -47,7 +47,6 @@ export default class ProblemSingleSelect extends React.Component {
       <>
         <AsyncSelect
           cacheOptions
-
           defaultOptions={!prob.shortname}
 
           placeholder="Search problem code/title"

@@ -134,6 +134,7 @@ class ProblemDetails extends React.Component {
     const isLoggedIn = !!this.user;
     const isInContest = !!contest;
     const isAllowedToSubmitToContest = isInContest && (contest.is_registered || contest.spectate_allow);
+    const isStaff = isLoggedIn && this.user.is_staff;
     const isSuperuser = isLoggedIn && this.user.is_superuser;
 
     const pdfAvailable = !!(data && data.pdf);
@@ -208,7 +209,7 @@ class ProblemDetails extends React.Component {
                       Submit <FaPaperPlane size={12}/>
                     </Link>)
                   }{
-                    isSuperuser && (
+                    isStaff && (
                       <Link to="#" className="btn" style={{color: "red"}}
                         onClick={() => this.setState({redirectUrl: `/admin/problem/${data.shortname}`})}>
                         Admin <FaWrench size={12}/>

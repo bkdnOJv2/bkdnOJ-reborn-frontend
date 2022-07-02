@@ -3,15 +3,18 @@ import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { Form, Row, Col, Button, Tabs, Tab } from 'react-bootstrap';
-import { FaGlobe, FaRegTrashAlt, FaChartLine } from 'react-icons/fa';
+import { FaGlobe, FaRedo, FaRegTrashAlt, FaChartLine } from 'react-icons/fa';
 
 import { SpinLoader, ErrorBox } from 'components';
 import { withParams } from 'helpers/react-router'
 import { setTitle } from 'helpers/setTitle';
 
 import UserMultiSelect from 'components/SelectMulti/User';
+import OrgSingleSelect from 'components/SelectSingle/Org';
 
 import orgAPI from 'api/organization';
+
+import Members from './_/Members';
 
 import './Details.scss';
 
@@ -22,7 +25,9 @@ class OrgDetail extends React.Component {
       slug: this.props.params.slug,
       data: null,
       loaded: false, errors: null,
+      parentOrg: null,
     }
+    setTitle(`Admin | Org. ${this.props.params.slug}`);
   }
 
   callApi() {
@@ -53,6 +58,38 @@ class OrgDetail extends React.Component {
   }
 
 
+  formSubmitHandler(e) {
+    e.preventDefault();
+    this.setState({ errors: null })
+
+    const data = this.state.data;
+    orgAPI.updateOrg({ slug: this.state.slug, data })
+    .then((res) => {
+      toast.success("OK Updated.")
+      this.setState({ data: res.data, })
+    })
+    .catch((err) => {
+      toast.error(`Cannot update (${err.response.status})`)
+      this.setState({errors: {errors:err.response.data} || ['Cannot update organization information.']})
+      console.log(err)
+    })
+  }
+
+  deleteObjectHandler() {
+    let conf = window.confirm("Xóa tổ chức này sẽ xóa tất cả tổ chức con của nó. Bạn có chắc?")
+    if (!conf) return;
+
+    orgAPI.deleteOrg({ slug: this.state.slug })
+    .then((res) => {
+      toast.success("OK Deleted.")
+      this.setState({ redirectUrl: "/admin/orgs" });
+    })
+    .catch((err) => {
+      toast.error(`Cannot delete. (${err.response.status})`)
+      this.setState({errors: {errors:err.response.data} || ['Cannot delete this organization.']})
+    })
+  }
+
   inputChangeHandler(event, params={isCheckbox: null}) {
     const isCheckbox = params.isCheckbox || false;
 
@@ -74,21 +111,20 @@ class OrgDetail extends React.Component {
       <div className="admin org-panel wrapper-vanilla">
         <h4 className="org-title">
           { !loaded && <span><SpinLoader/> Loading...</span>}
-          { loaded && !!errors && <span><SpinLoader/> Cannot Load </span>}
-          { loaded && !errors && <div className="panel-header">
+          { loaded && <div className="panel-header">
               <span className="title-text text-truncate">{`Org | ${this.state.slug}`}</span>
 
               <span>
                 <Button className="btn-svg" size="sm" variant="dark"
-                  onClick={()=>this.setState({ redirectUrl: `/contest/${this.key}` })}>
-                    <FaGlobe size={16}/><span className="d-none d-md-inline">View on Site</span>
+                  onClick={()=>this.callApi()}>
+                    <FaRedo size={14}/><span className="d-none d-md-inline">Refresh</span>
                 </Button>
               </span>
 
               <span>
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
-                    <FaRegTrashAlt size={16}/><span className="d-none d-md-inline">Delete</span>
+                    <FaRegTrashAlt size={14}/><span className="d-none d-md-inline">Delete</span>
                 </Button>
               </span>
             </div>
@@ -97,97 +133,155 @@ class OrgDetail extends React.Component {
         <hr/>
         <div className="org-details">
           { !loaded && <span><SpinLoader/> Loading...</span> }
-          { loaded && <>
-            <ErrorBox errors={errors}/>
-              { !errors && <>
-                <Form id="org-general" onSubmit={(e) => this.formSubmitHandler(e)}>
-                  <Row>
-                    <Form.Label column="sm" md={2}> Slug </Form.Label>
-                    <Col > <Form.Control size="sm" type="text" placeholder="Slug" id="slug"
-                            value={data.slug || ''} disabled readOnly
-                    /></Col>
+          <ErrorBox errors={errors}/>
+          { loaded && data && <>
+              { <>
+                <Tabs defaultActiveKey="general" id="org-tabs" className="pl-2">
+                  <Tab eventKey="general" title="Info">
+                    <Form id="org-general" onSubmit={(e) => this.formSubmitHandler(e)}>
+                        <Row>
+                          <Form.Label column="sm" md={2} className="required "> Slug </Form.Label>
+                          <Col > <Form.Control size="sm" type="text" placeholder="Slug" id="slug"
+                                  value={data.slug || ''} disabled readOnly required
+                          /></Col>
 
-                    <Form.Label column="sm" md={2} > Shortname </Form.Label>
-                    <Col > <Form.Control size="sm" type="text" placeholder="Short org name" id="short_name"
-                            value={data.short_name || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                    /></Col>
-                  </Row>
+                          <Form.Label column="sm" md={2} className="required "> Shortname </Form.Label>
+                          <Col > <Form.Control size="sm" type="text" placeholder="Short org name" id="short_name"
+                                  value={data.short_name || ''} onChange={(e)=>this.inputChangeHandler(e)} required
+                          /></Col>
+                        </Row>
 
-                  <Row>
-                    <Form.Label column="sm" md={2} > Name </Form.Label>
-                    <Col md={10}> <Form.Control size="sm" type="text" placeholder="Org name" id="name"
-                            value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)}
-                    /></Col>
-                  </Row>
+                        <Row>
+                          <Form.Label column="sm" md={2} > Không hiển thị lên web? </Form.Label>
+                          <Col md={4}> <Form.Control size="sm" type="checkbox" id="is_unlisted" checked={data.is_unlisted || false}
+                                    onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})} />
+                          </Col>
 
-                  <Row>
-                    <Col sm={2}>
-                      <div style={{maxHeight: "100px", maxWidth: "100px", height: "100px", width: "100px"}} >
-                        {
-                          data.logo_url ? <img src={data.logo_url} style={{height: "100%"}}/>
-                          : <p style={{height: "100%"}} className="border text-center m-0">No Image</p>
-                        }
-                      </div>
-                    </Col>
-                    <Col>
-                      <Row className="w-100">
-                        <Form.Label column="sm" > Org Logo Url </Form.Label>
-                        <Form.Control size="sm" type="text" id="logo_url"
-                              value={data.logo_url || ''}
-                              onChange={(e)=>this.inputChangeHandler(e)}/>
+                          {/* <Form.Label column="sm" md={2} > Ai cũng join được? </Form.Label>
+                          <Col > <Form.Control size="sm" type="checkbox" id="is_open" checked={data.is_open || false}
+                                    onChange={(e) => this.inputChangeHandler(e, {isCheckbox: true})} />
+                          </Col> */}
+                        </Row>
+
+                        <Row>
+                          <Form.Label column="sm" md={2} className="required"> Name </Form.Label>
+                          <Col md={10}> <Form.Control size="sm" type="text" placeholder="Org name" id="name"
+                                  value={data.name || ''} onChange={(e)=>this.inputChangeHandler(e)} required
+                          /></Col>
+                        </Row>
+
+                        <Row >
+                          <Form.Label column="sm" xl={12} > Organization Logo </Form.Label>
+                          <Col lg={2} className="flex-center">
+                            <div style={{maxHeight: "100px", maxWidth: "100px", height: "100px", width: "100px"}} className="border" >
+                              {
+                                data.logo_url ? <img src={data.logo_url} style={{maxHeight: "100px", maxWidth: "100px"}}/>
+                                : <p style={{height: "100%"}} className="text-center m-0">No Image</p>
+                              }
+                            </div>
+                          </Col>
+                          <Col>
+                            <Row className="w-100">
+                              <Form.Label column="sm" > Org Logo Url </Form.Label>
+                              <Form.Control size="sm" type="text" id="logo_url"
+                                    value={data.logo_url || ''}
+                                    onChange={(e)=>this.inputChangeHandler(e)}/>
+                            </Row>
+                          </Col>
+                        </Row>
+
+                        <Row>
+                          <Form.Label column="sm" xl={12} className="required"> About </Form.Label>
+                          <Col>
+                            <Form.Control as="textarea" id="about"
+                              value={data.about || ''} onChange={(e)=>this.inputChangeHandler(e)}
+                            />
+                          </Col>
+                        </Row>
+
+
+                        <Row>
+                          <Form.Label column="sm" md={2} className="required"> Admins </Form.Label>
+                          <Col>
+                            <UserMultiSelect id="admins"
+                              value={data.admins || []} onChange={(arr)=>this.setState({ data: { ...data, admins: arr } })}
+                            />
+                          </Col>
+                        </Row>
+
+                      <Row>
+                        <Form.Label column="sm" xs={6}> Total Member count: </Form.Label>
+                        <Col xs={6}>
+                          <Form.Control size="sm" type="text" placeholder="Member Count" id="member_count"
+                                value={isNaN(data.member_count) ? '' : data.member_count} disabled readOnly
+                          />
+                        </Col>
+
+                        <Form.Label column="sm" xs={6}> Real Member count: </Form.Label>
+                        <Col xs={6}>
+                          <Form.Control size="sm" type="text" placeholder="Real Member Count" id="real_member_count"
+                                value={isNaN(data.real_member_count) ? '' : data.real_member_count} disabled readOnly
+                          />
+                        </Col>
+
+                        <Form.Label column="sm" xs={6} > Sub org count: </Form.Label>
+                        <Col xs={6}> <Form.Control size="sm" type="text" placeholder="Sub Org Count" id="suborg_count"
+                                value={isNaN(data.suborg_count) ? '' : data.suborg_count} disabled readOnly
+                        /></Col>
                       </Row>
-                    </Col>
-                  </Row>
-                <Row>
-                  <Form.Label column="sm" sm={3} className="required"> Admins </Form.Label>
-                  <Col>
-                    <UserMultiSelect id="admins"
-                      value={data.admins || []} onChange={(arr)=>this.setState({ data: { ...data, admins: arr } })}
-                    />
-                  </Col>
-                </Row>
+                      <Row>
+                        <Col lg={6} >
+                          <Row className="text-center">
+                              <Form.Label column="sm" xl={12} > Become Root? </Form.Label>
+                              <input type="checkbox" id="become_oot" className="w-100"
+                                value={this.state.data.becomeRoot} onChange={(e)=>this.setState({ data: {...data, become_root: e.target.checked} })}/>
+                          </Row>
+                          <Row className="w-100">
+                              <Form.Label column="sm" xl={12} > Change Parent Organization? </Form.Label>
+                              <Button size="sm" variant="light" className="w-100 m-1 ml-2 mr-2"
+                                onClick={(e)=>this.setState({ data: {...data, new_parent_org: null } })}>Clear</Button>
+                              <OrgSingleSelect id="parent_org"
+                                value={this.state.data.new_parent_org} onChange={(val)=>this.setState({ data: {...data, new_parent_org: val} })}/>
+                          </Row>
+                        </Col>
+                        <Col lg={6}>
+                          <div>
+                            <Form.Label column="sm" > Parent Org </Form.Label>
+                            <div className="d-flex">
+                              {
+                                data.parent_org ? <>
+                                  {data.parent_org.logo_url ? <img src={data.parent_org.logo_url} style={{maxHeight: "100px", maxWidth: "100px"}} />
+                                  : <span className="border">No Image</span>}
+                                  <ul>
+                                    <li><strong>Slug</strong>: <Link to={`/admin/org/${data.parent_org.slug}`}>{data.parent_org.slug}</Link></li>
+                                    <li><strong>Shortname</strong>: {data.parent_org.short_name}</li>
+                                    <li><strong>Name</strong>: {data.parent_org.name}</li>
+                                  </ul>
+                                </>
+                                : <span className="w-100 text-center">No Parent Org</span>
+                              }
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
 
-                <Row>
-                  <Form.Label column="sm" xs={6}> Member count: </Form.Label>
-                  <Col xs={6}>
-                    <Form.Control size="sm" type="text" placeholder="Member Count" id="member_count"
-                          value={isNaN(data.member_count) ? '' : data.member_count} disabled readOnly
-                    />
-                  </Col>
+                      <hr className="m-2" />
 
-                  <Form.Label column="sm" xs={6} > Sub org count: </Form.Label>
-                  <Col xs={6}> <Form.Control size="sm" type="text" placeholder="Sub Org Count" id="suborg_count"
-                          value={isNaN(data.suborg_count) ? '' : data.suborg_count} disabled readOnly
-                  /></Col>
-                </Row>
-                <Row>
-                  <Form.Label column="sm" xl={12} > Parent Org </Form.Label>
-                  <Col xl={12}> {
-                    data.parent_org ? <>
-                      {data.parent_org.logo_url ? <img src={data.parent_org.logo_url} style={{maxHeight: "100px", maxWidth: "100px"}} />
-                      : <span className="border">No Image</span>}
-                      <ul>
-                        <li><strong>Slug</strong>: <Link to={`/admin/org/${data.parent_org.slug}`}>{data.parent_org.slug}</Link></li>
-                        <li><strong>Shortname</strong>: {data.parent_org.short_name}</li>
-                        <li><strong>Name</strong>: {data.parent_org.name}</li>
-                      </ul>
-                    </>
-                    : <span className="w-100 text-center">No Parent Org</span>
-                  } </Col>
-                </Row>
-
-                <hr className="m-2" />
-
-                <Row>
-                  <Col lg={10}>
-                  </Col>
-                  <Col >
-                    <Button variant="dark" size="sm" type="submit" className="">
-                      Save
-                    </Button>
-                  </Col>
-                </Row>
-              </Form>
+                      <Row>
+                        <Col lg={10}>
+                        </Col>
+                        <Col >
+                          <Button variant="dark" size="sm" type="submit" className="w-100">
+                            Save
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                  </Tab>
+                  <Tab eventKey="member" title="Members" onClick={()=>this.setState({errors: null})}>
+                    <Members slug={this.state.slug} />
+                  </Tab>
+                </Tabs>
             </> }
           </> }
         </div>

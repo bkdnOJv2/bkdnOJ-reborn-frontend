@@ -255,7 +255,7 @@ class General extends React.Component {
                   />
                 </Col>
                 <Col xl={12}>
-                  <sub>Sẽ được quyền xem và chỉnh sửa Contest. Tên tác giả sẽ được hiển thị công khai.</sub>
+                  <sub>Đặc quyền Tác giả, sẽ được quyền xem và chỉnh sửa Contest. Tên tác giả sẽ được hiển thị công khai.</sub>
                 </Col>
 
                 <Form.Label column="sm" md={2}> Collaborators </Form.Label>
@@ -265,7 +265,7 @@ class General extends React.Component {
                   />
                 </Col>
                 <Col xl={12}>
-                  <sub>Sẽ được quyền xem và chỉnh sửa Contest. Tên cộng tác viên sẽ không được hiển thị công khai.</sub>
+                  <sub>Đặc quyền Cộng tác viên, sẽ được quyền xem và chỉnh sửa Contest. Tên cộng tác viên sẽ không được hiển thị công khai.</sub>
                 </Col>
 
                 <Form.Label column="sm" md={2}> Reviewers </Form.Label>
@@ -275,7 +275,7 @@ class General extends React.Component {
                   />
                 </Col>
                 <Col xl={12}>
-                  <sub>Chỉ được quyền xem và nộp bài trong Contest.</sub>
+                  <sub>Đặc quyền Reviewers, được quyền xem và nộp bài trong Contest.</sub>
                 </Col>
                 <Col xl={12}>
                   <sub>Các bài nộp của những thành viên này sẽ không được nhìn thấy bởi Thí sinh và họ sẽ bị ẩn trên bảng xếp hạng.</sub>
@@ -283,17 +283,28 @@ class General extends React.Component {
               </Row>
 
               <Row>
-                <Form.Label column="sm" xs={6}> Hiển thị công khai? </Form.Label>
+                <Form.Label column="sm" xs={6}> Công bố? </Form.Label>
+                <Col xs={6}> <Form.Control size="sm" type="checkbox" id="published"
+                        checked={data.published || false}
+                        onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
+                /></Col>
+                <Col xl={12}>
+                  <sub>Công bố Contest. Nếu không công bố, chỉ có 3 nhóm người dùng đặc quyền trên mới thầy và tương tác đươc.
+                    Nếu có Công bố, tùy vào thiết lập bên dưới mà quyết định quyền View/Edit/Register.
+                  </sub>
+                </Col>
+              </Row>
+
+              <Row>
+                <Form.Label column="sm" xs={6}> Công khai cho Tất cả? </Form.Label>
                 <Col xs={6}> <Form.Control size="sm" type="checkbox" id="is_visible"
                         checked={data.is_visible || false}
                         onChange={(e)=>this.inputChangeHandler(e, {isCheckbox: true})}
                 /></Col>
-                <Col xl={12}>
-                  <sub>Cho phép mọi người nhìn thấy và xem contest. Nếu không tick, chỉ Authors, Collaborators, Reviewers
-                    và các user có đặc quyền mới thấy được contest. Nếu có tick, mọi user sẽ <strong>thấy contest</strong>.
-                    Họ cũng có thể đăng ký nếu những option dưới không được tick.
-                  </sub>
-                </Col>
+                <Col xl={12}><sub>
+                  Cho phép tất cả User đều thấy contest (các Problems khi contest diễn ra, bảng điểm chưa đóng băng).
+                  Họ cũng có thể Register contest nếu cả hai option bên dưới không được tick.
+                </sub></Col>
               </Row>
 
               <Row>
@@ -311,7 +322,7 @@ class General extends React.Component {
                 </Col>
                 <Col xl={12}>
                   <sub>
-                    Chỉ cho phép các người dùng được thêm có thê đăng ký Contest với tư cách Thí sinh.
+                    Chỉ có phép các Thí sinh được thêm Đăng ký Contest với tư cách Thí sinh.
                   </sub>
                 </Col>
               </Row>
@@ -330,7 +341,10 @@ class General extends React.Component {
                   />
                 </Col>
                 <Col xl={12}>
-                  <sub>Cho phép thành viên của các tổ chức được thêm có thể đăng ký Contest với tư cách Thí sinh.</sub>
+                  <sub>
+                    Cho phép thành viên của các tổ chức được thêm có thể đăng ký Contest với tư cách Thí sinh.
+                    Hơn nữa, các Admin của các tổ chức được thêm có quyền Edit contest.
+                  </sub>
                 </Col>
               </Row>
 
@@ -340,6 +354,11 @@ class General extends React.Component {
                   <UserMultiSelect id="banned_users"
                     value={data.banned_users || []} onChange={(arr)=>this.setState({ data: { ...data, banned_users: arr } })}
                   />
+                </Col>
+                <Col xl={12}>
+                  <sub>
+                    Cấm những thí sinh này nộp bài.
+                  </sub>
                 </Col>
               </Row>
             </Accordion.Body>

@@ -222,14 +222,13 @@ class AdminContestList extends React.Component {
               </span>
             </Button>
           </div>
-
-          <div className="flex-center">
-            <div className="admin-note text-center mb-1">
-              {
-                submitting && <span className="loading_3dot">Đang xử lý yêu cầu</span>
-              }
+          {
+            submitting && <div className="flex-center">
+              <div className="admin-note text-center mb-1">
+                  <span className="loading_3dot">Đang xử lý yêu cầu</span>
+              </div>
             </div>
-          </div>
+          }
         </div>
 
         {/* Problem List */}

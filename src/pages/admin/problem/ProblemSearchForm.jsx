@@ -22,7 +22,7 @@ export default class ProblemSearchForm extends React.Component {
     const data = this.state;
     return(
       <Form onSubmit={(e)=>(e.preventDefault())}>
-        <Accordion defaultActiveKey="0">
+        <Accordion defaultActiveKey="-1">
           <Accordion.Item eventKey="0" className="filter">
             <Accordion.Header>Search/Filter</Accordion.Header>
             <Accordion.Body>
@@ -51,8 +51,8 @@ export default class ProblemSearchForm extends React.Component {
               </Row>
 
               <Row>
-                <Form.Label column="sm" md={2} > Public? </Form.Label>
-                <Col md={2}>
+                <Col>
+                    <Form.Label column="sm" > Public? </Form.Label>
                     <Form.Select
                       size="sm" id="is_public" className="mb-1"
                       value={data.is_public}
@@ -64,8 +64,8 @@ export default class ProblemSearchForm extends React.Component {
                     </Form.Select>
                 </Col>
 
-                <Form.Label column="sm" md={2} > Org Private? </Form.Label>
-                <Col md={2}>
+                <Col>
+                    <Form.Label column="sm" > Org Private? </Form.Label>
                     <Form.Select
                       size="sm" id="is_organization_private" className="mb-1"
                       value={data.is_organization_private}
@@ -77,8 +77,8 @@ export default class ProblemSearchForm extends React.Component {
                     </Form.Select>
                 </Col>
 
-                <Form.Label column="sm" md={2} > ICPC? </Form.Label>
-                <Col md={2}>
+                <Col>
+                    <Form.Label column="sm" > ICPC? </Form.Label>
                     <Form.Select
                       size="sm" id="short_circuit" className="mb-1"
                       value={data.short_circuit}
@@ -95,13 +95,13 @@ export default class ProblemSearchForm extends React.Component {
         </Accordion>
         <Row>
           <Col >
-            <span>
+            {/* <span>
               Bộ lọc:{
                 this.props.searchData && <>
                   <code>{JSON.stringify(this.props.searchData)}</code>
                 </>
               }
-            </span>
+            </span> */}
           </Col>
           <div className="d-flex flex-row-reverse">
             <Button size="sm" variant="dark" className="ml-1 mr-1 btn-svg"

@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.b296b211.css",
-    "main.js": "/static/js/main.e9fe8b88.js",
+    "main.css": "/static/css/main.db9e44a3.css",
+    "main.js": "/static/js/main.64a52808.js",
     "static/media/default-org.png": "/static/media/default-org.3064b341d2701965b1ba.png",
     "static/media/bkdn-uni-flag.png": "/static/media/bkdn-uni-flag.6093ea649f2018e006cf.png",
     "static/media/bkdn-uni-icon-white.png": "/static/media/bkdn-uni-icon-white.361ade9a004daed664ca.png",
@@ -70,11 +70,11 @@
     "static/media/KaTeX_Size3-Regular.woff": "/static/media/KaTeX_Size3-Regular.7947224e8a9914fa332b.woff",
     "static/media/KaTeX_Size3-Regular.woff2": "/static/media/KaTeX_Size3-Regular.e1951519f6f0596f7356.woff2",
     "index.html": "/index.html",
-    "main.b296b211.css.map": "/static/css/main.b296b211.css.map",
-    "main.e9fe8b88.js.map": "/static/js/main.e9fe8b88.js.map"
+    "main.db9e44a3.css.map": "/static/css/main.db9e44a3.css.map",
+    "main.64a52808.js.map": "/static/js/main.64a52808.js.map"
   },
   "entrypoints": [
-    "static/css/main.b296b211.css",
-    "static/js/main.e9fe8b88.js"
+    "static/css/main.db9e44a3.css",
+    "static/js/main.64a52808.js"
   ]
 }

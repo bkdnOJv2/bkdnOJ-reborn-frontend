@@ -186,7 +186,7 @@ class AdminProblemList extends React.Component {
     return (
       <div className="admin admin-problems ">
         {/* Options for Admins: Create New,.... */}
-        <div className="admin-options wrapper-vanilla m-0 mb-3">
+        <div className="admin-options wrapper-vanilla m-0 mb-1">
           <div className="border d-inline-flex p-1" >
           <Button size="sm"
             variant="dark" className="btn-svg"
