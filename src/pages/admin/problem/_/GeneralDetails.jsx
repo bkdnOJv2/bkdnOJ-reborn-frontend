@@ -24,6 +24,12 @@ class GeneralDetails extends React.Component {
       submitting: false,
     }
   }
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      this.setState({ data: this.props.data });
+    }
+  }
+
   setSelectedPdf(file) {
     this.setState({selectedPdf: file})
   }

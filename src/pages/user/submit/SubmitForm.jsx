@@ -19,6 +19,7 @@ import {
 import 'helpers/importAllAceMode';
 import './SubmitForm.scss';
 
+const SOURCE_CODE_LIMIT = 5 * 1024 * 1024; //5MB -> 5*1024*1024 bytes (chars)
 
 class SubmitForm extends React.Component {
   constructor(props) {
@@ -50,6 +51,18 @@ class SubmitForm extends React.Component {
       // Only submit code when submitting changes from false->true
       // Because submitting will also changes when the Modal closes
       if (prevProps.submitting === true) return;
+      const source = this.state.code;
+
+      if (source.trim().length === 0) {
+        if (this.props.setSubErrors)
+          this.props.setSubErrors('Cannot submit with an empty source code.')
+          return;
+      }
+      if (source.trim().length > SOURCE_CODE_LIMIT) {
+        if (this.props.setSubErrors)
+          this.props.setSubErrors('Source code >5MB, try minify it then submit again.')
+          return;
+      }
 
       const data = {
         language: this.state.selectedLang.id,

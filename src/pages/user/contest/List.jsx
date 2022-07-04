@@ -204,38 +204,30 @@ class ContestListItem extends React.Component {
             {
               /* Future: Not started yet */
               type === 'future' && <>
-                { user && (
+                { user && !is_registered && <>{
                     spectate_allow ? <span className="d-inline-flex align-items-center">
-                      <Link to={`/contest/${ckey}`}>{`Spectate >>`}</Link>
+                      <Link to="#" onClick={() => this.registerContest(ckey, true)}>{`Register (out of competition) >>`}</Link>
                     </span> :
-                    ( ! is_registered ? (
-                        register_allow ? <span className="d-inline-flex align-items-center">
-                          <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
-                        </span>
-                        : <span className="d-inline-flex align-items-center">
-                          <span style={{color: "red"}}>Register is not Allowed.</span>
-                        </span>
-                      ) : <span className="d-inline-flex align-items-center">
-                        <Link to="#">{`Registered`}</Link>
-                      </span>
-                    )
-                    // ( register_allow ? (
-                    //     is_registered ?
-                    //     <span className="d-inline-flex align-items-center">
-                    //       <Link to="#">{`Registered`}</Link>
-                    //     </span>
-                    //     : <span className="d-inline-flex align-items-center">
-                    //       <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
-                    //     </span>
-                    //   ) : <span className="d-inline-flex align-items-center">
-                    //     <span style={{color: "red"}}>Register is not Allowed.</span>
-                    //   </span>
-                    // )
-                  )
+                    register_allow ?
+                    <span className="d-inline-flex align-items-center">
+                      <Link to="#" onClick={() => this.registerContest(ckey)}>{`Register >>`}</Link>
+                    </span>
+                    : <span className="d-inline-flex align-items-center">
+                      <span style={{color: "red"}}>Register is not Allowed.</span>
+                    </span>
+                  }</>
+                }
+                { user && is_registered && spectate_allow &&
+                  <Link to={`/contest/${ckey}`}>
+                    {`Spectate >>`}
+                  </Link>
                 }
                 { !user && <span className="d-inline-flex align-items-center">
                     <Link to={`/sign-in`}>{`Log in to Participate >>`}</Link>
                 </span> }
+                <span className="d-inline-flex align-items-center">
+                  <Link to={`/contest/${ckey}/standing`}>{`Current Standing >>`}</Link>
+                </span>
               </>
             }
 
