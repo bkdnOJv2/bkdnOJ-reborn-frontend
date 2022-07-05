@@ -74,6 +74,8 @@ class GeneralDetails extends React.Component {
     delete sendData.allowed_languages
     let reqs = [];
 
+    console.log(sendData);
+
     reqs.push(
       problemAPI.adminEditProblemDetails({
         shortname: this.props.shortname,

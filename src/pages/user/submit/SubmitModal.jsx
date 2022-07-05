@@ -49,6 +49,7 @@ class SubmitModalResult extends React.Component {
     if (prevProps.subId !== this.props.subId) {
       this.setState({subId : this.props.subId},
         () => {
+          clearInterval(this.timer)
           this.timer = setInterval(() => this.pollResult(), __SUBMIT_MODAL_POLL_DELAY);
           setTimeout(() => clearInterval(this.timer), __SUBMIT_MODAL_MAX_POLL_DURATION);
         }

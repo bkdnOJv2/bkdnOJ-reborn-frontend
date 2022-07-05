@@ -133,18 +133,17 @@ class AdminJudgeDetails extends React.Component {
     return (
       <div className="admin user-panel wrapper-vanilla">
         <h4 className="user-title">
-          { !loaded && <span><SpinLoader/> Loading...</span>}
-          { loaded && !!errors && <span>Something went wrong.</span>}
-          { loaded && !errors && <div className="panel-header">
-              <span className="title-text">{`User | ${data.username}`}</span>
-              <span className="d-flex">
+          <div className="panel-header">
+              <span className="title-text">{`User | ${data ? data.username : this.id}`}
+                { !loaded && <span><SpinLoader/> Loading...</span>}
+              </span>
+              { loaded && <span className="d-flex">
                 <Button className="btn-svg" size="sm" variant="danger"
                   onClick={()=>this.deleteObjectHandler()}>
                     <FaRegTrashAlt/><span className="d-none d-md-inline">Delete</span>
                 </Button>
-              </span>
+              </span> }
             </div>
-          }
         </h4>
         <hr/>
         <div className="user-details">
@@ -153,17 +152,16 @@ class AdminJudgeDetails extends React.Component {
           { loaded && !errors && <>
             <Row className="mt-2">
               <Form.Label column="sm" lg={1} > Password </Form.Label>
-              <Col lg={8}>
+              <Col lg={8} className="d-inline-flex">
                 <Form.Control size="sm" type="text"
                       onChange={(e)=>this.setState({ password: e.target.value})}
                       value={this.state.password}/>
-              </Col>
-              <Col lg={1}>
-                <Button size="sm" variant="dark" className="btn-svg w-100"
+                <Button size="sm" variant="dark" className="btn-svg ml-1 mr-1"
+                  style={{flexShrink: 10, minWidth: "100px"}}
                   onClick={()=>this.setState({ password: randomString() })}
                 ><VscRefresh/><span>Gen</span></Button>
               </Col>
-              <Col lg={2}>
+              <Col lg={3} >
                 <Button size="sm" variant="warning" className="btn-svg"
                   onClick={(e)=>this.resetPassword()}
                 ><FaCogs/><span>Reset Password</span></Button>
@@ -211,22 +209,22 @@ class AdminJudgeDetails extends React.Component {
               </Row>
 
               <Row>
-                <Form.Label column="sm" md={1}> First Name </Form.Label>
+                <Form.Label column="sm" lg={1}> First Name </Form.Label>
                 <Col> <Form.Control size="sm" type="text" id="first_name"
                         onChange={(e)=>this.inputChangeHandler(e)}
                         value={data.first_name}
                 /></Col>
 
-                <Form.Label column="sm" md={1}> Last Name </Form.Label>
+                <Form.Label column="sm" lg={1}> Last Name </Form.Label>
                 <Col> <Form.Control size="sm" type="text" id="last_name"
                         onChange={(e)=>this.inputChangeHandler(e)}
                         value={data.last_name}
                 /></Col>
 
-                <Form.Label column="sm" md={1}> Email </Form.Label>
-                <Col> <Form.Control size="sm" type="text" id="last_name"
+                <Form.Label column="sm" lg={1}> Email </Form.Label>
+                <Col> <Form.Control size="sm" type="text" id="email"
                         onChange={(e)=>this.inputChangeHandler(e)}
-                        value={data.last_name}
+                        value={data.email}
                 /></Col>
               </Row>
               {/* <Row>

@@ -200,19 +200,25 @@ class OrgListWrapper extends React.Component {
           </div>
         </div>
 
-        {
-          loaded && !errors && <div className="admin-table org-table wrapper-vanilla">
+          <div className="admin-table org-table wrapper-vanilla">
             <h4><strong>You are Admin of these Organizations</strong></h4>
             <ErrorBox errors={errors} />
-            {
-              <OrgList orgs={adminOf} prefix={""} setModalData={(slug)=>this.openNewModal(slug)}/>
-            }{
-              adminOf.length === 0 && <div style={{height: "100px"}} className="flex-center">
-                <em>Bạn hiện đang không là admin của tổ chức nào cả.</em>
+            { !loaded && <>
+              <div className="m-3 flex-center-col" style={{minHeight: "200px"}}>
+                <SpinLoader size={30} margin="10px"/>
+                <span><em>Hệ thống đang tải tất cả nhóm mà bạn là Admin. Thao tác này lần đầu có thể lâu nếu bạn có quá nhiều tổ chức.</em></span>
               </div>
-            }
+            </> }
+            { loaded && !errors && <>
+              {
+                <OrgList orgs={adminOf} prefix={""} setModalData={(slug)=>this.openNewModal(slug)}/>
+              }{
+                adminOf.length === 0 && <div style={{height: "100px"}} className="flex-center">
+                  <em>Bạn hiện đang không là admin của tổ chức nào cả.</em>
+                </div>
+              }
+            </> }
           </div>
-        }
       </div>
     )
   }

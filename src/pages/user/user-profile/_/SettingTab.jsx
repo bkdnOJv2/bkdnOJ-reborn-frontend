@@ -43,21 +43,21 @@ class SettingTab extends React.Component {
         <ErrorBox errors={this.state.errors} />
         <Container>
         <Row>
-          <Form.Label column="sm" md={2}> Password </Form.Label>
+          <Form.Label column="sm" lg={3}> New Password </Form.Label>
           <Col> <Form.Control size="sm" type="password" id="pw"
                   onChange={(e)=>this.setState({pw: e.target.value})}
                   value={this.state.pw}
           /></Col>
         </Row>
         <Row>
-          <Form.Label column="sm" md={2}> Password Confirm </Form.Label>
+          <Form.Label column="sm" lg={3}> Confirm New Password </Form.Label>
           <Col> <Form.Control size="sm" type="password" id="pw2"
                   onChange={(e)=>this.setState({pw2: e.target.value})}
                   value={this.state.pw2}
           /></Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="mt-1">
             <Button size="sm" className="btn-svg" variant="dark"
               onClick={()=>this.changePasswordHandler()}>
                 Change Password</Button>

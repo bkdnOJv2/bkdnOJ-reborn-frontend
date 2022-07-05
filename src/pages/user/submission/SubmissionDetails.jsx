@@ -25,6 +25,7 @@ import { shouldStopPolling } from 'constants/statusFilter';
 import './SubmissionDetails.scss';
 
 const __SUBMISSION_DETAIL_POLL_DELAY = 3000;
+const __SUBMISSION_MAX_POLL_DURATION = 30000; // ms
 
 class SubmissionTestCase extends React.Component {
   render() {
@@ -95,8 +96,11 @@ class SubmissionDetails extends React.Component {
           },
         }, () => {
             this.fetch();
-            if (! shouldStopPolling(this.state.data.status))
+            if (! shouldStopPolling(this.state.data.status)){
+              clearInterval(this.timer)
               this.timer = setInterval(() => this.pollResult(), __SUBMISSION_DETAIL_POLL_DELAY);
+              setTimeout(() => clearInterval(this.timer), __SUBMISSION_MAX_POLL_DURATION);
+            }
           })
       })
       .catch((err) => {
@@ -114,8 +118,11 @@ class SubmissionDetails extends React.Component {
 
   componentDidMount() {
     this.fetch();
-    if (! shouldStopPolling(this.state.data.status))
+    if (! shouldStopPolling(this.state.data.status)){
+      clearInterval(this.timer)
       this.timer = setInterval(() => this.pollResult(), __SUBMISSION_DETAIL_POLL_DELAY);
+      setTimeout(() => clearInterval(this.timer), __SUBMISSION_MAX_POLL_DURATION);
+    }
   }
 
   componentWillUnmount() {
