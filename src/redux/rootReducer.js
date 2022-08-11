@@ -6,6 +6,8 @@ import profileReducer from './Profile/reducer.js';
 import contestReducer from './Contest/reducer';
 
 import recentSubmissionReducer from './RecentSubmission/reducer';
+import contestSubFilterReducer from './ContestSubFilter/reducer';
+
 import ranksReducer from './Rank/reducer';
 import myOrgReducer from './MyOrg/reducer';
 
@@ -15,6 +17,8 @@ const rootReducer = combineReducers({
     profile: profileReducer,
     contest: contestReducer,
     recentSubmission: recentSubmissionReducer,
+    contestSubFilter: contestSubFilterReducer,
+
     ranks: ranksReducer,
 
     myOrg: myOrgReducer,
