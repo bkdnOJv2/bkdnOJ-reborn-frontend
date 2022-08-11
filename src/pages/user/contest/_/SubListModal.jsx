@@ -1,18 +1,12 @@
 import React from 'react';
-import { propTypes } from 'react-bootstrap/esm/Image';
-import { toast } from 'react-toastify';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 
-import { SpinLoader, ErrorBox, UserCard } from 'components';
+import { SpinLoader, ErrorBox } from 'components';
 import ReactPaginate from 'react-paginate';
-import submissionApi from 'api/submission';
 import contestAPI from 'api/contest';
 
 // Helpers
-import {getLocalDateWithTimezone} from 'helpers/dateFormatter';
 
 // Assets
 import {FaExternalLinkAlt} from 'react-icons/fa';
@@ -57,7 +51,7 @@ class SubListModal extends React.Component {
       })
       .catch((err) => {
         const __err = err.response.data || "Cannot fetch submissions at the moment.";
-        this.setState({ errors: __err })
+        this.setState({ loaded: true, errors: __err })
       })
   }
 
@@ -90,9 +84,8 @@ class SubListModal extends React.Component {
           </> }
           { loaded && !errors && count > 0 && <>
             <ul>{
-              this.state.subs.map((sub, idx) => {
+              subs.map((sub, idx) => {
                 const verdict = (sub.status === "D" ? sub.result : sub.status);
-                const max_time = sub.problem.time_limit;
                 const max_points = sub.problem.points;
                 const {is_frozen, points} = sub;
 
@@ -118,7 +111,7 @@ class SubListModal extends React.Component {
                   </span>
                   -
 
-                  <a href={`/contest/${contest_key}/submission/${sub.id}`} target="_blank" >
+                  <a href={`/contest/${contest_key}/submission/${sub.id}`} target="_blank" rel="noreferrer">
                     <span className="d-inline-flex align-items-baseline m-1" style={{columnGap: "5px"}}>
                       #{sub.id} <FaExternalLinkAlt size={14}/>
                     </span>
@@ -127,8 +120,9 @@ class SubListModal extends React.Component {
               })
             }</ul>
           </> }
-          {
-            this.state.loaded === true &&
+        </Modal.Body>
+
+        <Modal.Footer>
             <span className="classic-pagination">Page: <ReactPaginate
                   breakLabel="..."
                   onPageChange={this.handlePageClick}
@@ -140,11 +134,6 @@ class SubListModal extends React.Component {
                   previousLabel={null}
                   nextLabel={null}
                   /></span>
-          }
-        </Modal.Body>
-
-        <Modal.Footer>
-          {/* Footer */}
         </Modal.Footer>
       </Modal>
     )
