@@ -1,19 +1,20 @@
 import React from 'react';
-import { toast } from 'react-toastify';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { Button, Table } from 'react-bootstrap';
+import {toast} from 'react-toastify';
+import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
+import {Button, Table} from 'react-bootstrap';
 
-import { SpinLoader, ErrorBox, UserCard } from 'components';
+import {SpinLoader, ErrorBox, UserCard} from 'components';
 import SubListModal from './SubListModal';
+import StandingFilter from "./StandingFilter";
 
 import submissionApi from 'api/submission';
 import contestAPI from 'api/contest';
 
 // Helpers
-import { setTitle } from 'helpers/setTitle';
-import { getPollDelay } from 'helpers/polling';
-import { getLocalDateWithTimezone } from 'helpers/dateFormatter';
+import {setTitle} from 'helpers/setTitle';
+import {getPollDelay} from 'helpers/polling';
+import {getLocalDateWithTimezone} from 'helpers/dateFormatter';
 
 // Assets
 import top1 from 'assets/common/atcoder_top1.png';
@@ -22,7 +23,7 @@ import top30 from 'assets/common/atcoder_top30.png';
 import top100 from 'assets/common/atcoder_top100.png';
 
 import {GiMeltingIceCube, GiIceCube} from 'react-icons/gi';
-import { FaUniversity } from 'react-icons/fa';
+import {FaUniversity} from 'react-icons/fa';
 import {AiOutlineEye, AiOutlineInfoCircle} from 'react-icons/ai';
 
 // Contexts
@@ -39,26 +40,28 @@ const getClassNameFromPoint = (point, maxPoint) => {
   if (maxPoint > 0) {
     const percent = Math.round(point / maxPoint * 100);
 
-    if (percent <= 25) ptsClsName="one-fourth";
-    else if (percent <= 50) ptsClsName="two-fourth";
-    else if (percent <= 75) ptsClsName="three-fourth";
-    else if (percent < 100) ptsClsName="four-fourth";
-    else ptsClsName="full-points";
+    if (percent <= 25) ptsClsName = "one-fourth";
+    else if (percent <= 50) ptsClsName = "two-fourth";
+    else if (percent <= 75) ptsClsName = "three-fourth";
+    else if (percent < 100) ptsClsName = "four-fourth";
+    else ptsClsName = "full-points";
   }
   return ptsClsName
 }
 
 class StandingItem extends React.Component {
   render() {
-    const {rowIdx, user,
+    const {
+      rowIdx, user,
       score, cumtime, tiebreaker,
       frozen_score, frozen_cumtime, frozen_tiebreaker,
-      is_disqualified, virtual, format_data
+      is_disqualified, virtual, format_data,
+      filteredOrg
     } = this.props;
 
-    const { userMapping, probMapping, orgMapping, isFrozen } = this.props;
+    const {userMapping, probMapping, orgMapping, isFrozen} = this.props;
 
-    let best = Array( Object.keys(probMapping).length ).fill(<></>);
+    let best = Array(Object.keys(probMapping).length).fill(<></>);
     let data = JSON.parse(format_data);
     if (data && data.constructor === Object)
       Object.keys(data).forEach((k) => {
@@ -70,17 +73,17 @@ class StandingItem extends React.Component {
         const i = probMapping[k].pos;
         const problemMaxPoints = probMapping[k].points;
 
-        const { points, sub_time, tries, tries_after_frozen } = prob_data;
+        const {points, sub_time, tries, tries_after_frozen} = prob_data;
 
         const ptsClsName = getClassNameFromPoint(points, problemMaxPoints);
 
         best[i] = (
           <div className={`flex-center-col points-container ` + ((tries_after_frozen > 0) ? "frozen" : ptsClsName)}
-            onClick={() => this.props.setSubListData({ user, problem: probMapping[k].shortname })}>
+               onClick={() => this.props.setSubListData({user, problem: probMapping[k].shortname})}>
             <div className={`p-best-points points ${ptsClsName}`}>
               {`${points}`}
               {
-                (!!tries || !!tries_after_frozen ) &&
+                (!!tries || !!tries_after_frozen) &&
                 <span className="extra">(
                   <span className="tries">{tries}</span>
                   {(tries_after_frozen > 0) &&
@@ -88,7 +91,7 @@ class StandingItem extends React.Component {
                       +{tries_after_frozen}
                     </span>
                   }
-                )</span>
+                  )</span>
               }
             </div>
 
@@ -101,17 +104,24 @@ class StandingItem extends React.Component {
 
     let showScore, showCumtime, showTiebreaker;
     if (isFrozen) {
-      showScore = frozen_score; showCumtime = frozen_cumtime;
+      showScore = frozen_score;
+      showCumtime = frozen_cumtime;
     } else {
-      showScore = score; showCumtime = cumtime;
+      showScore = score;
+      showCumtime = cumtime;
     }
+    const orgName = userMapping[user]?.organization;
+
+    const isFilterEnable = filteredOrg.length > 0;
+    if (isFilterEnable && !filteredOrg.includes(orgName))
+      return <></>;
 
     return (
       <tr>
         <td className="td-rank">
           <div className="flex-center rank-display">
             <div className="rank-position">
-              {rowIdx+1}
+              {rowIdx + 1}
             </div>
             {
               (rowIdx === 0) ? <img src={top1} alt="Top 1 Icon"/> : ''
@@ -131,10 +141,11 @@ class StandingItem extends React.Component {
 
           {
             (userMapping && user in userMapping)
-            ?
-            <UserCard displayMode={this.props.displayMode} user={userMapping[user]} organization={orgMapping[user.organization]}/>
-            :
-            <span>{user}</span>
+              ?
+              <UserCard displayMode={this.props.displayMode} user={userMapping[user]}
+                        organization={orgMapping[userMapping[user].organization]}/>
+              :
+              <span>{user}</span>
           }
         </td>
 
@@ -182,23 +193,38 @@ class ContestStanding extends React.Component {
 
       // SubList Modal
       subListShow: false, subListData: null,
+
+      // filter by Org
+      filteredOrg: [],
+      isFilterEnable: false
     }
   }
-  setSubListData(data) {
-    this.setState({ subListShow: true, subListData: data })
+
+  onFilterSave(filteredOrg) {
+    this.setState({filteredOrg});
   }
+
+  onFilerToggle(isFilterEnable) {
+    this.setState({isFilterEnable});
+  }
+
+  setSubListData(data) {
+    this.setState({subListShow: true, subListData: data})
+  }
+
   clearSubListData() {
-    this.setState({ subListShow: false, subListData: null })
+    this.setState({subListShow: false, subListData: null})
   }
 
   /* Set viewing mode of scoreboard to not frozen */
   meltingIce() {
-    this.setState({ iceBroken: true, },
+    this.setState({iceBroken: true,},
       () => this.refetch());
   }
+
   /* Set viewing mode of scoreboard to Frozen */
   freezingIce() {
-    this.setState({ iceBroken: false, },
+    this.setState({iceBroken: false,},
       () => this.refetch())
   }
 
@@ -222,8 +248,8 @@ class ContestStanding extends React.Component {
 
     // Contest - Problems mapping
     let mapping = {}; // mapping here is a list of problems in the contest -> their id
-    let uniq=0;
-    res.data.problems.forEach( (prob) => {
+    let uniq = 0;
+    res.data.problems.forEach((prob) => {
       if (mapping[prob.id]) return;
       mapping[prob.id] = {
         pos: uniq,
@@ -232,22 +258,22 @@ class ContestStanding extends React.Component {
       }
       uniq++;
     })
-    this.setState({ probId2idx : mapping })
+    this.setState({probId2idx: mapping})
 
     // Contest - Organization mapping
     mapping = {}; // mapping here is a list of problems in the contest -> their id
-    res.data.organizations.forEach( (org) => {
+    res.data.organizations.forEach((org) => {
       mapping[org.slug] = org;
     })
-    this.setState({ orgMapping : mapping })
+    this.setState({orgMapping: mapping})
   }
 
-  async refetch(polling=false) {
+  async refetch(polling = false) {
     // Dont do fetch if user is viewing the modal
     if (this.state.subListShow) return;
 
-    if (polling) this.setState({ isPolling: true });
-    else this.setState({ loaded: false, errors: null })
+    if (polling) this.setState({isPolling: true});
+    else this.setState({loaded: false, errors: null})
 
     const params = (this.state.iceBroken ? {view_full: 1} : {view_full: 0});
 
@@ -255,16 +281,16 @@ class ContestStanding extends React.Component {
     // if participants profiles are not loaded, queue this api
     if (!this.state.userMapping) {
       apis.push(
-        contestAPI.getContestParticipants({key: this.state.contest.key })
+        contestAPI.getContestParticipants({key: this.state.contest.key})
           .then((res) => {
             let userMapping = {}
             res.data.forEach((user) => {
               userMapping[user.username] = user
             })
-            this.setState({ userMapping })
+            this.setState({userMapping})
           })
           .catch((err) => {
-            console.log('Cannot fetch participants profile. ',err)
+            console.log('Cannot fetch participants profile. ', err)
           })
       )
     }
@@ -294,29 +320,32 @@ class ContestStanding extends React.Component {
       user: (this.props && this.props.user) || null,
     })
   }
+
   componentDidUpdate(prevProps, prevState) {
-    const { user } = this.props;
-    const { contest } = this.context;
+    const {user} = this.props;
+    const {contest} = this.context;
     if (!contest) return; // skip if no contest
 
     if (prevState.contest !== contest || prevState.user !== user) {
-      this.setState({ user, contest }, () => {
+      this.setState({user, contest}, () => {
         setTitle(`${contest.name} | Standing`)
         this.refetch()
       });
     }
 
-    let pollDelay = (this.state.scoreboardCache*1000 || __STANDING_POLL_DELAY);
+    let pollDelay = (this.state.scoreboardCache * 1000 || __STANDING_POLL_DELAY);
     pollDelay = Math.max(pollDelay, __STANDING_POLL_DELAY);
     clearInterval(this.timer);
     this.timer = setInterval(() => this.refetch(true), pollDelay);
   }
-  componentWillUnmount(){
+
+  componentWillUnmount() {
     clearInterval(this.timer);
   }
 
   render() {
-    const { loaded, errors,
+    const {
+      loaded, errors,
       problems, standing, frozenEnabled, frozenTime, isFrozen,
       canBreakIce, displayMode,
       scoreboardCache,
@@ -331,14 +360,14 @@ class ContestStanding extends React.Component {
             Standing {isPolling && <SpinLoader size={18} margin="0 2px"/>}
           </h4>
 
-          <ErrorBox errors={this.state.errors} />
+          <ErrorBox errors={this.state.errors}/>
 
           <div className="flex-center-col standing-notice">
-          {
-            (scoreboardCache>0) && <span className="frozen-time">
+            {
+              (scoreboardCache > 0) && <span className="frozen-time">
               Scoreboard is cached for every {scoreboardCache} second(s), it will take a while for your submissions to appear here.
             </span>
-          }{frozenEnabled && (
+            }{frozenEnabled && (
             (new Date() < new Date(frozenTime)
               ? <span className="frozen-time">
                 Will be Frozen after {getLocalDateWithTimezone(frozenTime)}.
@@ -351,34 +380,40 @@ class ContestStanding extends React.Component {
 
           <div className="standing-options">
             {canBreakIce &&
-              ( !iceBroken ?
-                <Button  variant="light" className="btn-svg"
-                  onClick={() => this.meltingIce()}>
+              (!iceBroken ?
+                  <Button variant="light" className="btn-svg"
+                          onClick={() => this.meltingIce()}>
                     <AiOutlineEye size={20}/> Peek
-                </Button> :
-                <Button variant="dark" className="btn-svg"
-                  onClick={() => this.freezingIce()}>
+                  </Button> :
+                  <Button variant="dark" className="btn-svg"
+                          onClick={() => this.freezingIce()}>
                     <GiIceCube size={20}/> Freeze!
-                </Button>
+                  </Button>
               )
             }
             {
-              displayMode==='user'? <Button variant="light" className="btn-svg"
-                                    onClick={() => this.setState({displayMode: "org"})}>
-                  <FaUniversity size={20}/> Show
+              displayMode === 'user' ? <Button variant="light" className="btn-svg"
+                                               onClick={() => this.setState({displayMode: "org"})}>
+                <FaUniversity size={20}/> Show
               </Button> : <Button variant="dark" className="btn-svg"
-                          onClick={() => this.setState({displayMode: "user"})}>
+                                  onClick={() => this.setState({displayMode: "user"})}>
                 <FaUniversity size={20}/> Hide
               </Button>
             }
+            <StandingFilter
+              orgList={this.state.organizations}
+              onSave={(x) => this.onFilterSave(x)}
+              onToggle={(x) => this.onFilerToggle(x)}
+              isFilterEnable={this.state.isFilterEnable}
+            />
           </div>
         </div>
 
-        { !loaded && <SpinLoader margin="40px"/> }
-        { loaded && !this.state.errors && <>
+        {!loaded && <SpinLoader margin="40px"/>}
+        {loaded && !this.state.errors && <>
           <Table responsive hover size="sm" striped bordered className="rounded">
             <thead>
-              <tr>
+            <tr>
               <th className="th-rank">Rank</th>
               <th className="th-participant">Participant</th>
               <th className="th-score">Score</th>
@@ -388,35 +423,37 @@ class ContestStanding extends React.Component {
                   const probInfo = prob.partial ? `You can earn partial points from 0pts upto ${prob.points}pts.` : `You either get 0pts or ${prob.points}pts.`;
 
                   return <th key={`cs-th-prb-${idx}`} className={`th-p-best`}>
-                      <div className="flex-center-col" data-toggle="tooltip" data-placement="bottom" title={probInfo} style={{cursor: "help"}}>
-                        <strong>{ prob.label }</strong>
-                        <div className="border-top " style={{fontSize: "14px", width: "70%"}}>
-                          <span>{probMode}</span>
-                        </div>
+                    <div className="flex-center-col" data-toggle="tooltip" data-placement="bottom" title={probInfo}
+                         style={{cursor: "help"}}>
+                      <strong>{prob.label}</strong>
+                      <div className="border-top " style={{fontSize: "14px", width: "70%"}}>
+                        <span>{probMode}</span>
                       </div>
+                    </div>
                   </th>
                 })
               }
-              </tr>
+            </tr>
             </thead>
             <tbody>
-              {
-                standing.map((part, idx) => <StandingItem
-                  key={`ct-st-row-${idx}`}
-                  orgMapping={this.state.orgMapping}
-                  probMapping={this.state.probId2idx}
-                  userMapping={this.state.userMapping}
-                  rowIdx={idx}
-                  isFrozen={isFrozen} displayMode={displayMode}
-                  {...part}
+            {
+              standing.map((part, idx) => <StandingItem
+                key={`ct-st-row-${idx}`}
+                orgMapping={this.state.orgMapping}
+                probMapping={this.state.probId2idx}
+                userMapping={this.state.userMapping}
+                rowIdx={idx}
+                isFrozen={isFrozen} displayMode={displayMode}
+                filteredOrg={this.state.isFilterEnable ? this.state.filteredOrg : []}
+                {...part}
 
-                  setSubListData={(d)=>this.setSubListData(d)}
-                  />)
-              }
+                setSubListData={(d) => this.setSubListData(d)}
+              />)
+            }
             </tbody>
           </Table>
-          <SubListModal show={this.state.subListShow} onHide={()=>this.clearSubListData()}
-                        data={{...this.state.subListData, contest: this.state.contest.key}} />
+          <SubListModal show={this.state.subListShow} onHide={() => this.clearSubListData()}
+                        data={{...this.state.subListData, contest: this.state.contest.key}}/>
         </>}
       </div>
     )

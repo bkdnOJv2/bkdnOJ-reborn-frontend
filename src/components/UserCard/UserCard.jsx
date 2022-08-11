@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { FaUniversity } from 'react-icons/fa';
+import {FaUniversity} from 'react-icons/fa';
 import defaultOrgImg from 'assets/images/default-org.png';
 
 import './UserCard.scss';
@@ -15,10 +15,10 @@ class UserCard extends React.Component {
       'rank_class': "rate-unrated",
     }
 
-    let lo=0, hi=ranks.length-1;
-    let ans=0;
+    let lo = 0, hi = ranks.length - 1;
+    let ans = 0;
     while (lo <= hi) {
-      let mid = Math.floor((lo+hi)/2);
+      let mid = Math.floor((lo + hi) / 2);
       if (ranks[mid].rating_floor <= rating) {
         ans = mid;
         lo = mid + 1
@@ -44,18 +44,23 @@ class UserCard extends React.Component {
       realname += st;
     })
 
+    let orgTooltipTitle = organization?.name;
+    if (displayMode === "org" && !orgName) {
+      orgTooltipTitle = "This user hasn't set their Display Organization.";
+    }
+
     return (
       <div className="flex-center participant-container" style={{justifyContent: "center"}}>
         <div className="avatar-container">
           {
             displayMode === 'user'
-            ? <img className="avatar-img" src={user.avatar} alt="User Icon"></img>
-            : <img className="avatar-img" src={orgImg} alt="Org Icon"></img>
+              ? <img className="avatar-img" src={user.avatar} alt="User Icon"></img>
+              : <img className="avatar-img" src={orgImg} alt="Org Icon"></img>
           }
         </div>
         <div className="flex-center-col user-container">
           <div className="acc-username text-truncate"
-            data-toggle="tooltip" data-placement="right" title={`${rank_obj.rank} ${user.username}`}>
+               data-toggle="tooltip" data-placement="right" title={`${rank_obj.rank} ${user.username}`}>
             <p className={`${rank_obj.rank_class} username`}>{user.username}</p>
           </div>
           {realname.length > 0 &&
@@ -63,15 +68,16 @@ class UserCard extends React.Component {
               {realname}
             </div>
           }
-          {!(displayMode === 'user') && (
-            orgName ? <div className="text-left acc-org text-truncate"
-              data-toggle="tooltip" data-placement="right" title={`${organization.name}`}>
-              <FaUniversity/> {orgName}
-            </div> : <div className="text-left acc-org text-truncate"
-              data-toggle="tooltip" data-placement="right" title={`This user hasn't set their Display Organization.`}>
-                None
-            </div>
-          )}
+          {
+            displayMode === "org" && (
+              <div className="text-left acc-org text-truncate"
+                   data-toggle="tooltip" data-placement="right" title={orgTooltipTitle}>
+                {
+                  orgName ? (<><FaUniversity/> {orgName}</>) : "None"
+                }
+              </div>
+            )
+          }
         </div>
       </div>
     )
@@ -87,7 +93,7 @@ UserCard.propTypes = {
     first_name: PropTypes.string,
     last_name: PropTypes.string,
 
-    organization: PropTypes.string,
+    organization: PropTypes.object,
   }).isRequired,
 };
 
