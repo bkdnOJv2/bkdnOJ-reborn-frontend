@@ -13,6 +13,7 @@ import { ListSidebar, OneColumn } from 'layout';
 
 import {
   Content, ContestSidebar,
+  ContestSubFilterSidebar,
   RecentSubmissionSidebar,
 } from 'components';
 
@@ -219,7 +220,7 @@ class App extends React.Component {
                   mainContent={
                     <SubmissionList />
                   }
-                  sideComponents={[<RecentSubmissionSidebar />]}
+                  sideComponents={[<ContestSidebar/>, <ContestSubFilterSidebar/>,  <RecentSubmissionSidebar />]}
                 />
               }/>
               <Route path="submission/:id" element={
