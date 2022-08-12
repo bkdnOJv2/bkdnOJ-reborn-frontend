@@ -27,13 +27,14 @@
       justify-content: flex-start;
       min-height: 50px;
 
-      * {
+      div, span, p, h1, h2, h3, h4, h5, h6, a {
         width: 100%;
-        color: $base !important;
+        color: $base;
         word-break: break-word;
         flex: 1;
         font-family: $font-codeforces;
       }
+
 
       h4, h5 {
         margin: unset;
