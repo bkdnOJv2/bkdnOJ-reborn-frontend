@@ -1,5 +1,18 @@
 @import 'global.scss';
 
 div#contest-sub-filter {
+  div.filter-panel {
+    label {
+      font-size: 14px;
+      font-family: $font-codeforces;
+      color: $base;
+    }
+    span {
+      color: $base;
+    }
 
+    .staff-only {
+      color: $red-light;
+    }
+  }
 }
