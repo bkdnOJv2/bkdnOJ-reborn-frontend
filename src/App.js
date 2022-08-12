@@ -220,7 +220,7 @@ class App extends React.Component {
                   mainContent={
                     <SubmissionList />
                   }
-                  sideComponents={[<ContestSidebar/>, <ContestSubFilterSidebar/>,  <RecentSubmissionSidebar />]}
+                  sideComponents={[<ContestSubFilterSidebar/>,  <RecentSubmissionSidebar />]}
                 />
               }/>
               <Route path="submission/:id" element={
