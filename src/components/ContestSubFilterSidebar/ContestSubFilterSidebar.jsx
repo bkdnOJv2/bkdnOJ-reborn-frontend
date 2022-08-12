@@ -13,6 +13,9 @@ import ContestContext from 'context/ContestContext';
 // Helpers
 import { getHourMinuteSecond, getYearMonthDate } from 'helpers/dateFormatter';
 
+// Assets
+import { FaTimes, FaFilter } from 'react-icons/fa';
+
 import './ContestSubFilterSidebar.scss';
 
 const LANGUAGES = [
@@ -99,44 +102,59 @@ class ContestSubFilterSidebar extends React.Component {
     const { contest } = this.context;
     const { user } = this.props;
 
-    console.log(contest)
+    const problems = contest.problems || [];
+    console.log(contest.problems)
+
+    const isLoggedIn = (!!user);
+    const isStaff = (isLoggedIn && user.is_staff);
+    const isSuperuser = (isStaff && user.is_superuser);
 
     return (
       <div className="wrapper-vanilla" id="recent-submission-sidebar">
         <h4>Submissions Filter</h4>
-        { !user && <span><Link to='/sign-in'>Log in</Link> to see</span> }
-        { !!user && !contest && <span>Contest is not available.</span> }
-        { !!user && !!contest && <>
+        { !contest && <span>Contest is not available.</span> }
+        { !!contest && <>
 
           <div className="d-flex pl-3 pr-3 text-left">
-              <label id="problem-select-lbl" className="m-0" for="only-me">Problem</label>
-              <select id="problem-select">
+              <label id="problem-select-lbl" className="m-0 w-100" htmlFor="only-me">Problem</label>
+              <select id="problem-select" className="m-0 w-100" >
+                <option key={`ct-fltr-pr-df`} defaultValue>--</option>
+                { problems.map((p, idx) =>
+                  <option key={`ct-fltr-pr-${idx}`} value={p.shortname}>{`${p.label} | ${p.title}`}</option>
+                ) }
               </select>
 
-              <label id="problem-select-lbl" className="m-0" for="only-me">Language</label>
-              <select id="problem-select">
+              <label id="problem-select-lbl" className="m-0 w-100" htmlFor="only-me">Language</label>
+              <select id="problem-select" className="m-0 w-100" >
                 <option key={`ct-fltr-ln-df`} defaultValue>--</option>
                 { LANGUAGES.map((l, idx) =>
                   <option key={`ct-fltr-ln-${idx}`} value={l.value}>{l.name}</option>
                 ) }
               </select>
 
-              <label id="problem-select-lbl" className="m-0" for="only-me">Verdict</label>
-              <select id="problem-select">
+              <label id="problem-select-lbl" className="m-0 w-100" htmlFor="only-me">Verdict</label>
+              <select id="problem-select" className="m-0 w-100" >
                 <option key={`ct-fltr-vd-df`} defaultValue>--</option>
                 { VERDICTS.map((v, idx) =>
                   <option key={`ct-fltr-vd-${idx}`} value={v.value}>{v.name}</option>
                 ) }
               </select>
 
-              <label id="only-me-lbl" className="d-flex align-items-center m-0">
-                <input type="checkbox" id="only-me"></input>
-                <span style={{flex: 2}}>Only me</span>
-              </label>
+              {
+                isLoggedIn &&
+                <label id="only-me-lbl" className="d-flex align-items-center m-0">
+                  <input type="checkbox" id="only-me" className="ml-1 mr-1"></input>
+                  <span style={{flex: 2}}>Only me</span>
+                </label>
+              }
           </div>
           <div className="p-1 text-right" style={{display: "flex", flexDirection: "row", columnGap: "5px"}}>
-            <Button size="sm" variant="secondary">Filter</Button>
-            <Button size="sm" variant="light">Clear</Button>
+            <Button size="sm" variant="secondary" className="btn-svg">
+              <FaFilter/> Filter
+            </Button>
+            <Button size="sm" variant="light" className="btn-svg">
+              <FaTimes/> Clear
+            </Button>
           </div>
         </>}
       </div>
