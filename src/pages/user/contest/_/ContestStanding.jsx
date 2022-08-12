@@ -63,10 +63,9 @@ class StandingItem extends React.Component {
       is_disqualified,
       virtual,
       format_data,
-      filteredOrg,
       favoriteTeams,
       onUserFavorite,
-      isShowFavoriteOnly,
+      filteredRank,
     } = this.props;
 
     const {userMapping, probMapping, orgMapping, isFrozen} = this.props;
@@ -126,17 +125,8 @@ class StandingItem extends React.Component {
       showScore = score;
       showCumtime = cumtime;
     }
-    const orgName = userMapping ? userMapping[user]?.organization : undefined;
-
-    const isOrgFilterEnable = filteredOrg.length > 0;
-    const isFilterEnable = isOrgFilterEnable || isShowFavoriteOnly;
 
     const isFavorite = favoriteTeams.includes(user);
-    const isShow =
-      (isOrgFilterEnable && filteredOrg.includes(orgName)) ||
-      (isShowFavoriteOnly && isFavorite);
-
-    if (isFilterEnable && !isShow) return <></>;
 
     return (
       <tr>
@@ -158,6 +148,16 @@ class StandingItem extends React.Component {
               <img src={top100} alt="Top 100 Icon" />
             ) : (
               ""
+            )}
+            {filteredRank && (
+              <span
+                className="text-secondary"
+                title="Rank in filtered team"
+                data-toogle="tooltip"
+                data-placement="right"
+              >
+                #({filteredRank})
+              </span>
             )}
           </div>
         </td>
@@ -224,7 +224,7 @@ class ContestStanding extends React.Component {
       subListShow: false,
       subListData: null,
 
-      // filter by Org
+      // filter
       filteredOrg: [],
       isOrgFilterEnable: false,
       favoriteTeams: [],
@@ -412,6 +412,8 @@ class ContestStanding extends React.Component {
       isPolling,
     } = this.state;
 
+    let baseFilteredRank = 1;
+
     return (
       <div className="wrapper-vanilla p-2" id="contest-standing">
         <div className="standing-lbl">
@@ -537,27 +539,41 @@ class ContestStanding extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {standing.map((part, idx) => (
-                  <StandingItem
-                    key={`ct-st-row-${idx}`}
-                    orgMapping={this.state.orgMapping}
-                    probMapping={this.state.probId2idx}
-                    userMapping={this.state.userMapping}
-                    rowIdx={idx}
-                    isFrozen={isFrozen}
-                    displayMode={displayMode}
-                    filteredOrg={
-                      this.state.isOrgFilterEnable ? this.state.filteredOrg : []
-                    }
-                    favoriteTeams={this.state.favoriteTeams}
-                    isShowFavoriteOnly={this.state.isFavoriteOnly}
-                    onUserFavorite={(username, isFavorite) =>
-                      this.onUserFavorite(username, isFavorite)
-                    }
-                    {...part}
-                    setSubListData={d => this.setSubListData(d)}
-                  />
-                ))}
+                {standing.map((part, idx) => {
+                  const {isOrgFilterEnable, isFavoriteOnly} = this.state;
+                  const isFilterEnable = isOrgFilterEnable || isFavoriteOnly;
+
+                  let userFilteredRank = undefined;
+                  if (isFilterEnable) {
+                    const {user} = part;
+                    const {filteredOrg} = this.state;
+                    const orgName = this.state.userMapping[user].organization;
+                    const isFavorite = this.state.favoriteTeams.includes(user);
+
+                    const isShow = filteredOrg.includes(orgName) || isFavorite;
+                    if (isShow) userFilteredRank = baseFilteredRank++;
+                    else return <></>;
+                  }
+
+                  return (
+                    <StandingItem
+                      key={`ct-st-row-${idx}`}
+                      orgMapping={this.state.orgMapping}
+                      probMapping={this.state.probId2idx}
+                      userMapping={this.state.userMapping}
+                      rowIdx={idx}
+                      isFrozen={isFrozen}
+                      displayMode={displayMode}
+                      filteredRank={userFilteredRank}
+                      favoriteTeams={this.state.favoriteTeams}
+                      onUserFavorite={(username, isFavorite) =>
+                        this.onUserFavorite(username, isFavorite)
+                      }
+                      {...part}
+                      setSubListData={d => this.setSubListData(d)}
+                    />
+                  );
+                })}
               </tbody>
             </Table>
             <SubListModal

@@ -42,7 +42,6 @@ class UserCard extends React.Component {
       (organization && organization.logo_url) || defaultOrgImg || null;
     const orgName =
       (organization && (organization.short_name || organization.slug)) || null;
-    const userImg = user.avatar;
 
     let realname = "";
     [user.first_name, user.last_name].forEach(st => {
@@ -85,12 +84,18 @@ class UserCard extends React.Component {
             </div>
             {isFavorite ? (
               <AiFillHeart
+                title="Favorite team/user"
+                data-toogle="tooltip"
+                data-placement="right"
                 className="favorite-icon text-danger"
                 onClick={onFavoriteClick}
                 size={20}
               />
             ) : (
               <AiOutlineHeart
+                title="Mask as favorite"
+                data-toogle="tooltip"
+                data-placement="right"
                 className="favorite-icon"
                 onClick={onFavoriteClick}
                 size={20}
