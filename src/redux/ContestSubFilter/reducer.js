@@ -6,7 +6,7 @@ const reducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case SET_PARAMS:
             return {
-                ...state, ...action.params
+                ...action.params
             };
         case CLEAR_PARAMS:
             return {};

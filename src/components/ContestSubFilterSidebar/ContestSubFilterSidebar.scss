@@ -9,6 +9,15 @@ div#contest-sub-filter {
     }
     span {
       color: $base;
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+    div.checkbox-panel {
+      padding: 0 5px;
+      justify-content: center;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
     }
 
     .staff-only {
