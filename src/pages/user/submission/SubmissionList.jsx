@@ -27,6 +27,7 @@ import ContestContext from "context/ContestContext";
 
 import "./SubmissionList.scss";
 import "styles/ClassicPagination.scss";
+import {NO_CONTEST_KEY} from "redux/SubFilter/types";
 
 const verdictExplains = {
   AC: "Your solution gives correct output within given contraints.",
@@ -211,7 +212,8 @@ class SubmissionList extends React.Component {
     this.setState({loaded: false, errors: null});
 
     if (this.state.contest) {
-      const extraParams = this.props.contestSubFilter;
+      const extraParams = this.props.subFilter[this.state.contest.key] || {};
+
       contestApi
         .getContestSubmissions({
           key: this.state.contest.key,
@@ -234,7 +236,9 @@ class SubmissionList extends React.Component {
           });
         });
     } else {
-      let prms = {page: params.page + 1};
+      const extraParams = this.props.subFilter[NO_CONTEST_KEY] || {};
+      let prms = {page: params.page + 1, ...extraParams};
+
       if (this.props.selectedOrg.slug) {
         prms.org = this.props.selectedOrg.slug;
       }
@@ -271,7 +275,7 @@ class SubmissionList extends React.Component {
     if (prevProps.selectedOrg !== this.props.selectedOrg) {
       this.callApi();
     }
-    if (prevProps.contestSubFilter !== this.props.contestSubFilter) {
+    if (prevProps.subFilter !== this.props.subFilter) {
       this.callApi();
     }
   }
@@ -361,7 +365,7 @@ const mapStateToProps = state => {
   return {
     user: state.user.user,
     selectedOrg: state.myOrg.selectedOrg,
-    contestSubFilter: state.contestSubFilter,
+    subFilter: state.subFilter,
   };
 };
 wrapped = connect(mapStateToProps, null)(wrapped);

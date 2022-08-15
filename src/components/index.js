@@ -15,7 +15,7 @@ import DropdownTreeNoRerender from './DropdownTreeNoRerender';
 import SwitchOrgModal from './SwitchOrgModal';
 
 import ContestSidebar from './ContestSidebar';
-import ContestSubFilterSidebar from './ContestSubFilterSidebar';
+import SubFilterSidebar from './SubFilterSidebar';
 import RecentSubmissionSidebar from './RecentSubmissionSidebar';
 
 export {
@@ -36,6 +36,6 @@ export {
     SwitchOrgModal,
 
     ContestSidebar,
-    ContestSubFilterSidebar,
+    SubFilterSidebar,
     RecentSubmissionSidebar,
 };

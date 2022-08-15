@@ -2,7 +2,14 @@ import React from "react";
 
 // Redux
 import {connect} from "react-redux";
-import {setParams, clearParams} from "redux/ContestSubFilter/actions";
+import {
+  setContestParams,
+  clearContestParams,
+  setPublicParams,
+  clearPublicParams,
+} from "redux/SubFilter/actions";
+
+import {NO_CONTEST_KEY} from "redux/SubFilter/types";
 
 import {Button, Table, Row, Col} from "react-bootstrap";
 import {Link} from "react-router-dom";
@@ -16,27 +23,27 @@ import {getHourMinuteSecond, getYearMonthDate} from "helpers/dateFormatter";
 // Assets
 import {FaTimes, FaFilter} from "react-icons/fa";
 
-import "./ContestSubFilterSidebar.scss";
+import "./SubFilterSidebar.scss";
 
 const LANGUAGES = [
   {
-    key: "C",
+    value: "C",
     name: "C",
   },
   {
-    key: "C++",
+    value: "C++",
     name: "C++",
   },
   {
-    key: "Java",
+    value: "Java",
     name: "Java",
   },
   {
-    key: "Pascal",
+    value: "Pascal",
     name: "Pascal",
   },
   {
-    key: "Python",
+    value: "Python",
     name: "Python",
   },
 ];
@@ -66,6 +73,20 @@ const VERDICTS = [
     name: "Compile Error",
   },
 ];
+const ORDER_BY = [
+  {
+    value: "time",
+    name: "CPU Time",
+  },
+  {
+    value: "memory",
+    name: "Memory Usage",
+  },
+  {
+    value: "date",
+    name: "Submit Time",
+  },
+];
 
 class ContestSubFilterSidebar extends React.Component {
   static contextType = ContestContext;
@@ -78,7 +99,6 @@ class ContestSubFilterSidebar extends React.Component {
   }
 
   setParams(key, value) {
-    console.log(key, value)
     if (value) {
       const oldParams = this.state.queryParams;
       this.setState({queryParams: {...oldParams, [key]: value}});
@@ -90,19 +110,32 @@ class ContestSubFilterSidebar extends React.Component {
   }
 
   onFilter() {
-    this.props.setParams(this.state.queryParams);
+    const {contest} = this.context;
+    if (contest)
+      this.props.setContestParams(contest.key, this.state.queryParams);
+    else this.props.setPublicParams(this.state.queryParams);
   }
   onClear() {
+    const {contest} = this.context;
     this.setState({queryParams: {}});
-    this.props.clearParams();
+    if (contest) this.props.clearContestParams(contest.key);
+    else this.props.clearPublicParams();
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    const {contest} = this.context;
+    if (contest)
+      this.setState({
+        queryParams: this.props.subFilter[contest.key] || {},
+      });
+    else
+      this.setState({
+        queryParams: this.props.subFilter[NO_CONTEST_KEY] || {},
+      });
+  }
   componentDidUpdate() {}
 
   render() {
-    console.log(this.state.queryParams)
-
     const {contest} = this.context;
     const {user} = this.props;
 
@@ -113,7 +146,7 @@ class ContestSubFilterSidebar extends React.Component {
     const isSuperuser = isStaff && user.is_superuser;
 
     return (
-      <div className="wrapper-vanilla" id="contest-sub-filter">
+      <div className="wrapper-vanilla" id="sub-filter">
         <h4>Submissions Filter</h4>
         {!contest && <span>Contest is not available.</span>}
         {!!contest && (
@@ -122,9 +155,28 @@ class ContestSubFilterSidebar extends React.Component {
               <Row>
                 <Col>
                   <label
+                    id="user-text-lbl"
+                    className="m-0 w-100"
+                    htmlFor="user-text"
+                  >
+                    Participant
+                  </label>
+                  <input
+                    id="user-text"
+                    className="m-0 w-100"
+                    type="text"
+                    onChange={e => this.setParams("user", e.target.value)}
+                    value={this.state.queryParams.user || ""}
+                    style={{fontSize: "12px"}}
+                  ></input>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <label
                     id="problem-select-lbl"
                     className="m-0 w-100"
-                    htmlFor="only-me"
+                    htmlFor="problem-select"
                   >
                     Problem
                   </label>
@@ -151,7 +203,7 @@ class ContestSubFilterSidebar extends React.Component {
                   <label
                     id="language-select-lbl"
                     className="m-0 w-100"
-                    htmlFor="only-me"
+                    htmlFor="language-select"
                   >
                     Lang
                   </label>
@@ -175,7 +227,7 @@ class ContestSubFilterSidebar extends React.Component {
                   <label
                     id="verdict-select-lbl"
                     className="m-0 w-100"
-                    htmlFor="only-me"
+                    htmlFor="verdict-select"
                   >
                     Verdict
                   </label>
@@ -193,14 +245,65 @@ class ContestSubFilterSidebar extends React.Component {
                         {v.name}
                       </option>
                     ))}
-                    {
-                      isStaff && <option key={`ct-fltr-vd-ie`} value={"IE"} className="text-danger">
+                    {isStaff && (
+                      <option
+                        key={`ct-fltr-vd-ie`}
+                        value={"IE"}
+                        className="text-danger"
+                      >
                         Internal Error
                       </option>
-                    }
+                    )}
                   </select>
                 </Col>
               </Row>
+              <Row>
+                <Col xs={9}>
+                  <label
+                    id="order-by-select-lbl"
+                    className="m-0 w-100"
+                    htmlFor="order-by"
+                  >
+                    Order By
+                  </label>
+                  <select
+                    id="order-by"
+                    className="m-0 w-100"
+                    onChange={e => this.setParams("order_by", e.target.value)}
+                    value={this.state.queryParams.order_by || ""}
+                  >
+                    <option key={`ct-fltr-ln-df`} value="">
+                      --
+                    </option>
+                    {ORDER_BY.map((ord, idx) => (
+                      <option key={`ct-fltr-ln-${idx}`} value={ord.value}>
+                        {ord.name}
+                      </option>
+                    ))}
+                  </select>
+                </Col>
+                <Col xs={3}>
+                  <label
+                    id="order-by-ordering-select-lbl"
+                    className="m-0 w-100"
+                    htmlFor="order-by-ordering"
+                  ></label>
+                  <select
+                    id="order-by-ordering"
+                    className="m-0 w-100"
+                    onChange={e => this.setParams("dec", e.target.value)}
+                    value={this.state.queryParams.dec || ""}
+                  >
+                    <option key={`ct-fltr-ln-asc`} value="">
+                      ASC
+                    </option>
+                    <option key={`ct-fltr-ln-dec`} value="1">
+                      DEC
+                    </option>
+                  </select>
+                </Col>
+              </Row>
+
               <div className="w-100 checkbox-panel" style={{columnGap: "5px"}}>
                 {isLoggedIn && (
                   <label
@@ -303,14 +406,17 @@ const mapStateToProps = state => {
   return {
     user: state.user.user,
     profile: state.profile.profile,
-    contestSubFilter: state.contestSubFilter,
+    subFilter: state.subFilter,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    setParams: params => dispatch(setParams(params)),
-    clearParams: () => dispatch(clearParams()),
+    setContestParams: (key, params) =>
+      dispatch(setContestParams({key, params})),
+    setPublicParams: params => dispatch(setPublicParams({params})),
+    clearContestParams: key => dispatch(clearContestParams({key})),
+    clearPublicParams: () => dispatch(clearPublicParams()),
   };
 };
 

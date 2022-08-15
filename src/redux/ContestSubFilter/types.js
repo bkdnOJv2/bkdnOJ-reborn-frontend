@@ -1,2 +1,0 @@
-export const SET_PARAMS = 'CTSUBS_SET_PARAMS';
-export const CLEAR_PARAMS = 'CTSUBS_CLEAR_PARAMS';
