@@ -1,8 +1,9 @@
 import { SET_PARAMS, CLEAR_PARAMS } from './types';
 
-export const setParams = () => {
+export const setParams = (params) => {
     return {
         type: SET_PARAMS,
+        params: {...params},
     };
 };
 
