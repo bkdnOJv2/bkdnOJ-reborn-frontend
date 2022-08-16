@@ -1,8 +1,9 @@
 import React from "react";
+import { toast } from "react-toastify";
 import {connect} from "react-redux";
 import ReactPaginate from "react-paginate";
 import {Link} from "react-router-dom";
-import {Table} from "react-bootstrap";
+import {Button, Table} from "react-bootstrap";
 
 // import { FaPaperPlane } from 'react-icons/fa';
 import {GiTrophyCup} from "react-icons/gi";
@@ -16,11 +17,12 @@ import dateFormatter, {
 } from "helpers/dateFormatter";
 
 // Assets
-import {FaRegEyeSlash} from "react-icons/fa";
+import {FaRegEyeSlash, FaRedoAlt, FaSyncAlt} from "react-icons/fa";
 
 // Helpers
 import {setTitle} from "helpers/setTitle";
 import {parseTime, parseMem} from "helpers/textFormatter";
+import {isLoggedIn, isStaff} from "helpers/auth";
 
 // Contexts
 import ContestContext from "context/ContestContext";
@@ -28,6 +30,9 @@ import ContestContext from "context/ContestContext";
 import "./SubmissionList.scss";
 import "styles/ClassicPagination.scss";
 import {NO_CONTEST_KEY} from "redux/SubFilter/types";
+
+// Constants
+import {messages, values} from "./constants";
 
 const verdictExplains = {
   AC: "Your solution gives correct output within given contraints.",
@@ -200,18 +205,26 @@ class SubmissionList extends React.Component {
       contest: null,
 
       submissions: [],
+      count: 0,
       currPage: 0,
       pageCount: 1,
       loaded: false,
       errors: null,
+
+      refetchDisable: false,
+      rejudgeDisable: false,
     };
     setTitle(`Submissions`);
+  }
+
+  isInContest() {
+    return !!this.state.contest;
   }
 
   callApi(params = {page: 0}) {
     this.setState({loaded: false, errors: null});
 
-    if (this.state.contest) {
+    if (this.isInContest()) {
       const extraParams = this.props.subFilter[this.state.contest.key] || {};
 
       contestApi
@@ -284,6 +297,51 @@ class SubmissionList extends React.Component {
     this.callApi({page: event.selected});
   };
 
+  onRefetchClick() {
+    if (this.state.refetchDisable) return;
+    this.setState({refetchDisable: true}, () => {
+      this.callApi();
+      setTimeout(
+        () => this.setState({refetchDisable: false}),
+        values.refetchDisableDuration
+      );
+    });
+  }
+
+  onMassRejudgeClick() {
+    const count = this.state.count;
+    if (count === 0) {
+      window.alert(messages.getMassRejudgeAlert());
+      return;
+    }
+
+    const conf = window.confirm(messages.getMassRejudgeConfirm(count));
+    if (!conf) return;
+
+    let request;
+    if (this.isInContest()) {
+      const extraParams = this.props.subFilter[this.state.contest.key] || {};
+      request = contestApi.rejudgeContestSubmissions({
+        key: this.state.contest.key,
+        params: {...extraParams},
+      })
+    } else {
+      const filterParams = this.props.subFilter[NO_CONTEST_KEY] || {};
+      let prms = {...filterParams};
+
+      if (this.props.selectedOrg.slug) {
+        prms.org = this.props.selectedOrg.slug;
+      }
+      request = submissionApi.rejudgeSubmissions(prms)
+    }
+
+    request.then(() => {
+      toast.success(messages.toast.rejudging.getOKMessage())
+    }).catch(err => {
+      toast.error(messages.toast.rejudging.getFailedMessage(err.response.status))
+    })
+  }
+
   render() {
     const {loaded, errors, count} = this.state;
     const {user} = this.props;
@@ -291,7 +349,29 @@ class SubmissionList extends React.Component {
 
     return (
       <div className="submission-table wrapper-vanilla">
+        <div className="submission-table-control">
+          {isStaff(user) && (
+            <Button
+              size="sm" className="btn-svg"
+              variant={this.state.rejudgeDisable ? "secondary" : "danger"}
+              disabled={this.state.rejudgeDisable}
+              onClick={() => this.onMassRejudgeClick()}
+            >
+              Rejudge <FaSyncAlt />
+            </Button>
+          )}
+          <Button
+            size="sm"
+            className="btn-svg"
+            variant={this.state.refetchDisable ? "secondary" : "dark"}
+            disabled={!!this.state.refetchDisable}
+            onClick={() => this.onRefetchClick()}
+          >
+            <FaRedoAlt />
+          </Button>
+        </div>
         <h4>Submissions</h4>
+
         <ErrorBox errors={errors} />
         <Table responsive hover size="sm" striped bordered className="rounded">
           <thead>
