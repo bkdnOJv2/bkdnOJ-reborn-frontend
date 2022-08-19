@@ -15,5 +15,5 @@ export const messages = {
 };
 
 export const values = {
-  refetchDisableDuration: 3000,
+  refetchDisableDuration: 2000,
 }

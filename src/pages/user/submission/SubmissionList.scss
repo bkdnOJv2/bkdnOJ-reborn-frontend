@@ -14,7 +14,7 @@ $HEADLINE-HEIGHT: 36px;
     flex-direction: row;
 
     button {
-      margin: 2px 2px 2px 0;
+      margin: 2px 4px 2px 0;
       height: calc($HEADLINE-HEIGHT - 10px);
       min-width: calc($HEADLINE-HEIGHT - 10px);
     }
@@ -158,6 +158,17 @@ $HEADLINE-HEIGHT: 36px;
       &:hover {
         background-color: rgba(100, 200, 255, 0.35);
       }
+    }
+  }
+
+  .count-text {
+    position: absolute;
+    right: 5px;
+    bottom: 0;
+    font-size: 14px;
+    .number {
+      font-family: $font-monospace;
+      font-weight: bold;
     }
   }
 
