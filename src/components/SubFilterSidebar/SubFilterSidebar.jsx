@@ -132,7 +132,7 @@ class ContestSubFilterSidebar extends React.Component {
     else this.props.clearPublicParams();
   }
 
-  componentDidMount() {
+  initFromRedux() {
     const {contest} = this.context;
     if (contest)
       this.setState({
@@ -143,7 +143,13 @@ class ContestSubFilterSidebar extends React.Component {
         queryParams: this.props.subFilter[NO_CONTEST_KEY] || {},
       });
   }
-  componentDidUpdate() {}
+  componentDidMount() {
+    this.initFromRedux();
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.subFilter !== prevProps.subFilter)
+      this.initFromRedux();
+  }
 
   render() {
     const {contest} = this.context;
