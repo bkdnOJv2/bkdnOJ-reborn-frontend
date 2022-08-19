@@ -169,6 +169,9 @@ class ContestSubFilterSidebar extends React.Component {
                     id="user-text-lbl"
                     className="m-0 w-100"
                     htmlFor="user-text"
+                    style={{
+                      textDecoration: (this.state.queryParams.me ? "line-through" : "none")
+                    }}
                   >
                     Participant
                   </label>
@@ -179,6 +182,7 @@ class ContestSubFilterSidebar extends React.Component {
                     onChange={e => this.setParams("user", e.target.value)}
                     value={this.state.queryParams.user || ""}
                     style={{fontSize: "12px"}}
+                    disabled={!!this.state.queryParams.me}
                   ></input>
                 </Col>
               </Row>
@@ -266,7 +270,7 @@ class ContestSubFilterSidebar extends React.Component {
                         {v.name}
                       </option>
                     ))}
-                    {isStaff && (
+                    {isStaff && (<>
                       <option
                         key={`ct-fltr-vd-ie`}
                         value={"IE"}
@@ -274,7 +278,14 @@ class ContestSubFilterSidebar extends React.Component {
                       >
                         Internal Error
                       </option>
-                    )}
+                      <option
+                        key={`ct-fltr-vd-sc`}
+                        value={"SC"}
+                        className="text-danger"
+                      >
+                        Skipped
+                      </option>
+                    </>)}
                   </select>
                 </Col>
               </Row>
@@ -336,6 +347,7 @@ class ContestSubFilterSidebar extends React.Component {
                   <input
                     className="w-100 m-0"
                     type="datetime-local"
+                    step="1"
                     id="date-after"
                     value={this.state.queryParams.date_after || ""}
                     onChange={e => this.setParams("date_after", e.target.value)}
@@ -355,6 +367,7 @@ class ContestSubFilterSidebar extends React.Component {
                     className="w-100 m-0"
                     type="datetime-local"
                     id="date-before"
+                    step="1"
                     value={this.state.queryParams.date_before || ""}
                     onChange={e => this.setParams("date_before", e.target.value)}
                   ></input>
