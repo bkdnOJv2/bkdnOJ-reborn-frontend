@@ -5,7 +5,7 @@ const getSubmissions = (params) => {
 }
 
 const rejudgeSubmissions = (params) => {
-    return axiosClient.patch('/submission/', (params && { params: {...params} }));
+    return axiosClient.patch('/submission/', null, (params && { params: {...params} }));
 }
 
 const getSubmissionDetails = ({id, params}) => {

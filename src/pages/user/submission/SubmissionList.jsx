@@ -22,7 +22,7 @@ import {FaRegEyeSlash, FaRedoAlt, FaSyncAlt} from "react-icons/fa";
 // Helpers
 import {setTitle} from "helpers/setTitle";
 import {parseTime, parseMem} from "helpers/textFormatter";
-import {isLoggedIn, isStaff} from "helpers/auth";
+import {isLoggedIn, isStaff, isSuperUser} from "helpers/auth";
 
 // Contexts
 import ContestContext from "context/ContestContext";
@@ -338,7 +338,11 @@ class SubmissionList extends React.Component {
     request.then(() => {
       toast.success(messages.toast.rejudging.getOKMessage())
     }).catch(err => {
-      toast.error(messages.toast.rejudging.getFailedMessage(err.response.status))
+      toast.error(
+        (err.response?.data?.message ? `${err.response.data.message}`
+          : messages.toast.rejudging.getFailedMessage(err.response.status)
+        )
+      )
     })
   }
 
@@ -350,6 +354,7 @@ class SubmissionList extends React.Component {
     return (
       <div className="submission-table wrapper-vanilla">
         <div className="submission-table-control">
+          {/* {(isSuperUser(user) || (isStaff(user) && this.isInContest())) && ( */}
           {isStaff(user) && (
             <Button
               size="sm" className="btn-svg"
