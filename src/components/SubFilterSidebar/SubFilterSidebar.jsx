@@ -86,11 +86,12 @@ const ORDER_BY = [
     value: "date",
     name: "Submit Time",
   },
+  {
+    value: "rejudged_date",
+    name: "Rejudge Date",
+  },
 ];
-
-const DATETIME_LOCAL_KEYS = [
-  'date_before', 'date_after',
-]
+const DATETIME_LOCAL_KEYS = ["date_before", "date_after"];
 
 class ContestSubFilterSidebar extends React.Component {
   static contextType = ContestContext;
@@ -115,14 +116,13 @@ class ContestSubFilterSidebar extends React.Component {
 
   onFilter() {
     const {contest} = this.context;
-    let params = {...this.state.queryParams}
+    let params = {...this.state.queryParams};
 
-    DATETIME_LOCAL_KEYS.forEach( key => {
-      if(params[key]) params[key] = (new Date(params[key])).toISOString()
-    })
+    DATETIME_LOCAL_KEYS.forEach(key => {
+      if (params[key]) params[key] = new Date(params[key]).toISOString();
+    });
 
-    if (contest)
-      this.props.setContestParams(contest.key, params);
+    if (contest) this.props.setContestParams(contest.key, params);
     else this.props.setPublicParams(params);
   }
   onClear() {
@@ -170,7 +170,9 @@ class ContestSubFilterSidebar extends React.Component {
                     className="m-0 w-100"
                     htmlFor="user-text"
                     style={{
-                      textDecoration: (this.state.queryParams.me ? "line-through" : "none")
+                      textDecoration: this.state.queryParams.me
+                        ? "line-through"
+                        : "none",
                     }}
                   >
                     Participant
@@ -195,24 +197,26 @@ class ContestSubFilterSidebar extends React.Component {
                   >
                     Problem
                   </label>
-                  { problems.length > 0 && <select
+                  {problems.length > 0 && (
+                    <select
                       id="problem-select"
                       className="m-0 w-100"
                       onChange={e => this.setParams("problem", e.target.value)}
                       value={this.state.queryParams.problem || ""}
-                  >
-                    <option key={`ct-fltr-pr-df`} value="">
-                      --
-                    </option>
-                    {problems.map((p, idx) => (
-                      <option
-                        key={`ct-fltr-pr-${idx}`}
-                        value={p.shortname}
-                      >{`${p.label}. ${p.title}`}</option>
-                    ))}
-                  </select>
-                  }
-                  { problems.length === 0 && <input
+                    >
+                      <option key={`ct-fltr-pr-df`} value="">
+                        --
+                      </option>
+                      {problems.map((p, idx) => (
+                        <option
+                          key={`ct-fltr-pr-${idx}`}
+                          value={p.shortname}
+                        >{`${p.label}. ${p.title}`}</option>
+                      ))}
+                    </select>
+                  )}
+                  {problems.length === 0 && (
+                    <input
                       type="text"
                       id="problem-input"
                       className="m-0 w-100"
@@ -220,7 +224,7 @@ class ContestSubFilterSidebar extends React.Component {
                       value={this.state.queryParams.problem || ""}
                       style={{fontSize: "12px"}}
                     />
-                  }
+                  )}
                 </Col>
               </Row>
               <Row className="m-0 w-100">
@@ -270,22 +274,31 @@ class ContestSubFilterSidebar extends React.Component {
                         {v.name}
                       </option>
                     ))}
-                    {isStaff && (<>
-                      <option
-                        key={`ct-fltr-vd-ie`}
-                        value={"IE"}
-                        className="text-danger"
-                      >
-                        Internal Error
-                      </option>
-                      <option
-                        key={`ct-fltr-vd-sc`}
-                        value={"SC"}
-                        className="text-danger"
-                      >
-                        Skipped
-                      </option>
-                    </>)}
+                    {isStaff && (
+                      <>
+                        <option
+                          key={`ct-fltr-vd-q`}
+                          value={"Q"}
+                          className="text-danger"
+                        >
+                          Not Done Judging
+                        </option>
+                        <option
+                          key={`ct-fltr-vd-ie`}
+                          value={"IE"}
+                          className="text-danger"
+                        >
+                          Internal Error
+                        </option>
+                        <option
+                          key={`ct-fltr-vd-sc`}
+                          value={"SC"}
+                          className="text-danger"
+                        >
+                          Skipped
+                        </option>
+                      </>
+                    )}
                   </select>
                 </Col>
               </Row>
@@ -369,7 +382,9 @@ class ContestSubFilterSidebar extends React.Component {
                     id="date-before"
                     step="1"
                     value={this.state.queryParams.date_before || ""}
-                    onChange={e => this.setParams("date_before", e.target.value)}
+                    onChange={e =>
+                      this.setParams("date_before", e.target.value)
+                    }
                   ></input>
                 </Col>
               </Row>
