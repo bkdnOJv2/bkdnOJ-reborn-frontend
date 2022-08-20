@@ -8,8 +8,8 @@ export const messages = {
 
   toast: {
     rejudging: {
-      getOK: (...args) => {return "OK Rejudging."},
-      getFailedMessage: (...args) => { return `Cannot rejudge. (${args[0]})` },
+      getOK: (...args) => {return "OK Rejudging..."},
+      getErr: (...args) => { return `Cannot rejudge. (${args[0]})` },
     }
   },
 };

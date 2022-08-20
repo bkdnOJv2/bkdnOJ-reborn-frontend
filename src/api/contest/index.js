@@ -39,7 +39,7 @@ const getContestSubmissions = ({ key, params }) => {
 }
 
 const rejudgeContestSubmissions = ({ key, params }) => {
-    return axiosClient.patch(`/contest/${key}/submission/`, (params && { params: {...params} }));
+    return axiosClient.patch(`/contest/${key}/submission/`, null, (params && { params: {...params} }));
 }
 
 const getContestProblems = ({ key, params }) => {

@@ -48,8 +48,8 @@ const verdictExplains = {
   MLE: "Your solution used too much memory.",
   OLE: "Your solution printed too much data.",
   IR: "Your solution did not return exitcode 0.",
-  RTE: "Your solution did no return exitcode 0.",
-  IE: "There is something wrong with the servers. The admins are notified.",
+  RTE: "Your solution did not return exitcode 0.",
+  IE: "There is something wrong with the servers. Please notify the admin.",
   CE: "There is syntax error in your solution. Please Double-check the language and version.",
   FR: "Results are frozen and will be revealed later.",
 };
@@ -371,13 +371,14 @@ class SubmissionList extends React.Component {
 
     request
       .then(() => {
-        toast.success(messages.toast.rejudging.getOKMessage());
+        toast.success(messages.toast.rejudging.getOK());
+        this.callApi()
       })
       .catch(err => {
         toast.error(
           err.response?.data?.message
             ? `${err.response.data.message}`
-            : messages.toast.rejudging.getFailedMessage(err.response.status)
+            : messages.toast.rejudging.getErr(err.response.status)
         );
       });
   }

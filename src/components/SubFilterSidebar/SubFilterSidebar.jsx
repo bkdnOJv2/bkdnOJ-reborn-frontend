@@ -86,10 +86,6 @@ const ORDER_BY = [
     value: "date",
     name: "Submit Time",
   },
-  {
-    value: "rejudged_date",
-    name: "Rejudge Date",
-  },
 ];
 const DATETIME_LOCAL_KEYS = ["date_before", "date_after"];
 
@@ -112,6 +108,16 @@ class ContestSubFilterSidebar extends React.Component {
       delete newParams[key];
       this.setState({queryParams: newParams});
     }
+  }
+
+  getTime(key) {
+    const data = this.state.queryParams;
+    if (data && data[key]) {
+      let time = new Date(data[key])
+      time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+      return time.toISOString().slice(0, 19);
+    }
+    return '';
   }
 
   onFilter() {
@@ -331,6 +337,12 @@ class ContestSubFilterSidebar extends React.Component {
                         {ord.name}
                       </option>
                     ))}
+                    {isStaff && <>
+                      <option key={`ct-fltr-ln-rjd`} value="rejudged_date" className="text-danger">
+                        Rejudge Date
+                      </option>
+                    </>
+                    }
                   </select>
                 </Col>
                 <Col xs={4}>
@@ -368,7 +380,7 @@ class ContestSubFilterSidebar extends React.Component {
                     type="datetime-local"
                     step="1"
                     id="date-after"
-                    value={this.state.queryParams.date_after || ""}
+                    value={this.getTime("date_after")}
                     onChange={e => this.setParams("date_after", e.target.value)}
                   ></input>
                 </Col>
@@ -387,7 +399,7 @@ class ContestSubFilterSidebar extends React.Component {
                     type="datetime-local"
                     id="date-before"
                     step="1"
-                    value={this.state.queryParams.date_before || ""}
+                    value={this.getTime("date_before")}
                     onChange={e =>
                       this.setParams("date_before", e.target.value)
                     }
