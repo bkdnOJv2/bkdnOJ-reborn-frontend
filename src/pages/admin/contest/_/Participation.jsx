@@ -7,6 +7,7 @@ import {getLocalDateWithTimezone} from "helpers/dateFormatter";
 
 import {SpinLoader, ErrorBox} from "components";
 import contestAPI from "api/contest";
+import "./Participation.scss";
 import "styles/ClassicPagination.scss";
 
 const INITIAL_STATE = {
@@ -20,6 +21,7 @@ const INITIAL_STATE = {
   // params
   virtual: null,
   // modal
+  selected: [],
 };
 const VIRTUAL_TYPE = ["LIVE", "SPECTATE"];
 
@@ -68,6 +70,7 @@ class Participation extends React.Component {
 
           selectChk: Array(res.data.results.length).fill(false),
           loaded: true,
+          selected: [],
         });
       })
       .catch(err => {
@@ -113,7 +116,7 @@ class Participation extends React.Component {
                 ))}
               </Col>
             </Row>
-            <Row className="mb-1">
+            <Row className="mb-1 mt-1">
               <Col md={8}></Col>
               <Col className="flex-center">
                 <Button
@@ -135,14 +138,24 @@ class Participation extends React.Component {
                   onClick={() => this.refetch()}
                 >
                   {" "}
-                  Search{" "}
+                  Filter{" "}
                 </Button>
               </Col>
             </Row>
           </div>
           <hr className="m-2" />
           <div className="admin-table contest-participation-table">
-            <h4 className="m-0">Participations</h4>
+            <h4 className="contest-participation-lbl m-0">Participations</h4>
+            <div className="part-add-btn">
+              <Button
+                size="sm"
+                variant="dark"
+                style={{width: "100%"}}
+                onClick={() => this.openModalHandler()}
+              >
+                Add
+              </Button>
+            </div>
             <Table
               responsive
               hover
@@ -165,23 +178,39 @@ class Participation extends React.Component {
                     )}
                   </th>
                   <th>
+                    Org
+                  </th>
+                  <th>
                     Disqualified{" "}
                     {this.clarifyPopup(
                       "Những lần tham dự bị Disqualified này sẽ mang điểm là -9999 trên bảng xếp hạng. " +
                         "Nếu lượt tham dự này là LIVE, thí sinh này sẽ không được xếp hạng Rating."
                     )}
                   </th>
+                  <th>
+                    <input type="checkbox"></input>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {" "}
-                {participations.map(part => (
+                {participations.map((part, ridx) => (
                   <tr key={`ct-part-${part.id}`}>
                     <td>{part.id}</td>
                     <td>{part.user}</td>
                     <td>{getLocalDateWithTimezone(part.real_start)}</td>
                     <td>{part.virtual}</td>
+                    <td>{part.organization || "None"}</td>
                     <td>{part.is_disqualified ? "Yes" : "No"}</td>
+                    <td>
+                      <input type="checkbox" onChange={() => {
+                        const selected = this.state.selected;
+                        this.setState({
+                          selected: selected.map((v, i) => i === ridx ? !v : v)
+                        })
+                      }}
+                      />
+                    </td>
                   </tr>
                 ))}{" "}
               </tbody>
@@ -205,32 +234,6 @@ class Participation extends React.Component {
               </span>
             )}
           </div>
-
-          <Row className="mt-2">
-            <Col md={8}></Col>
-            <Col>
-              <Button
-                size="sm"
-                variant="dark"
-                style={{width: "100%"}}
-                onClick={() => this.openModalHandler()}
-              >
-                {" "}
-                Add{" "}
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                size="sm"
-                variant="danger"
-                style={{width: "100%"}}
-                disabled={!this.state.loaded}
-              >
-                {" "}
-                Save{" "}
-              </Button>
-            </Col>
-          </Row>
         </div>
         <AddParticipationModal
           ckey={this.ckey}
