@@ -1,11 +1,14 @@
 import React from "react";
-import {Link} from "react-router-dom";
 import {Form, Row, Col, Table, Button, Modal} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
+import {FaPlusCircle} from "react-icons/fa";
+
 import {getLocalDateWithTimezone} from "helpers/dateFormatter";
+import {qmClarify} from "helpers/components";
 
 import {SpinLoader, ErrorBox} from "components";
+import OrgSingleSelect from "components/SelectSingle/Org";
 import contestAPI from "api/contest";
 import "./Participation.scss";
 import "styles/ClassicPagination.scss";
@@ -21,7 +24,7 @@ const INITIAL_STATE = {
   // params
   virtual: null,
   // modal
-  selected: [],
+  selectedChk: [],
 };
 const VIRTUAL_TYPE = ["LIVE", "SPECTATE"];
 
@@ -31,26 +34,25 @@ class Participation extends React.Component {
     this.ckey = this.props.ckey;
     this.state = {
       ...INITIAL_STATE,
-      modalShow: false,
+      addParticipationModalShow: false,
+      setOrganizationModalShow: false,
     };
   }
-  openModalHandler() {
-    this.setState({modalShow: true});
+  openAddParticipationModal() {
+    this.setState({addParticipationModalShow: true});
   }
-  closeModalHandler() {
-    this.setState({modalShow: false});
+  closeAddParticipationModal() {
+    this.setState({addParticipationModalShow: false});
+  }
+  openSetOrganizationModal() {
+    this.setState({setOrganizationModalShow: true});
+  }
+  closeSetOrganizationModal() {
+    this.setState({setOrganizationModalShow: false});
   }
 
   resetFetch() {
     this.setState(INITIAL_STATE, () => this.refetch());
-  }
-
-  clarifyPopup(msg) {
-    return (
-      <Link to="#" onClick={() => alert(msg)}>
-        ?
-      </Link>
-    );
   }
 
   refetch(params = {page: 0}) {
@@ -70,7 +72,6 @@ class Participation extends React.Component {
 
           selectChk: Array(res.data.results.length).fill(false),
           loaded: true,
-          selected: [],
         });
       })
       .catch(err => {
@@ -93,7 +94,7 @@ class Participation extends React.Component {
   render() {
     const {participations} = this.state;
     return (
-      <>
+      <div className="contest-participation-wrapper">
         <div className="table-wrapper m-2">
           <div className="options border m-1 p-1">
             <Row className="flex-center">
@@ -144,6 +145,25 @@ class Participation extends React.Component {
             </Row>
           </div>
           <hr className="m-2" />
+          <div className="contest-participation-options-wrapper border p-1 mb-1">
+            <strong>Actions</strong>
+            {qmClarify("Actions sẽ tác động những lượt tham dự được select. Select chúng bằng checkbox bên phải ở table bên dưới.")}
+            <div className="contest-participation-options">
+              <Button size="sm" variant="dark"
+                onClick={() => {
+                  alert(
+                    JSON.stringify(this.state.selectChk)
+                  )
+                }}
+              >Show</Button>
+              <Button size="sm" variant="warning"
+                onClick={()=>this.openSetOrganizationModal()}
+              >Set Org</Button>
+              <Button size="sm" variant="warning">Disqualify</Button>
+              <Button size="sm" variant="danger">Delete</Button>
+            </div>
+          </div>
+
           <div className="admin-table contest-participation-table">
             <h4 className="contest-participation-lbl m-0">Participations</h4>
             <div className="part-add-btn">
@@ -151,9 +171,10 @@ class Participation extends React.Component {
                 size="sm"
                 variant="dark"
                 style={{width: "100%"}}
+                className="btn-svg"
                 onClick={() => this.openModalHandler()}
               >
-                Add
+                <FaPlusCircle /> Add
               </Button>
             </div>
             <Table
@@ -170,8 +191,8 @@ class Participation extends React.Component {
                   <th>User</th>
                   <th>When</th>
                   <th>
-                    Type{" "}
-                    {this.clarifyPopup(
+                    Type
+                    {qmClarify(
                       "Hình thức tham dự của thí sinh. \n* -1 -> SPECTATE, chỉ theo dõi, kết quả không được tính\n" +
                         "* 0 -> LIVE, thí sinh tham dự chính thức\n* khác -> VIRTUAL, thí sinh tham dự không chính " +
                         "thức, sau khi contest đã kết thúc."
@@ -181,19 +202,30 @@ class Participation extends React.Component {
                     Org
                   </th>
                   <th>
-                    Disqualified{" "}
-                    {this.clarifyPopup(
+                    Disqualified
+                    {qmClarify(
                       "Những lần tham dự bị Disqualified này sẽ mang điểm là -9999 trên bảng xếp hạng. " +
                         "Nếu lượt tham dự này là LIVE, thí sinh này sẽ không được xếp hạng Rating."
                     )}
                   </th>
                   <th>
-                    <input type="checkbox"></input>
+                    <input type="checkbox"
+                      onChange={e => {
+                        const arrLeng = this.state.selectChk.length
+                        this.setState({
+                          selectChk: Array(arrLeng).fill(e.target.checked)
+                        })
+                      }}
+                    ></input>
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {" "}
+                {participations.length === 0 &&
+                  <tr><td colSpan={99}><span><em>
+                    No participations
+                  </em></span></td></tr>
+                }
                 {participations.map((part, ridx) => (
                   <tr key={`ct-part-${part.id}`}>
                     <td>{part.id}</td>
@@ -203,12 +235,14 @@ class Participation extends React.Component {
                     <td>{part.organization || "None"}</td>
                     <td>{part.is_disqualified ? "Yes" : "No"}</td>
                     <td>
-                      <input type="checkbox" onChange={() => {
-                        const selected = this.state.selected;
-                        this.setState({
-                          selected: selected.map((v, i) => i === ridx ? !v : v)
-                        })
-                      }}
+                      <input type="checkbox" 
+                        checked={this.state.selectChk[ridx]}
+                        onChange={() => {
+                          const selectChk = this.state.selectChk;
+                          this.setState({
+                            selectChk: selectChk.map((v, i) => i === ridx ? !v : v)
+                          })
+                        }}
                       />
                     </td>
                   </tr>
@@ -235,14 +269,69 @@ class Participation extends React.Component {
             )}
           </div>
         </div>
-        <AddParticipationModal
+        <SetOrganizationModal
           ckey={this.ckey}
-          modalShow={this.state.modalShow}
-          closeModalHandler={() => this.closeModalHandler()}
+          modalShow={this.state.setOrganizationModalShow}
+          closeModalHandler={() => this.closeSetOrganizationModal()}
           refetch={() => this.refetch()}
         />
-      </>
+        <AddParticipationModal
+          ckey={this.ckey}
+          modalShow={this.state.addParticipationModalShow}
+          closeModalHandler={() => this.closeAddParticipationModal()}
+          refetch={() => this.refetch()}
+        />
+      </div>
     );
+  }
+}
+
+class SetOrganizationModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedOrg: null,
+    }
+  }
+
+  closeModalHandler() {
+    this.setState({submitting: false, errors: null});
+    this.props.closeModalHandler();
+  }
+
+  render() {
+    return (
+      <Modal
+        show={this.props.modalShow}
+        onHide={() => this.closeModalHandler()}
+      >
+        <Modal.Header>
+          <Modal.Title>Set Organization</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <OrgSingleSelect
+            onChange={sel => this.setState({selectedOrg: sel})}
+            value={this.state.selectedOrg}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button 
+            variant="secondary" 
+            size="sm"
+            onClick={() => this.closeModalHandler()}
+          >
+            Đóng
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={e => this.submitHandler(e)}
+          >
+            Add
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
   }
 }
 

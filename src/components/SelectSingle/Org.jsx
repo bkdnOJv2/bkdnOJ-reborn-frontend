@@ -38,7 +38,7 @@ const OrgSelectLabel = props => {
   );
 };
 
-export default class UserSingleSelect extends React.Component {
+export default class OrgSingleSelect extends React.Component {
   constructor(props) {
     super(props);
   }
