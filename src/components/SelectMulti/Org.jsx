@@ -55,12 +55,13 @@ export default class UserMultiSelect extends React.Component {
   }
 
   render() {
-    const orgs = this.props.value;
+    const orgs = this.props.value || []; 
 
     return (
       <>
         <AsyncSelect
           isMulti
+          isDisabled={this.props.isDisabled || false}
           cacheOptions
           // defaultOptions
           placeholder="Tìm slug/name/short_name..."

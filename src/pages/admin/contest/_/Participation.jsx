@@ -2,13 +2,14 @@ import React from "react";
 import {Form, Row, Col, Table, Button, Modal} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
-import {FaPlusCircle} from "react-icons/fa";
+import {FaPlusCircle, FaFilter, FaTimes} from "react-icons/fa";
 
 import {getLocalDateWithTimezone} from "helpers/dateFormatter";
 import {qmClarify} from "helpers/components";
 
 import {SpinLoader, ErrorBox} from "components";
 import OrgSingleSelect from "components/SelectSingle/Org";
+import OrgMultiSelect from "components/SelectMulti/Org";
 import contestAPI from "api/contest";
 import "./Participation.scss";
 import "styles/ClassicPagination.scss";
@@ -96,18 +97,28 @@ class Participation extends React.Component {
     return (
       <div className="contest-participation-wrapper">
         <div className="table-wrapper m-2">
-          <div className="options border m-1 p-1">
-            <Row className="flex-center">
-              <Col className="d-inline-flex" md={4}>
-                <div className="mr-2">Participation Type:</div>
+          <strong>Filters:</strong>
+          <div className="options border p-1">
+            <Row className="mb-2">
+              <Col className="" xl={12}>
+                <span className="flex-center">
+                  <input type="checkbox" id="part-filter-type-chk" className="mr-1"
+                    value={this.state.filterByTypeChk}
+                    onChange={e => this.setState({filterByTypeChk : e.target.checked })}
+                  /> 
+                  <label htmlFor="part-filter-type-chk">Filter by Type</label>
+                  {qmClarify("Chỉ có tác dụng nếu được check. "+
+                              "Disable muốn truy vấn tất cả type. ")}
+                </span>
               </Col>
-              <Col className="d-inline-flex" md={8}>
+              <Col className="ml-2">
                 {VIRTUAL_TYPE.map(type => (
-                  <div key={`part-${type}`} className="flex-center-col">
+                  <div key={`part-${type}`} className="d-inline">
                     <Form.Check
                       inline
                       name="participation-type"
                       type="radio"
+                      disabled={!this.state.filterByTypeChk}
                       id={`${type}`}
                       label={`${type}`}
                       checked={type === this.state.virtual}
@@ -117,33 +128,65 @@ class Participation extends React.Component {
                 ))}
               </Col>
             </Row>
-            <Row className="mb-1 mt-1">
-              <Col md={8}></Col>
-              <Col className="flex-center">
-                <Button
-                  size="sm"
-                  variant="dark"
-                  style={{width: "100%"}}
-                  onClick={() => this.resetFetch()}
-                >
-                  {" "}
-                  Reset{" "}
-                </Button>
+
+            <Row className="flex-center mb-2">
+              <Col className="d-inline-flex" lg={12}>
+                <span className="flex-center">
+                  <input type="checkbox" id="part-filter-org-chk" className="mr-1"
+                    value={this.state.filterByOrgChk}
+                    onChange={e => this.setState({filterByOrgChk : e.target.checked })}
+                  /> 
+                  <label htmlFor="part-filter-org-chk">Filter by Orgs</label>
+                  {qmClarify("Chỉ có tác dụng nếu được check. "+
+                              "Để trống nếu muốn truy vấn các phiên đăng ký mà không có org. "+
+                              "Ngược lại sẽ truy vấn tất cả phiên mà có org trong list")}
+                </span>
               </Col>
-              <Col className="flex-center">
-                <Button
-                  size="sm"
-                  variant="dark"
-                  style={{width: "100%"}}
-                  disabled={!this.state.loaded}
-                  onClick={() => this.refetch()}
-                >
-                  {" "}
-                  Filter{" "}
-                </Button>
+              <Col className="ml-2 d-inline-flex">
+                <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}/>
               </Col>
             </Row>
+
+            <Row className="flex-center mb-2">
+              <Col className="d-inline-flex" lg={12}>
+                <span className="flex-center">
+                  <input type="checkbox" id="part-filter-search-chk" className="mr-1"
+                    value={this.state.filterBySearchChk}
+                    onChange={e => this.setState({filterBySearchChk : e.target.checked })}
+                  /> 
+                  <label htmlFor="part-filter-search-chk">Search</label>
+                  {qmClarify("Chỉ có tác dụng nếu được check. "+
+                              "Tìm theo username:\n  'abc*' để tìm 'abcde', 'abc123',.;\n  '*x*' để tìm username có 1 ký tự 'x'")}
+                </span>
+              </Col>
+              <Col className="ml-2 d-inline-flex">
+                <input type="text" className="w-100" disabled={!this.filterBySearchChk}
+                        placeholder="Search username, can use wildcard character *"
+                ></input>
+              </Col>
+            </Row>
+
+            <div className="d-inline-flex flex-row-reverse w-100">
+              <Button
+                size="sm"
+                variant="dark"
+                className="ml-1 mr-1 btn-svg"
+                disabled={!this.state.loaded}
+                onClick={() => this.refetch()}
+              >
+                <FaFilter/> Filter
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="ml-1 mr-1 btn-svg"
+                onClick={() => this.resetFetch()}
+              >
+                <FaTimes/> Reset
+              </Button>
+            </div>
           </div>
+
           <hr className="m-2" />
           <div className="contest-participation-options-wrapper border p-1 mb-1">
             <strong>Actions</strong>
