@@ -2,7 +2,9 @@ import React from "react";
 import {Form, Row, Col, Table, Button, Modal} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
-import {FaPlusCircle, FaFilter, FaTimes} from "react-icons/fa";
+import {
+  FaPlusCircle, FaFilter, FaTimes, FaRegSave
+} from "react-icons/fa";
 
 import {getLocalDateWithTimezone} from "helpers/dateFormatter";
 import {qmClarify} from "helpers/components";
@@ -13,6 +15,109 @@ import OrgMultiSelect from "components/SelectMulti/Org";
 import contestAPI from "api/contest";
 import "./Participation.scss";
 import "styles/ClassicPagination.scss";
+
+class Filters extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {}
+  }
+
+  render() {
+    return (
+      <div className="participation-filters">
+        <strong>Filters:</strong>
+        <div className="options border p-1">
+          <Row className="m-0 mb-2 mt-2">
+            <Col className="" xl={12}>
+              <span className="flex-center">
+                <input type="checkbox" id="part-filter-type-chk" className="mr-1"
+                  value={this.state.filterByTypeChk}
+                  onChange={e => this.setState({filterByTypeChk : e.target.checked })}
+                /> 
+                <label htmlFor="part-filter-type-chk">Filter by Type</label>
+                {qmClarify("Chỉ có tác dụng nếu được check. "+
+                            "Disable muốn truy vấn tất cả type. ")}
+              </span>
+            </Col>
+            <Col className="ml-2">
+              {VIRTUAL_TYPE.map(type => (
+                <div key={`part-${type}`} className="d-inline">
+                  <Form.Check
+                    inline
+                    name="participation-type"
+                    type="radio"
+                    disabled={!this.state.filterByTypeChk}
+                    id={`${type}`}
+                    label={`${type}`}
+                    checked={type === this.state.virtual}
+                    onChange={e => this.setState({virtual: e.target.id})}
+                  />
+                </div>
+              ))}
+            </Col>
+          </Row>
+
+          <Row className="flex-center m-0 mb-2">
+            <Col className="d-inline-flex" lg={12}>
+              <span className="flex-center">
+                <input type="checkbox" id="part-filter-org-chk" className="mr-1"
+                  value={this.state.filterByOrgChk}
+                  onChange={e => this.setState({filterByOrgChk : e.target.checked })}
+                /> 
+                <label htmlFor="part-filter-org-chk">Filter by Orgs</label>
+                {qmClarify("Chỉ có tác dụng nếu được check. "+
+                            "Để trống nếu muốn truy vấn các phiên đăng ký mà không có org. "+
+                            "Ngược lại sẽ truy vấn tất cả phiên mà có org trong list")}
+              </span>
+            </Col>
+            <Col className="ml-2 d-inline-flex">
+              <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}/>
+            </Col>
+          </Row>
+
+          <Row className="flex-center m-0 mb-2">
+            <Col className="d-inline-flex" lg={12}>
+              <span className="flex-center">
+                <input type="checkbox" id="part-filter-search-chk" className="mr-1"
+                  value={this.state.filterBySearchChk}
+                  onChange={e => this.setState({filterBySearchChk : e.target.checked })}
+                /> 
+                <label htmlFor="part-filter-search-chk">Search</label>
+                {qmClarify("Chỉ có tác dụng nếu được check. "+
+                            "Tìm theo username:\n  'abc*' để tìm 'abcde', 'abc123',.;\n  '*x*' để tìm username có 1 ký tự 'x'")}
+              </span>
+            </Col>
+            <Col className="ml-2 d-inline-flex">
+              <input type="text" className="w-100" disabled={!this.state.filterBySearchChk }
+                      placeholder="Search username, can use wildcard character *"
+              ></input>
+            </Col>
+          </Row>
+
+          <div className="d-inline-flex flex-row-reverse w-100">
+            <Button
+              size="sm"
+              variant="dark"
+              className="ml-1 mr-1 btn-svg"
+              onClick={() => this.refetch()}
+            >
+              <FaFilter/> Filter
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="ml-1 mr-1 btn-svg"
+              onClick={() => this.resetFetch()}
+            >
+              <FaTimes/> Reset
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
 
 const INITIAL_STATE = {
   participations: [],
@@ -25,7 +130,7 @@ const INITIAL_STATE = {
   // params
   virtual: null,
   // modal
-  selectedChk: [],
+  selectChk: [],
 };
 const VIRTUAL_TYPE = ["LIVE", "SPECTATE"];
 
@@ -35,6 +140,7 @@ class Participation extends React.Component {
     this.ckey = this.props.ckey;
     this.state = {
       ...INITIAL_STATE,
+      filters: {},
       addParticipationModalShow: false,
       setOrganizationModalShow: false,
     };
@@ -92,100 +198,74 @@ class Participation extends React.Component {
     this.refetch();
   }
 
+  genMessageActOnParticipations(action, params, affected) {
+    let stringified = JSON.stringify(affected);
+    if (stringified.length > 255) {
+      stringified = stringified.substring(0, 255-4)+"...]"
+    }
+    if (action === 'delete') {
+      return "Bạn đang xóa các lượt tham dự:\n"+
+        `${stringified}`+"\nBạn có muốn tiếp tục?"
+    } else
+    if (action === 'disqualify') {
+      return "Bạn đang hủy tư cách thi đấu (disqualify) của các lượt tham dự:\n"+
+        `${stringified}`+"\nBạn có muốn tiếp tục?"
+    } else 
+    if (action === 'undisqualify') {
+      return "Bạn muốn khôi phục tư cách thi đấu (undisqualify) của các lượt tham dự:\n"+
+        `${stringified}`+"\nBạn có muốn tiếp tục?"
+    } else 
+    if (action === 'set-org') {
+      return `Bạn muốn đặt org='${params.organization}' cho các lượt tham dự sau:`+
+        `${stringified}`+"\nBạn có muốn tiếp tục?"
+    }
+    return `Unrecognized action '${action}'`
+  }
+
+  actOnParticipations(action, params) {
+    let partIds = [], partUsers = []
+    this.state.participations.map( (p, i) => {
+      if (this.state.selectChk[i]) {
+        partIds.push(p.id);
+        partUsers.push(p.user)
+      }
+    })
+    
+    if (partIds.length === 0) {
+      alert("Không có lượt đăng ký nào đang được chọn.")
+      return;
+    }
+    const conf = window.confirm(this.genMessageActOnParticipations(
+      action, params, partUsers,
+    ))
+    if (!conf) return;
+
+    const data = {
+      action: action.toLowerCase(),
+      data: {
+        participations: partIds,
+        ...params,
+      }
+    }
+    console.log(data);
+
+    contestAPI.actContestParticipation({
+      key: this.ckey,
+      data,
+    }).then((res) => {
+      console.log(res)
+    }).catch((err) => {
+      console.log('ActOnParticipations')
+      console.log(err)
+    })
+  }
+
   render() {
     const {participations} = this.state;
     return (
       <div className="contest-participation-wrapper">
         <div className="table-wrapper m-2">
-          <strong>Filters:</strong>
-          <div className="options border p-1">
-            <Row className="mb-2">
-              <Col className="" xl={12}>
-                <span className="flex-center">
-                  <input type="checkbox" id="part-filter-type-chk" className="mr-1"
-                    value={this.state.filterByTypeChk}
-                    onChange={e => this.setState({filterByTypeChk : e.target.checked })}
-                  /> 
-                  <label htmlFor="part-filter-type-chk">Filter by Type</label>
-                  {qmClarify("Chỉ có tác dụng nếu được check. "+
-                              "Disable muốn truy vấn tất cả type. ")}
-                </span>
-              </Col>
-              <Col className="ml-2">
-                {VIRTUAL_TYPE.map(type => (
-                  <div key={`part-${type}`} className="d-inline">
-                    <Form.Check
-                      inline
-                      name="participation-type"
-                      type="radio"
-                      disabled={!this.state.filterByTypeChk}
-                      id={`${type}`}
-                      label={`${type}`}
-                      checked={type === this.state.virtual}
-                      onChange={e => this.setState({virtual: e.target.id})}
-                    />
-                  </div>
-                ))}
-              </Col>
-            </Row>
-
-            <Row className="flex-center mb-2">
-              <Col className="d-inline-flex" lg={12}>
-                <span className="flex-center">
-                  <input type="checkbox" id="part-filter-org-chk" className="mr-1"
-                    value={this.state.filterByOrgChk}
-                    onChange={e => this.setState({filterByOrgChk : e.target.checked })}
-                  /> 
-                  <label htmlFor="part-filter-org-chk">Filter by Orgs</label>
-                  {qmClarify("Chỉ có tác dụng nếu được check. "+
-                              "Để trống nếu muốn truy vấn các phiên đăng ký mà không có org. "+
-                              "Ngược lại sẽ truy vấn tất cả phiên mà có org trong list")}
-                </span>
-              </Col>
-              <Col className="ml-2 d-inline-flex">
-                <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}/>
-              </Col>
-            </Row>
-
-            <Row className="flex-center mb-2">
-              <Col className="d-inline-flex" lg={12}>
-                <span className="flex-center">
-                  <input type="checkbox" id="part-filter-search-chk" className="mr-1"
-                    value={this.state.filterBySearchChk}
-                    onChange={e => this.setState({filterBySearchChk : e.target.checked })}
-                  /> 
-                  <label htmlFor="part-filter-search-chk">Search</label>
-                  {qmClarify("Chỉ có tác dụng nếu được check. "+
-                              "Tìm theo username:\n  'abc*' để tìm 'abcde', 'abc123',.;\n  '*x*' để tìm username có 1 ký tự 'x'")}
-                </span>
-              </Col>
-              <Col className="ml-2 d-inline-flex">
-                <input type="text" className="w-100" disabled={!this.filterBySearchChk}
-                        placeholder="Search username, can use wildcard character *"
-                ></input>
-              </Col>
-            </Row>
-
-            <div className="d-inline-flex flex-row-reverse w-100">
-              <Button
-                size="sm"
-                variant="dark"
-                className="ml-1 mr-1 btn-svg"
-                disabled={!this.state.loaded}
-                onClick={() => this.refetch()}
-              >
-                <FaFilter/> Filter
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="ml-1 mr-1 btn-svg"
-                onClick={() => this.resetFetch()}
-              >
-                <FaTimes/> Reset
-              </Button>
-            </div>
-          </div>
+          <Filters value={this.state.filters} onChange={data => this.setState({ filters: data })} />
 
           <hr className="m-2" />
           <div className="contest-participation-options-wrapper border p-1 mb-1">
@@ -199,11 +279,24 @@ class Participation extends React.Component {
                   )
                 }}
               >Show</Button>
-              <Button size="sm" variant="warning"
-                onClick={()=>this.openSetOrganizationModal()}
-              >Set Org</Button>
-              <Button size="sm" variant="warning">Disqualify</Button>
-              <Button size="sm" variant="danger">Delete</Button>
+              <span className="ml-1 mr-1">
+                <Button size="sm" variant="warning"
+                  onClick={()=>this.openSetOrganizationModal()}
+                >Change Org</Button>
+              </span>
+              <span className="ml-1 mr-1">
+                <Button size="sm" variant="warning"
+                  onClick={()=>this.actOnParticipations('disqualify')}
+                >Disqualify</Button>
+                <Button size="sm" variant="success"
+                  onClick={()=>this.actOnParticipations('undisqualify')}
+                >Undisqualify</Button>
+              </span>
+              <span className="ml-1 mr-1">
+                <Button size="sm" variant="danger"
+                  onClick={()=>this.actOnParticipations('delete')}
+                >Delete</Button>
+              </span>
             </div>
           </div>
 
@@ -215,7 +308,7 @@ class Participation extends React.Component {
                 variant="dark"
                 style={{width: "100%"}}
                 className="btn-svg"
-                onClick={() => this.openModalHandler()}
+                onClick={() => this.openAddParticipationModal()}
               >
                 <FaPlusCircle /> Add
               </Button>
@@ -316,6 +409,7 @@ class Participation extends React.Component {
           ckey={this.ckey}
           modalShow={this.state.setOrganizationModalShow}
           closeModalHandler={() => this.closeSetOrganizationModal()}
+          actOnParticipations={(act, data)=>this.actOnParticipations(act, data)}
           refetch={() => this.refetch()}
         />
         <AddParticipationModal
@@ -352,6 +446,7 @@ class SetOrganizationModal extends React.Component {
           <Modal.Title>Set Organization</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          Lựa chọn tổ chức đến gán cho các lượt đăng ký:
           <OrgSingleSelect
             onChange={sel => this.setState({selectedOrg: sel})}
             value={this.state.selectedOrg}
@@ -359,18 +454,23 @@ class SetOrganizationModal extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button 
-            variant="secondary" 
             size="sm"
+            variant="secondary" 
+            className="btn-svg"
             onClick={() => this.closeModalHandler()}
           >
-            Đóng
+            <FaTimes/> Đóng
           </Button>
           <Button
-            variant="danger"
             size="sm"
-            onClick={e => this.submitHandler(e)}
+            variant="danger"
+            className="btn-svg"
+            onClick={() => this.props.actOnParticipations(
+              'set-org', 
+              {organization: this.state.selectedOrg.slug}
+            )}
           >
-            Add
+            <FaRegSave/> Lưu 
           </Button>
         </Modal.Footer>
       </Modal>

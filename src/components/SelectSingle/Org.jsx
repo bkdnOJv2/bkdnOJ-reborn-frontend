@@ -44,7 +44,7 @@ export default class OrgSingleSelect extends React.Component {
   }
 
   async loadOptions(val) {
-    return orgAPI.getOrgs({params: {search: val}}).then(res => {
+    return orgAPI.getAllOrgs({params: {search: val}}).then(res => {
       let data = res.data.results.map(org => ({
         value: org.slug,
         label: <OrgSelectLabel {...org} />,
