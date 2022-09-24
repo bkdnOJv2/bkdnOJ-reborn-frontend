@@ -19,10 +19,23 @@ import "styles/ClassicPagination.scss";
 class Filters extends React.Component {
   constructor (props) {
     super(props);
-    this.state = {}
+    this.state = {
+      filters: {},
+    }
+  }
+
+  setFilters() {
+    var filters = {}
+    const state = this.state;
+    if (state.filterByTypeChk) filters.virtual = state.filters.virtual;
+    if (state.filterByOrgChk) filters.organizations = state.filters.organizations;
+    if (state.filterBySearchChk) filters.search = state.filters.search;
+    this.props.setFilters(filters)
   }
 
   render() {
+    const {filters} = this.state;
+
     return (
       <div className="participation-filters">
         <strong>Filters:</strong>
@@ -49,8 +62,13 @@ class Filters extends React.Component {
                     disabled={!this.state.filterByTypeChk}
                     id={`${type}`}
                     label={`${type}`}
-                    checked={type === this.state.virtual}
-                    onChange={e => this.setState({virtual: e.target.id})}
+                    checked={type === filters.virtual}
+                    onChange={e => this.setState({
+                      filters: {
+                        ...filters,
+                        virtual: e.target.id,
+                      },
+                    })}
                   />
                 </div>
               ))}
@@ -71,7 +89,18 @@ class Filters extends React.Component {
               </span>
             </Col>
             <Col className="ml-2 d-inline-flex">
-              <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}/>
+              <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}
+                onChange={sel => {
+                  this.setState({
+                    selectedOrgs: sel,
+                    filters: {
+                      ...filters,
+                      organizations: sel.map(org => org.slug),
+                    }
+                  })
+                }}
+                value={this.state.selectedOrgs}
+              />
             </Col>
           </Row>
 
@@ -90,6 +119,12 @@ class Filters extends React.Component {
             <Col className="ml-2 d-inline-flex">
               <input type="text" className="w-100" disabled={!this.state.filterBySearchChk }
                       placeholder="Search username, can use wildcard character *"
+                      onChange={e => this.setState({
+                        filters: {
+                          ...filters,
+                          search: e.target.value, 
+                        }
+                      })}
               ></input>
             </Col>
           </Row>
@@ -99,7 +134,7 @@ class Filters extends React.Component {
               size="sm"
               variant="dark"
               className="ml-1 mr-1 btn-svg"
-              onClick={() => this.refetch()}
+              onClick={() => this.setFilters()}
             >
               <FaFilter/> Filter
             </Button>
@@ -107,7 +142,10 @@ class Filters extends React.Component {
               size="sm"
               variant="secondary"
               className="ml-1 mr-1 btn-svg"
-              onClick={() => this.resetFetch()}
+              onClick={() => {
+                this.setState({ filters: {} })
+                this.props.setFilters({})
+              }}
             >
               <FaTimes/> Reset
             </Button>
@@ -117,7 +155,6 @@ class Filters extends React.Component {
     )
   }
 }
-
 
 const INITIAL_STATE = {
   participations: [],
@@ -164,9 +201,11 @@ class Participation extends React.Component {
 
   refetch(params = {page: 0}) {
     this.setState({loaded: false, errors: null});
-    let prms = {page: params.page + 1};
-
-    if (this.state.virtual) prms.virtual = this.state.virtual;
+    let prms = {
+      page: params.page + 1,
+      ...this.state.filters
+    };
+    console.log(this.state.filters)
 
     contestAPI
       .getContestParticipations({key: this.ckey, params: prms})
@@ -196,6 +235,9 @@ class Participation extends React.Component {
 
   componentDidMount() {
     this.refetch();
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.filters !== this.state.filters) this.refetch()
   }
 
   genMessageActOnParticipations(action, params, affected) {
@@ -265,7 +307,11 @@ class Participation extends React.Component {
     return (
       <div className="contest-participation-wrapper">
         <div className="table-wrapper m-2">
-          <Filters value={this.state.filters} onChange={data => this.setState({ filters: data })} />
+          <Filters 
+            value={this.state.filters}
+            onChange={data => this.setState({ filters: data })} 
+            setFilters={filters => this.setState({filters})}
+          />
 
           <hr className="m-2" />
           <div className="contest-participation-options-wrapper border p-1 mb-1">
