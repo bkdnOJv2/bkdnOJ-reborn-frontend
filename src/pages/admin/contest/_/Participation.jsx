@@ -1,9 +1,10 @@
 import React from "react";
+import { toast } from "react-toastify";
 import {Form, Row, Col, Table, Button, Modal} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
 import {
-  FaPlusCircle, FaFilter, FaTimes, FaRegSave
+  FaPlusCircle, FaFilter, FaTimes, FaRegSave, FaUniversity
 } from "react-icons/fa";
 
 import {getLocalDateWithTimezone} from "helpers/dateFormatter";
@@ -28,7 +29,10 @@ class Filters extends React.Component {
     var filters = {}
     const state = this.state;
     if (state.filterByTypeChk) filters.virtual = state.filters.virtual;
-    if (state.filterByOrgChk) filters.organizations = state.filters.organizations;
+    if (state.filterByOrgChk) {
+      filters.organizations = state.filters.organizations || [];
+      if (state.filterByOrgNoneOrg) filters.organizations.push('');
+    }
     if (state.filterBySearchChk) filters.search = state.filters.search;
     this.props.setFilters(filters)
   }
@@ -88,7 +92,13 @@ class Filters extends React.Component {
                             "Ngược lại sẽ truy vấn tất cả phiên mà có org trong list")}
               </span>
             </Col>
-            <Col className="ml-2 d-inline-flex">
+            <Col className="ml-2 d-block">
+              <span className="d-block">
+                <input type="checkbox" id="part-filter-org-none" disabled={!this.state.filterByOrgChk}
+                  onChange={e => this.setState({ filterByOrgNoneOrg: e.target.checked })}
+                />
+                <label htmlFor="part-filter-org-none" className="ml-1">Include None</label>
+              </span>
               <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}
                 onChange={sel => {
                   this.setState({
@@ -113,12 +123,12 @@ class Filters extends React.Component {
                 /> 
                 <label htmlFor="part-filter-search-chk">Search</label>
                 {qmClarify("Chỉ có tác dụng nếu được check. "+
-                            "Tìm theo username:\n  'abc*' để tìm 'abcde', 'abc123',.;\n  '*x*' để tìm username có 1 ký tự 'x'")}
+                            "Tìm theo username:\n  'tester' để tìm 'tester1', 'tester12',...")}
               </span>
             </Col>
             <Col className="ml-2 d-inline-flex">
               <input type="text" className="w-100" disabled={!this.state.filterBySearchChk }
-                      placeholder="Search username, can use wildcard character *"
+                      placeholder="Search prefix username.."
                       onChange={e => this.setState({
                         filters: {
                           ...filters,
@@ -135,12 +145,14 @@ class Filters extends React.Component {
               variant="dark"
               className="ml-1 mr-1 btn-svg"
               onClick={() => this.setFilters()}
+              disabled={this.props.disabled}
             >
-              <FaFilter/> Filter
+              {this.props.disabled ? <SpinLoader margin="0" size={16}/> : <FaFilter/>}
+               Filter
             </Button>
             <Button
               size="sm"
-              variant="secondary"
+              variant="light"
               className="ml-1 mr-1 btn-svg"
               onClick={() => {
                 this.setState({ filters: {} })
@@ -205,7 +217,6 @@ class Participation extends React.Component {
       page: params.page + 1,
       ...this.state.filters
     };
-    console.log(this.state.filters)
 
     contestAPI
       .getContestParticipations({key: this.ckey, params: prms})
@@ -232,6 +243,10 @@ class Participation extends React.Component {
   handlePageClick = event => {
     this.refetch({page: event.selected});
   };
+
+  setErrors(errData) {
+    this.setState({ errors: errData })
+  }
 
   componentDidMount() {
     this.refetch();
@@ -269,7 +284,7 @@ class Participation extends React.Component {
     this.state.participations.map( (p, i) => {
       if (this.state.selectChk[i]) {
         partIds.push(p.id);
-        partUsers.push(p.user)
+        partUsers.push(p.user.username)
       }
     })
     
@@ -289,16 +304,26 @@ class Participation extends React.Component {
         ...params,
       }
     }
-    console.log(data);
 
-    contestAPI.actContestParticipation({
-      key: this.ckey,
-      data,
-    }).then((res) => {
-      console.log(res)
-    }).catch((err) => {
-      console.log('ActOnParticipations')
-      console.log(err)
+    const apiCall =  contestAPI.actContestParticipation({
+      key: this.ckey, data,
+    });
+    const parent = this;
+
+    toast
+    .promise(apiCall, {
+      pending: {
+        render() { return "Processing..."; },
+      },
+      success: {
+        render() { parent.refetch(); return "Success."; },
+      },
+      error: {
+        render({data}) {
+          parent.setErrors(data.response.data);
+          return "Update Failed.";
+        },
+      },
     })
   }
 
@@ -311,20 +336,13 @@ class Participation extends React.Component {
             value={this.state.filters}
             onChange={data => this.setState({ filters: data })} 
             setFilters={filters => this.setState({filters})}
+            disabled={!this.state.loaded}
           />
 
-          <hr className="m-2" />
-          <div className="contest-participation-options-wrapper border p-1 mb-1">
-            <strong>Actions</strong>
+          <div className="contest-participation-options-wrapper border p-1 mb-1 mt-1">
+           <strong>Actions</strong>
             {qmClarify("Actions sẽ tác động những lượt tham dự được select. Select chúng bằng checkbox bên phải ở table bên dưới.")}
             <div className="contest-participation-options">
-              <Button size="sm" variant="dark"
-                onClick={() => {
-                  alert(
-                    JSON.stringify(this.state.selectChk)
-                  )
-                }}
-              >Show</Button>
               <span className="ml-1 mr-1">
                 <Button size="sm" variant="warning"
                   onClick={()=>this.openSetOrganizationModal()}
@@ -344,111 +362,143 @@ class Participation extends React.Component {
                 >Delete</Button>
               </span>
             </div>
-          </div>
 
-          <div className="admin-table contest-participation-table">
-            <h4 className="contest-participation-lbl m-0">Participations</h4>
-            <div className="part-add-btn">
-              <Button
+            <ErrorBox errors={this.state.errors}/>
+
+            <div className="admin-table contest-participation-table mt-1">
+              <h4 className="contest-participation-lbl m-0">Participations</h4>
+              <div className="part-add-btn">
+                <Button
+                  size="sm"
+                  variant="dark"
+                  style={{width: "100%"}}
+                  className="btn-svg"
+                  onClick={() => this.openAddParticipationModal()}
+                >
+                  <FaPlusCircle /> Add
+                </Button>
+              </div>
+              <Table
+                responsive
+                hover
                 size="sm"
-                variant="dark"
-                style={{width: "100%"}}
-                className="btn-svg"
-                onClick={() => this.openAddParticipationModal()}
+                striped
+                bordered
+                className="rounded mb-0"
               >
-                <FaPlusCircle /> Add
-              </Button>
-            </div>
-            <Table
-              responsive
-              hover
-              size="sm"
-              striped
-              bordered
-              className="rounded mb-0"
-            >
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>User</th>
-                  <th>When</th>
-                  <th>
-                    Type
-                    {qmClarify(
-                      "Hình thức tham dự của thí sinh. \n* -1 -> SPECTATE, chỉ theo dõi, kết quả không được tính\n" +
-                        "* 0 -> LIVE, thí sinh tham dự chính thức\n* khác -> VIRTUAL, thí sinh tham dự không chính " +
-                        "thức, sau khi contest đã kết thúc."
-                    )}
-                  </th>
-                  <th>
-                    Org
-                  </th>
-                  <th>
-                    Disqualified
-                    {qmClarify(
-                      "Những lần tham dự bị Disqualified này sẽ mang điểm là -9999 trên bảng xếp hạng. " +
-                        "Nếu lượt tham dự này là LIVE, thí sinh này sẽ không được xếp hạng Rating."
-                    )}
-                  </th>
-                  <th>
-                    <input type="checkbox"
-                      onChange={e => {
-                        const arrLeng = this.state.selectChk.length
-                        this.setState({
-                          selectChk: Array(arrLeng).fill(e.target.checked)
-                        })
-                      }}
-                    ></input>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {participations.length === 0 &&
-                  <tr><td colSpan={99}><span><em>
-                    No participations
-                  </em></span></td></tr>
-                }
-                {participations.map((part, ridx) => (
-                  <tr key={`ct-part-${part.id}`}>
-                    <td>{part.id}</td>
-                    <td>{part.user}</td>
-                    <td>{getLocalDateWithTimezone(part.real_start)}</td>
-                    <td>{part.virtual}</td>
-                    <td>{part.organization || "None"}</td>
-                    <td>{part.is_disqualified ? "Yes" : "No"}</td>
-                    <td>
-                      <input type="checkbox" 
-                        checked={this.state.selectChk[ridx]}
-                        onChange={() => {
-                          const selectChk = this.state.selectChk;
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>When</th>
+                    <th>
+                      Type
+                      {qmClarify(
+                        "Hình thức tham dự của thí sinh. \n* -1 -> SPECTATE, chỉ theo dõi, kết quả không được tính\n" +
+                          "* 0 -> LIVE, thí sinh tham dự chính thức\n* khác -> VIRTUAL, thí sinh tham dự không chính " +
+                          "thức, sau khi contest đã kết thúc."
+                      )}
+                    </th>
+                    <th>
+                      Org
+                    </th>
+                    <th>
+                      Disqualified
+                      {qmClarify(
+                        "Những lần tham dự bị Disqualified này sẽ mang điểm là -9999 trên bảng xếp hạng. " +
+                          "Nếu lượt tham dự này là LIVE, thí sinh này sẽ không được xếp hạng Rating."
+                      )}
+                    </th>
+                    <th>
+                      <input type="checkbox"
+                        onChange={e => {
+                          const arrLeng = this.state.selectChk.length
                           this.setState({
-                            selectChk: selectChk.map((v, i) => i === ridx ? !v : v)
+                            selectChk: Array(arrLeng).fill(e.target.checked)
                           })
                         }}
-                      />
-                    </td>
+                      ></input>
+                    </th>
                   </tr>
-                ))}{" "}
-              </tbody>
-            </Table>
-            {this.state.loaded === false ? (
-              <SpinLoader margin="0" />
-            ) : (
-              <span className="classic-pagination">
-                Page:{" "}
-                <ReactPaginate
-                  breakLabel="..."
-                  onPageChange={this.handlePageClick}
-                  forcePage={this.state.currPage}
-                  pageLabelBuilder={page => `[${page}]`}
-                  pageRangeDisplayed={3}
-                  pageCount={this.state.pageCount}
-                  renderOnZeroPageCount={null}
-                  previousLabel={null}
-                  nextLabel={null}
-                />
-              </span>
-            )}
+                </thead>
+                <tbody>
+                  {participations.length === 0 &&
+                    <tr><td colSpan={99}><span><em>
+                      No participations
+                    </em></span></td></tr>
+                  }
+                  {participations.map((part, ridx) => {
+                    let name = `${part.user.first_name} ${part.user.last_name}`
+                    if (name.length === 1) name = null;
+
+                    return (
+                      <tr key={`ct-part-${part.id}`}>
+                        <td>{part.id}</td>
+                        <td>
+                          <div className="flex-center justify-content-start">
+                            <img src={part.user.avatar} className="d-flex border" height={40} 
+                              style={{ width: "auto" }}
+                            /> 
+                            <div className="ml-1 d-block text-left">
+                              <div><strong>{part.user.username}</strong></div>
+                              <em className="d-block" style={{fontSize: 10}}>{part.user.display_name || "**no display name"}</em>
+                              <em className="d-block" style={{fontSize: 10}}>{name || "**no name"}</em>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{getLocalDateWithTimezone(part.real_start)}</td>
+                        <td>{part.virtual}</td>
+                        <td>{
+                          !part.organization ? "None" : 
+                          <div className="flex-center">
+                            {
+                              part.organization.logo_url ? 
+                              <img src={part.organization.logo_url||""} className="d-flex border" height={40} 
+                                  style={{ width: "auto" }}
+                              /> : <FaUniversity size={34}/>
+                            }
+                            <div className="ml-1 d-block text-left">
+                              <div><strong>{part.organization.slug}</strong></div>
+                              <div>{part.organization.name}</div>
+                            </div>
+                          </div>
+                        }</td>
+                        <td>{part.is_disqualified ? "Yes" : "No"}</td>
+                        <td>
+                          <input type="checkbox" 
+                            checked={this.state.selectChk[ridx]}
+                            onChange={() => {
+                              const selectChk = this.state.selectChk;
+                              this.setState({
+                                selectChk: selectChk.map((v, i) => i === ridx ? !v : v)
+                              })
+                            }}
+                          />
+                        </td>
+                      </tr>
+                  )})
+                }
+                </tbody>
+              </Table>
+              {this.state.loaded === false ? (
+                <SpinLoader margin="0" />
+              ) : (
+                <span className="classic-pagination">
+                  Page:{" "}
+                  <ReactPaginate
+                    breakLabel="..."
+                    onPageChange={this.handlePageClick}
+                    forcePage={this.state.currPage}
+                    pageLabelBuilder={page => `[${page}]`}
+                    pageRangeDisplayed={3}
+                    pageCount={this.state.pageCount}
+                    renderOnZeroPageCount={null}
+                    previousLabel={null}
+                    nextLabel={null}
+                  />
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <SetOrganizationModal
@@ -511,10 +561,13 @@ class SetOrganizationModal extends React.Component {
             size="sm"
             variant="danger"
             className="btn-svg"
-            onClick={() => this.props.actOnParticipations(
-              'set-org', 
-              {organization: this.state.selectedOrg.slug}
-            )}
+            onClick={() => {
+              this.props.actOnParticipations(
+                'set-org', 
+                {organization: this.state.selectedOrg.slug}
+              );
+              this.closeModalHandler();
+            }}
           >
             <FaRegSave/> Lưu 
           </Button>
