@@ -37,6 +37,16 @@ class Filters extends React.Component {
     this.props.setFilters(filters)
   }
 
+  resetFilters() {
+    this.setState({
+      filterByTypeChk: false,
+      filterByOrgChk: false,
+      filterByOrgNoneOrgChk: false,
+      filterBySearchChk: false,
+      filters: {},
+    })
+  }
+
   render() {
     const {filters} = this.state;
 
@@ -48,7 +58,7 @@ class Filters extends React.Component {
             <Col className="" xl={12}>
               <span className="flex-center">
                 <input type="checkbox" id="part-filter-type-chk" className="mr-1"
-                  value={this.state.filterByTypeChk}
+                  checked={this.state.filterByTypeChk}
                   onChange={e => this.setState({filterByTypeChk : e.target.checked })}
                 /> 
                 <label htmlFor="part-filter-type-chk">Filter by Type</label>
@@ -83,13 +93,13 @@ class Filters extends React.Component {
             <Col className="d-inline-flex" lg={12}>
               <span className="flex-center">
                 <input type="checkbox" id="part-filter-org-chk" className="mr-1"
-                  value={this.state.filterByOrgChk}
+                  checked={this.state.filterByOrgChk}
                   onChange={e => this.setState({filterByOrgChk : e.target.checked })}
                 /> 
                 <label htmlFor="part-filter-org-chk">Filter by Orgs</label>
                 {qmClarify("Chỉ có tác dụng nếu được check. "+
-                            "Để trống nếu muốn truy vấn các phiên đăng ký mà không có org. "+
-                            "Ngược lại sẽ truy vấn tất cả phiên mà có org trong list")}
+                            "Truy vấn tất cả lượt tham dự có org trong list. "+
+                            "Check `Include None` để truy vấn các lượt không có org.")}
               </span>
             </Col>
             <Col className="ml-2 d-block">
@@ -118,7 +128,7 @@ class Filters extends React.Component {
             <Col className="d-inline-flex" lg={12}>
               <span className="flex-center">
                 <input type="checkbox" id="part-filter-search-chk" className="mr-1"
-                  value={this.state.filterBySearchChk}
+                  checked={this.state.filterBySearchChk}
                   onChange={e => this.setState({filterBySearchChk : e.target.checked })}
                 /> 
                 <label htmlFor="part-filter-search-chk">Search</label>
@@ -129,6 +139,7 @@ class Filters extends React.Component {
             <Col className="ml-2 d-inline-flex">
               <input type="text" className="w-100" disabled={!this.state.filterBySearchChk }
                       placeholder="Search prefix username.."
+                      value={this.state.filters.search || ""}
                       onChange={e => this.setState({
                         filters: {
                           ...filters,
@@ -154,10 +165,7 @@ class Filters extends React.Component {
               size="sm"
               variant="light"
               className="ml-1 mr-1 btn-svg"
-              onClick={() => {
-                this.setState({ filters: {} })
-                this.props.setFilters({})
-              }}
+              onClick={() => this.resetFilters()}
             >
               <FaTimes/> Reset
             </Button>
@@ -310,8 +318,7 @@ class Participation extends React.Component {
     });
     const parent = this;
 
-    toast
-    .promise(apiCall, {
+    toast.promise(apiCall, {
       pending: {
         render() { return "Processing..."; },
       },
@@ -582,6 +589,8 @@ class AddParticipationModal extends React.Component {
     super(props);
     this.state = {
       addPartType: null,
+      setOrgAuto: true,
+      selectedOrg: null,
       users: "",
       submitting: false,
       errors: null,
@@ -591,7 +600,7 @@ class AddParticipationModal extends React.Component {
   submitHandler(e) {
     e.preventDefault();
 
-    let {addPartType, users} = this.state;
+    let {addPartType, setOrgAuto, selectedOrg, users} = this.state;
     if (!addPartType) {
       alert("Hãy chọn 1 tư cách tham dự.");
       return false;
@@ -605,7 +614,13 @@ class AddParticipationModal extends React.Component {
 
     this.setState({submitting: true, errors: null});
 
-    const data = {users, participation_type: addPartType};
+    let data = {
+      users, 
+      participation_type: addPartType,
+      set_org_auto: setOrgAuto,
+    };
+    if (!setOrgAuto) data.organization = selectedOrg ? selectedOrg.slug : null;
+
     contestAPI
       .addContestParticipations({key: this.props.ckey, data})
       .then(() => {
@@ -643,7 +658,7 @@ class AddParticipationModal extends React.Component {
             id="contest-participation-add-form"
             onSubmit={e => this.submitHanlder(e)}
           >
-            <div className="">Thêm họ với tư cách tham dự:</div>
+            <div className=""><strong>* Thêm họ với tư cách tham dự:</strong></div>
             <div className="flex-center">
               {VIRTUAL_TYPE.map(type => (
                 <div key={`part-${type}`} className="flex-center">
@@ -660,6 +675,7 @@ class AddParticipationModal extends React.Component {
               ))}
             </div>
 
+            <div className="mt-1"><strong>* Thêm các tài khoản có username sau:</strong></div>
             <Form.Control
               as="textarea"
               style={{height: "100px"}}
@@ -667,12 +683,32 @@ class AddParticipationModal extends React.Component {
               value={users}
               onChange={e => this.setState({users: e.target.value})}
             />
+
+            <div className="mt-1"><strong>* Gán tổ chức cho các lượt đăng ký:</strong></div>
+            <div className="">
+              <input type="checkbox" 
+                      id="add-participation-set-org-auto-chkbox"
+                      checked={this.state.setOrgAuto}
+                      onChange={e => this.setState({ setOrgAuto: e.target.checked })}
+              />
+              <label htmlFor="add-participation-set-org-auto-chkbox"
+                      className="ml-1">
+                Tự động set tổ chức từ Tổ chức đại diện ở Profile
+              </label>
+            <OrgSingleSelect
+              disabled={this.state.setOrgAuto}
+              onChange={sel => this.setState({selectedOrg: sel})}
+              value={this.state.selectedOrg}
+            />
+            </div>
+
+
             <div className="flex-center">
               <em style={{fontSize: "12px"}}>
-                Dán những tên người dùng (space-separated) mà bạn muốn đăng ký
-                vào contest. Nếu có người dùng được thêm đã đăng ký (với tư cách
-                là LIVE hoặc SPECTATE), hệ thống sẽ chỉnh lại Participation Type
-                của họ.
+                **Dán những tên người dùng (space-separated) mà bạn muốn đăng ký
+                vào contest. Nếu có người dùng được thêm đã đăng ký, hệ thống sẽ{" "}
+                <strong>chỉnh lại participation_type và organization</strong>{" "}
+                theo lựa chọn trên form.
               </em>
             </div>
           </Form>

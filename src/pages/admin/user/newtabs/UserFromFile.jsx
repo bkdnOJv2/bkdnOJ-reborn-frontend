@@ -47,7 +47,7 @@ export default class UserFromFile extends React.Component {
           toast.success("OK Created");
           const blob = new Blob([res.data], {type: "application/csv"});
           saveFile(blob);
-          this.props.redirectTo("/admin/user");
+          this.props.redirectTo("/admin/users/");
         })
         .catch(err => {
           toast.error(`Cannot create. (${err})`);

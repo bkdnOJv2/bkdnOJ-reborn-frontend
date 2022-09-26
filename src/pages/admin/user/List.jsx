@@ -1,7 +1,7 @@
 import React from "react";
 import ReactPaginate from "react-paginate";
 import {Navigate, Link} from "react-router-dom";
-import {Button, Table} from "react-bootstrap";
+import {Button, Table, Row, Col, Form} from "react-bootstrap";
 
 /* icons */
 import {
@@ -18,6 +18,7 @@ import {setTitle} from "helpers/setTitle";
 import "./List.scss";
 import "styles/ClassicPagination.scss";
 import {qmClarify} from "helpers/components";
+import { toast } from "react-toastify";
 
 class UserItem extends React.Component {
   render() {
@@ -34,11 +35,11 @@ class UserItem extends React.Component {
 
     return (
       <tr>
-        <td className="text-truncate" style={{maxWidth: "20px"}}>
-          <Link to={`/admin/user/${id}`}>{id}</Link>
+        <td>
+          <Link to={`/admin/user/${username}`}>{id}</Link>
         </td>
         <td className="text-truncate" style={{maxWidth: "40px"}}>
-          <Link to={`/admin/user/${id}`}>{username}</Link>
+          <Link to={`/admin/user/${username}`}>{username}</Link>
         </td>
         <td className="text-truncate" style={{maxWidth: "100px"}}>
           {email}
@@ -78,6 +79,8 @@ class AdminUserList extends React.Component {
       errors: null,
 
       submitting: false,
+
+      search: null,
     };
     setTitle("Admin | Users");
   }
@@ -97,9 +100,10 @@ class AdminUserList extends React.Component {
 
   callApi(params) {
     this.setState({loaded: false, errors: null});
+    let query = {params: {page: params.page + 1, search: this.state.search}}
 
     userAPI
-      .getUsers({params: {page: params.page + 1}})
+      .getUsers({...query})
       .then(res => {
         this.setState({
           objects: res.data.results,
@@ -118,6 +122,9 @@ class AdminUserList extends React.Component {
         });
       });
   }
+  refetch() {
+    this.callApi({page: this.state.currPage})
+  }
 
   componentDidMount() {
     this.callApi({page: this.state.currPage});
@@ -131,16 +138,14 @@ class AdminUserList extends React.Component {
     e.preventDefault();
     this.setState({errors: null});
 
-    let ids = [];
     let usernames = [];
     this.state.selectChk.forEach((v, i) => {
       if (v) {
-        ids.push(this.state.objects[i].id);
         usernames.push(this.state.objects[i].username);
       }
     });
 
-    if (ids.length === 0) {
+    if (usernames.length === 0) {
       alert("Không có User nào đang được chọn.");
       return;
     }
@@ -151,13 +156,14 @@ class AdminUserList extends React.Component {
     );
     if (conf) {
       let reqs = [];
-      ids.forEach(id => {
-        reqs.push(userAPI.adminDeleteUser({id}));
+      usernames.forEach(username => {
+        reqs.push(userAPI.adminDeleteUser({username}));
       });
 
       Promise.all(reqs)
         .then(() => {
           this.callApi({page: this.state.currPage});
+          toast.success("OK Deleted.")
         })
         .catch(err => {
           let msg = "Không thể xóa các User này.";
@@ -212,6 +218,31 @@ class AdminUserList extends React.Component {
 
         {/* Problem List */}
         <div className="admin-table user-table wrapper-vanilla">
+          <div className="user-table-options m-0 p-1 border w-100 text-left d-block">
+            <Row className="m-0 p-0">
+              <Form.Label column="sm" lg={1}>
+                Search
+              </Form.Label>
+              <Col className="m-0 p-0">
+                <Form.Control
+                  size="sm"
+                  type="text"
+                  placeholder="Search username (prefix), first name, last name (full text)"
+                  value={this.state.search || ""}
+                  onChange={e => this.setState({search: e.target.value})}
+                />
+              </Col>
+              <Col sm={2}>
+                <Button size="sm" variant="dark" className="w-100"
+                  disabled={!this.state.loaded}
+                  onClick={() => this.refetch()}
+                >
+                  Filter
+                </Button>
+              </Col>
+            </Row>
+          </div>
+
           <h4>User List</h4>
           <ErrorBox errors={this.state.errors} />
           <Table
@@ -262,8 +293,8 @@ class AdminUserList extends React.Component {
                   </td>
                 </tr>
               )}
-              {this.state.loaded === true ? (
-                this.state.objects.map((obj, idx) => (
+              {this.state.loaded === true && (
+                this.state.objects.length > 0 ? this.state.objects.map((obj, idx) => (
                   <UserItem
                     key={`user-${obj.username}`}
                     rowidx={idx}
@@ -272,13 +303,13 @@ class AdminUserList extends React.Component {
                     onSelectChkChange={() => this.selectChkChangeHandler(idx)}
                   />
                 ))
-              ) : (
+              : (
                 <tr>
                   <td colSpan={99}>
                     <em>No User can be found.</em>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </Table>
           {this.state.loaded === false ? (

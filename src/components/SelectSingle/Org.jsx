@@ -67,6 +67,7 @@ export default class OrgSingleSelect extends React.Component {
             "Hệ thống chỉ trả về 20 Orgs khớp tìm kiếm nhất. " +
             "Hãy thử đổi nội dung tìm nếu không tìm thấy Org mong muốn."
           }
+          isDisabled={this.props.disabled}
           loadOptions={val => this.loadOptions(val)}
           onChange={sel => this.props.onChange({...sel.data})}
           value={
