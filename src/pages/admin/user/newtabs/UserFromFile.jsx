@@ -104,6 +104,43 @@ export default class UserFromFile extends React.Component {
               </Row>
             </Accordion.Body>
           </Accordion.Item>
+          <Accordion.Item eventKey="2" className="help-advanced">
+            <Accordion.Header>Tạo tài khoản thi</Accordion.Header>
+            <Accordion.Body>
+              <Row>
+                <Col>
+                  <div className="border p-1">
+                    <p>Xét file csv sau:</p>
+                    <pre>{`username,email,first_name,organization
+team001,team001@mail.com,BKDN.team1,bkdn
+team002,team002@mail.com,BKDN.team2,bkdn
+team003,team003@mail.com,HUSC.team3,husc
+team004,team004@mail.com,DTU.team4,dtu
+team005,team005@mail.com,uni.fictional,uni`}</pre>
+                    <p>
+                      Chúng ta có thể sử dụng cột first_name để làm tên của đội.
+                      Giá trị này sẽ được hiển thị lên Standing.
+                    </p>
+                    <p>
+                      Hệ thống có thể nhận thêm một cột <code>organization</code>
+                      là mã slug của tổ chức. Nếu tìm thấy tổ chức có slug, tài khoản
+                      được tạo sẽ có profile được set tổ chức đại diện là organization đó. 
+                      Mục đích chính là dành cho option tự động set org khi Add Participation trong Contest.
+                      Nếu không tìm thấy org với slug này, hệ thống sẽ để trống.
+                    </p>
+                    <p>
+                      Vậy tốt nhất nên tạo sẵn các organization trước khi generate tài khoản
+                      dùng cho cuộc thi.
+                    </p>
+                    <p>
+                      Hệ thống sẽ trả lại file CSV để bạn check nếu có tài khoản gán org không thành công,
+                      khi có giá trị blank tại row đó.
+                    </p>
+                  </div>
+                </Col>
+              </Row>
+            </Accordion.Body>
+          </Accordion.Item>
         </Accordion>
         <div className="border m-1">
           <Row>
