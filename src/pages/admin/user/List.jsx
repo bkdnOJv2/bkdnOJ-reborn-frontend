@@ -19,6 +19,7 @@ import "./List.scss";
 import "styles/ClassicPagination.scss";
 import {qmClarify} from "helpers/components";
 import { toast } from "react-toastify";
+import { FaFilter, FaTimes } from "react-icons/fa";
 
 class UserItem extends React.Component {
   render() {
@@ -57,7 +58,7 @@ class UserItem extends React.Component {
         <td>
           <input
             type="checkbox"
-            value={selectChk}
+            checked={selectChk}
             onChange={() => onSelectChkChange()}
           />
         </td>
@@ -80,7 +81,7 @@ class AdminUserList extends React.Component {
 
       submitting: false,
 
-      search: null,
+      filters: {},
     };
     setTitle("Admin | Users");
   }
@@ -100,7 +101,7 @@ class AdminUserList extends React.Component {
 
   callApi(params) {
     this.setState({loaded: false, errors: null});
-    let query = {params: {page: params.page + 1, search: this.state.search}}
+    let query = {params: {page: params.page + 1, ...this.state.filters}}
 
     userAPI
       .getUsers({...query})
@@ -181,6 +182,10 @@ class AdminUserList extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.filters !== this.state.filters) this.refetch();
+  }
+
   render() {
     if (this.state.redirectUrl)
       return <Navigate to={`${this.state.redirectUrl}`} />;
@@ -216,34 +221,35 @@ class AdminUserList extends React.Component {
           )}
         </div>
 
-        {/* Problem List */}
+        {/* User List */}
         <div className="admin-table user-table wrapper-vanilla">
-          <div className="user-table-options m-0 p-1 border w-100 text-left d-block">
-            <Row className="m-0 p-0">
-              <Form.Label column="sm" lg={1}>
-                Search
-              </Form.Label>
-              <Col className="m-0 p-0">
-                <Form.Control
-                  size="sm"
-                  type="text"
-                  placeholder="Search username (prefix), first name, last name (full text)"
-                  value={this.state.search || ""}
-                  onChange={e => this.setState({search: e.target.value})}
-                />
-              </Col>
-              <Col sm={2}>
-                <Button size="sm" variant="dark" className="w-100"
-                  disabled={!this.state.loaded}
-                  onClick={() => this.refetch()}
-                >
-                  Filter
-                </Button>
-              </Col>
-            </Row>
+          <UserFilter 
+            filters={this.state.filters}
+            setFilters={(filters => this.setState({filters}))}
+            disabled={!this.state.loaded}
+          />
+
+          <div className="border m-1 p-1 flex-center justify-content-start">
+            <strong className="mr-2">Actions{qmClarify(
+              "Thực hiện actions lên các user được chọn. Chọn các user bằng ô "+
+              "checkbox phía bên phải mỗi trường."
+            )}</strong>
+            <span className="ml-1 mr-1">
+              <Button size="sm" variant="success"
+                onClick={e => this.handleDeleteSelect(e)}
+              >Activate</Button>
+              <Button size="sm" variant="warning"
+                onClick={e => this.handleDeleteSelect(e)}
+              >Deactivate</Button>
+            </span>
+            <span className="ml-1 mr-1">
+              <Button size="sm" variant="danger"
+                onClick={e => this.handleDeleteSelect(e)}
+              >Delete</Button>
+            </span>
           </div>
 
-          <h4>User List</h4>
+          <h4>User List {this.state.loaded && `(${this.state.count})`}</h4>
           <ErrorBox errors={this.state.errors} />
           <Table
             responsive
@@ -279,9 +285,11 @@ class AdminUserList extends React.Component {
                 <th>Joined</th>
                 {/* <th >Last seen</th> */}
                 <th style={{width: "8%"}}>
-                  <Link to="#" onClick={e => this.handleDeleteSelect(e)}>
-                    Delete
-                  </Link>
+                  <input type="checkbox" 
+                    onChange={e => this.setState({  
+                      selectChk: Array(this.state.objects.length).fill(e.target.checked) 
+                    })}
+                  />
                 </th>
               </tr>
             </thead>
@@ -333,6 +341,191 @@ class AdminUserList extends React.Component {
         </div>
       </div>
     );
+  }
+}
+
+class UserFilter extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      filters: {...this.props.filters},
+    }
+  }
+
+  changeFilters(changes) {
+    const {filters} = this.state;
+    this.setState({
+      filters: {
+        ...filters,
+        ...changes,
+      }
+    })
+  }
+
+  setFilters() {
+    let filt = {...this.state.filters}
+    if (!this.state.filterByStatusChk) {
+      delete filt['is_active']
+      delete filt['is_staff']
+    }
+    if (!this.state.filterByJoinDateChk) {
+      delete filt['date_joined_before']
+      delete filt['date_joined_after']
+    } else {
+      ['date_joined_before', 'date_joined_after'].forEach(key => {
+        if (filt[key]) filt[key] = new Date(filt[key]).toISOString();
+      });
+    }
+    if (this.state.filters.orderBy) {
+      filt['ordering'] = this.state.filters.orderBy
+    }
+
+    this.props.setFilters(filt)
+  }
+
+  resetFilters() {
+    this.setState({ filters: {} })
+    this.props.setFilters({})
+  }
+
+  getTime(key) {
+    const data = this.state.filters;
+    if (data && data[key]) {
+      let time = new Date(data[key]);
+      time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+      return time.toISOString().slice(0, 19);
+    }
+    return "";
+  }
+
+  render() {
+    const {filters} = this.state;
+    const {disabled} = this.props;
+    
+    return (
+      <div className="user-table-options m-0 p-1 border w-100 text-left d-block">
+        <Row className="m-0 p-0">
+          <Form.Label column="sm" lg={1}>
+            <strong>Search</strong> 
+          </Form.Label>
+          <Col className="m-0 p-0">
+            <Form.Control
+              size="sm"
+              type="text"
+              placeholder="Search username (prefix), first name, last name (full text)"
+              value={filters.search || ""}
+              onChange={e => this.changeFilters({ search: e.target.value, })}
+            />
+          </Col>
+        </Row>
+        <Row className="m-0 mt-1 p-0">
+          <Col className="">
+            <label className="mr-2">
+              <input type="checkbox" id="user-filter-chk-active"
+                checked={this.state.filterByStatusChk}
+                onChange={e=>this.setState({filterByStatusChk: e.target.checked})}/>
+              <span className="ml-1"><strong>Filter by Status?</strong></span>
+            </label>
+            <label className="ml-2">
+              <input type="checkbox" id="user-filter-chk-active"
+                disabled={!this.state.filterByStatusChk}
+                checked={filters.is_active} onChange={e=>this.changeFilters({is_active: e.target.checked})}/>
+              <span className="ml-1">Active</span>
+            </label>
+            <label className="ml-2">
+              <input type="checkbox" id="user-filter-chk-staff"
+                disabled={!this.state.filterByStatusChk}
+                checked={filters.is_staff} onChange={e=>this.changeFilters({is_staff: e.target.checked})}/>
+              <span className="ml-1">Staff</span>
+            </label>
+            <label className="ml-2">
+              <input type="checkbox" id="user-filter-chk-staff"
+                disabled={!this.state.filterByStatusChk}
+                checked={filters.is_superuser} onChange={e=>this.changeFilters({is_superuser: e.target.checked})}/>
+              <span className="ml-1">Superuser</span>
+            </label>
+          </Col>
+        </Row>
+        <Row className="m-0 p-0">
+          <Col className="">
+            <label className="">
+              <input type="checkbox" id="user-filter-chk-active"
+                checked={this.state.filterByJoinDateChk}
+                onChange={e=>this.setState({filterByJoinDateChk: e.target.checked})}/>
+              <span className="ml-1"><strong>Filter by Join Date?</strong></span>
+            </label>
+            <Col>
+              <label
+                id="date-after-lbl"
+                className="m-0 w-100"
+                htmlFor="date-after"
+              >
+                Joined After
+              </label>
+              <input
+                className="w-100 m-0"
+                type="datetime-local"
+                id="joined-after"
+                disabled={!this.state.filterByJoinDateChk}
+                step="1"
+                value={this.getTime("date_joined_after")}
+                onChange={e => this.changeFilters({date_joined_after: e.target.value})}
+              ></input>
+            </Col>
+            <Col>
+              <label
+                id="date-before-lbl"
+                className="m-0 w-100"
+                htmlFor="date-before"
+              >
+                Joined Before
+              </label>
+              <input
+                className="w-100 m-0"
+                type="datetime-local"
+                id="joined-before"
+                disabled={!this.state.filterByJoinDateChk}
+                step="1"
+                value={this.getTime("date_joined_before")}
+                onChange={e => this.changeFilters({date_joined_before: e.target.value})}
+              ></input>
+            </Col>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="ml-2 mt-2">
+            <label className="">
+              <span className="ml-1 mr-2"><strong>Order by</strong></span>
+              <select id="user-filter-chk-active"
+                value={this.state.filters.ordering || ""}
+                onChange={e=>this.changeFilters({ordering: e.target.value})}>
+                  <option value="">--</option>
+                  <option value="id">ID asc</option>
+                  <option value="-id">ID desc</option>
+                  <option value="username">Username asc</option>
+                  <option value="-username">Username desc</option>
+                  <option value="date_joined">Date Joined asc</option>
+                  <option value="-date_joined">Date Joined desc</option>
+              </select>
+            </label>
+          </Col>
+        </Row>
+
+        <div className="w-100 mt-2 d-flex flex-row-reverse">
+          <Button size="sm" variant="dark" className="ml-1 mr-1 btn-svg"
+            disabled={disabled}
+            onClick={() => this.setFilters(filters)}
+          >
+            <FaFilter/> Filter
+          </Button>
+          <Button size="sm" variant="light" className="ml-1 mr-1 btn-svg"
+            onClick={() => this.resetFilters()}
+          >
+            <FaTimes/> Reset
+          </Button>
+        </div>
+      </div>
+    )
   }
 }
 
