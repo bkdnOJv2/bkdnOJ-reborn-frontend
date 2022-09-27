@@ -20,6 +20,7 @@ import "styles/ClassicPagination.scss";
 import {qmClarify} from "helpers/components";
 import { toast } from "react-toastify";
 import { FaFilter, FaTimes } from "react-icons/fa";
+import { FcOk, FcHighPriority } from "react-icons/fc";
 
 class UserItem extends React.Component {
   render() {
@@ -45,9 +46,9 @@ class UserItem extends React.Component {
         <td className="text-truncate" style={{maxWidth: "100px"}}>
           {email}
         </td>
-        <td>{is_active ? "Yes" : "No"}</td>
-        <td>{is_staff ? "Yes" : "No"}</td>
-        <td>{is_superuser ? "Yes" : "No"}</td>
+        <td>{is_active ? <FcOk/> : <FcHighPriority/>}</td>
+        <td>{is_staff ? <FcOk/> : <FcHighPriority/>}</td>
+        <td>{is_superuser ? <FcOk/> : <FcHighPriority/>}</td>
         <td className="text-truncate" style={{maxWidth: "100px"}}>
           {new Date(date_joined).toLocaleString()}
         </td>
@@ -100,7 +101,7 @@ class AdminUserList extends React.Component {
   }
 
   callApi(params) {
-    this.setState({loaded: false, errors: null});
+    this.setState({loaded: false, errors: null, selectChkAll: false});
     let query = {params: {page: params.page + 1, ...this.state.filters}}
 
     userAPI
@@ -135,15 +136,12 @@ class AdminUserList extends React.Component {
     this.callApi({page: event.selected});
   };
 
-  handleDeleteSelect(e) {
-    e.preventDefault();
+  handleActOnUsers(action) {
     this.setState({errors: null});
 
     let usernames = [];
     this.state.selectChk.forEach((v, i) => {
-      if (v) {
-        usernames.push(this.state.objects[i].username);
-      }
+      if (v) usernames.push(this.state.objects[i].username);
     });
 
     if (usernames.length === 0) {
@@ -153,33 +151,28 @@ class AdminUserList extends React.Component {
 
     // TODO: Write a bulk delete API for submissions
     const conf = window.confirm(
-      "Xóa các User " + JSON.stringify(usernames) + "?"
+      `${action} các user ` + JSON.stringify(usernames) + " này?"
     );
-    if (conf) {
-      let reqs = [];
-      usernames.forEach(username => {
-        reqs.push(userAPI.adminDeleteUser({username}));
-      });
+    if (! conf) return false;
 
-      Promise.all(reqs)
-        .then(() => {
-          this.callApi({page: this.state.currPage});
-          toast.success("OK Deleted.")
-        })
-        .catch(err => {
-          let msg = "Không thể xóa các User này.";
-          if (err.response) {
-            if (err.response.status === 405)
-              msg += " Phương thức chưa được hỗ trợ.";
-            if (err.response.status === 404)
-              msg =
-                "Không tìm thấy một trong số User được chọn. Có lẽ họ đã bị xóa?";
-            if ([403, 401].includes(err.response.status))
-              msg += " Bạn không có quyền cho thao tác này.";
-          }
-          this.setState({errors: {errors: msg}});
-        });
+    const payload = {
+      action: action,
+      data: { users: usernames, }
     }
+    const apiCall = userAPI.adminActOnUsers(payload);
+    const parent = this;
+    toast.promise(apiCall, {
+      pending: { render() { return "Processing..."; }, },
+      success: { render() { 
+        parent.refetch(); 
+        return "Success."; 
+      }, },
+      error: { render({data}) { 
+          parent.setState({ errors: data.response.data, }); 
+          return "Update Failed."; 
+        }, 
+      },
+    })
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -229,22 +222,22 @@ class AdminUserList extends React.Component {
             disabled={!this.state.loaded}
           />
 
-          <div className="border m-1 p-1 flex-center justify-content-start">
+          <div className="border m-1 d-flex align-items-center justify-content-start">
             <strong className="mr-2">Actions{qmClarify(
               "Thực hiện actions lên các user được chọn. Chọn các user bằng ô "+
               "checkbox phía bên phải mỗi trường."
             )}</strong>
             <span className="ml-1 mr-1">
               <Button size="sm" variant="success"
-                onClick={e => this.handleDeleteSelect(e)}
+                onClick={() => this.handleActOnUsers("activate")}
               >Activate</Button>
               <Button size="sm" variant="warning"
-                onClick={e => this.handleDeleteSelect(e)}
+                onClick={() => this.handleActOnUsers("deactivate")}
               >Deactivate</Button>
             </span>
             <span className="ml-1 mr-1">
               <Button size="sm" variant="danger"
-                onClick={e => this.handleDeleteSelect(e)}
+                onClick={() => this.handleActOnUsers("delete")}
               >Delete</Button>
             </span>
           </div>
@@ -267,7 +260,7 @@ class AdminUserList extends React.Component {
                 <th>
                   Active
                   {qmClarify(
-                    "Tài khoản không Active sẽ không được phép đăng nhập."
+                    "Tài khoản không Active sẽ không được phép đăng nhập và không được thao tác với hệ thống."
                   )}
                 </th>
                 <th>
@@ -286,7 +279,9 @@ class AdminUserList extends React.Component {
                 {/* <th >Last seen</th> */}
                 <th style={{width: "8%"}}>
                   <input type="checkbox" 
+                    value={this.state.selectChkAll}
                     onChange={e => this.setState({  
+                      selectChkAll: e.target.checked,
                       selectChk: Array(this.state.objects.length).fill(e.target.checked) 
                     })}
                   />
@@ -367,6 +362,11 @@ class UserFilter extends React.Component {
     if (!this.state.filterByStatusChk) {
       delete filt['is_active']
       delete filt['is_staff']
+      delete filt['is_superuser']
+    } else {
+      filt['is_active'] = !!filt['is_active']
+      filt['is_staff'] = !!filt['is_staff']
+      filt['is_superuser'] = !!filt['is_superuser']
     }
     if (!this.state.filterByJoinDateChk) {
       delete filt['date_joined_before']
@@ -376,15 +376,16 @@ class UserFilter extends React.Component {
         if (filt[key]) filt[key] = new Date(filt[key]).toISOString();
       });
     }
-    if (this.state.filters.orderBy) {
-      filt['ordering'] = this.state.filters.orderBy
-    }
 
     this.props.setFilters(filt)
   }
 
   resetFilters() {
-    this.setState({ filters: {} })
+    this.setState({ 
+      filters: {}, 
+      filterByStatusChk: false, 
+      filterByJoinDateChk: false 
+    })
     this.props.setFilters({})
   }
 

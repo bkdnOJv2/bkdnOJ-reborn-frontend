@@ -12,6 +12,10 @@ const adminEditUser = ({username, data}) => {
     return axiosClient.patch(`/user/${username}/`, data);
 }
 
+const adminActOnUsers = (payload) => {
+    return axiosClient.post(`/users/act/`, payload);
+}
+
 const adminDeleteUser = ({username}) => {
     return axiosClient.delete(`/user/${username}/`);
 }
@@ -27,6 +31,7 @@ const adminResetPassword = ({username, data}) => {
 const userAPI = {
     getUsers,
     getUser,
+    adminActOnUsers,
     adminGenUserFromCSV,
     adminEditUser,
     adminDeleteUser,
