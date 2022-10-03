@@ -13,10 +13,6 @@ import submissionAPI from "api/submission";
 
 // Componenets
 import {SpinLoader} from "components";
-
-// Context
-import ContestContext from "context/ContestContext";
-
 // Helpers
 import {withParams} from "helpers/react-router";
 
@@ -74,7 +70,6 @@ class SubmissionDetails extends React.Component {
       .adminRejudgeSubmission({id: this.state.id})
       .then(() => {
         toast.success("OK Rejudging.");
-
         this.setState(
           {
             loaded: false,
