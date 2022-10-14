@@ -55,7 +55,7 @@ export default class UserMultiSelect extends React.Component {
   }
 
   render() {
-    const orgs = this.props.value || []; 
+    const orgs = this.props.value || [];
 
     return (
       <>

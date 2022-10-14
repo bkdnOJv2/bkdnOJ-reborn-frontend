@@ -1,10 +1,14 @@
 import React from "react";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import {Form, Row, Col, Table, Button, Modal} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
 import {
-  FaPlusCircle, FaFilter, FaTimes, FaRegSave, FaUniversity
+  FaPlusCircle,
+  FaFilter,
+  FaTimes,
+  FaRegSave,
+  FaUniversity,
 } from "react-icons/fa";
 
 import {getLocalDateWithTimezone} from "helpers/dateFormatter";
@@ -18,23 +22,23 @@ import "./Participation.scss";
 import "styles/ClassicPagination.scss";
 
 class Filters extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       filters: {},
-    }
+    };
   }
 
   setFilters() {
-    var filters = {}
+    var filters = {};
     const state = this.state;
     if (state.filterByTypeChk) filters.virtual = state.filters.virtual;
     if (state.filterByOrgChk) {
       filters.organizations = state.filters.organizations || [];
-      if (state.filterByOrgNoneOrg) filters.organizations.push('');
+      if (state.filterByOrgNoneOrg) filters.organizations.push("");
     }
     if (state.filterBySearchChk) filters.search = state.filters.search;
-    this.props.setFilters(filters)
+    this.props.setFilters(filters);
   }
 
   resetFilters() {
@@ -44,7 +48,7 @@ class Filters extends React.Component {
       filterByOrgNoneOrgChk: false,
       filterBySearchChk: false,
       filters: {},
-    })
+    });
   }
 
   render() {
@@ -57,13 +61,20 @@ class Filters extends React.Component {
           <Row className="m-0 mb-2 mt-2">
             <Col className="" xl={12}>
               <span className="flex-center">
-                <input type="checkbox" id="part-filter-type-chk" className="mr-1"
+                <input
+                  type="checkbox"
+                  id="part-filter-type-chk"
+                  className="mr-1"
                   checked={this.state.filterByTypeChk}
-                  onChange={e => this.setState({filterByTypeChk : e.target.checked })}
-                /> 
+                  onChange={e =>
+                    this.setState({filterByTypeChk: e.target.checked})
+                  }
+                />
                 <label htmlFor="part-filter-type-chk">Filter by Type</label>
-                {qmClarify("Chỉ có tác dụng nếu được check. "+
-                            "Disable muốn truy vấn tất cả type. ")}
+                {qmClarify(
+                  "Chỉ có tác dụng nếu được check. " +
+                    "Disable muốn truy vấn tất cả type. "
+                )}
               </span>
             </Col>
             <Col className="ml-2">
@@ -77,12 +88,14 @@ class Filters extends React.Component {
                     id={`${type}`}
                     label={`${type}`}
                     checked={type === filters.virtual}
-                    onChange={e => this.setState({
-                      filters: {
-                        ...filters,
-                        virtual: e.target.id,
-                      },
-                    })}
+                    onChange={e =>
+                      this.setState({
+                        filters: {
+                          ...filters,
+                          virtual: e.target.id,
+                        },
+                      })
+                    }
                   />
                 </div>
               ))}
@@ -92,32 +105,47 @@ class Filters extends React.Component {
           <Row className="flex-center m-0 mb-2">
             <Col className="d-inline-flex" lg={12}>
               <span className="flex-center">
-                <input type="checkbox" id="part-filter-org-chk" className="mr-1"
+                <input
+                  type="checkbox"
+                  id="part-filter-org-chk"
+                  className="mr-1"
                   checked={this.state.filterByOrgChk}
-                  onChange={e => this.setState({filterByOrgChk : e.target.checked })}
-                /> 
+                  onChange={e =>
+                    this.setState({filterByOrgChk: e.target.checked})
+                  }
+                />
                 <label htmlFor="part-filter-org-chk">Filter by Orgs</label>
-                {qmClarify("Chỉ có tác dụng nếu được check. "+
-                            "Truy vấn tất cả lượt tham dự có org trong list. "+
-                            "Check `Include None` để truy vấn các lượt không có org.")}
+                {qmClarify(
+                  "Chỉ có tác dụng nếu được check. " +
+                    "Truy vấn tất cả lượt tham dự có org trong list. " +
+                    "Check `Include None` để truy vấn các lượt không có org."
+                )}
               </span>
             </Col>
             <Col className="ml-2 d-block">
               <span className="d-block">
-                <input type="checkbox" id="part-filter-org-none" disabled={!this.state.filterByOrgChk}
-                  onChange={e => this.setState({ filterByOrgNoneOrg: e.target.checked })}
+                <input
+                  type="checkbox"
+                  id="part-filter-org-none"
+                  disabled={!this.state.filterByOrgChk}
+                  onChange={e =>
+                    this.setState({filterByOrgNoneOrg: e.target.checked})
+                  }
                 />
-                <label htmlFor="part-filter-org-none" className="ml-1">Include None</label>
+                <label htmlFor="part-filter-org-none" className="ml-1">
+                  Include None
+                </label>
               </span>
-              <OrgMultiSelect isDisabled={!this.state.filterByOrgChk}
+              <OrgMultiSelect
+                isDisabled={!this.state.filterByOrgChk}
                 onChange={sel => {
                   this.setState({
                     selectedOrgs: sel,
                     filters: {
                       ...filters,
                       organizations: sel.map(org => org.slug),
-                    }
-                  })
+                    },
+                  });
                 }}
                 value={this.state.selectedOrgs}
               />
@@ -127,25 +155,37 @@ class Filters extends React.Component {
           <Row className="flex-center m-0 mb-2">
             <Col className="d-inline-flex" lg={12}>
               <span className="flex-center">
-                <input type="checkbox" id="part-filter-search-chk" className="mr-1"
+                <input
+                  type="checkbox"
+                  id="part-filter-search-chk"
+                  className="mr-1"
                   checked={this.state.filterBySearchChk}
-                  onChange={e => this.setState({filterBySearchChk : e.target.checked })}
-                /> 
+                  onChange={e =>
+                    this.setState({filterBySearchChk: e.target.checked})
+                  }
+                />
                 <label htmlFor="part-filter-search-chk">Search</label>
-                {qmClarify("Chỉ có tác dụng nếu được check. "+
-                            "Tìm theo username:\n  'tester' để tìm 'tester1', 'tester12',...")}
+                {qmClarify(
+                  "Chỉ có tác dụng nếu được check. " +
+                    "Tìm theo username:\n  'tester' để tìm 'tester1', 'tester12',..."
+                )}
               </span>
             </Col>
             <Col className="ml-2 d-inline-flex">
-              <input type="text" className="w-100" disabled={!this.state.filterBySearchChk }
-                      placeholder="Search prefix username.."
-                      value={this.state.filters.search || ""}
-                      onChange={e => this.setState({
-                        filters: {
-                          ...filters,
-                          search: e.target.value, 
-                        }
-                      })}
+              <input
+                type="text"
+                className="w-100"
+                disabled={!this.state.filterBySearchChk}
+                placeholder="Search prefix username.."
+                value={this.state.filters.search || ""}
+                onChange={e =>
+                  this.setState({
+                    filters: {
+                      ...filters,
+                      search: e.target.value,
+                    },
+                  })
+                }
               ></input>
             </Col>
           </Row>
@@ -158,8 +198,12 @@ class Filters extends React.Component {
               onClick={() => this.setFilters()}
               disabled={this.props.disabled}
             >
-              {this.props.disabled ? <SpinLoader margin="0" size={16}/> : <FaFilter/>}
-               Filter
+              {this.props.disabled ? (
+                <SpinLoader margin="0" size={16} />
+              ) : (
+                <FaFilter />
+              )}
+              Filter
             </Button>
             <Button
               size="sm"
@@ -167,12 +211,12 @@ class Filters extends React.Component {
               className="ml-1 mr-1 btn-svg"
               onClick={() => this.resetFilters()}
             >
-              <FaTimes/> Reset
+              <FaTimes /> Reset
             </Button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -223,7 +267,7 @@ class Participation extends React.Component {
     this.setState({loaded: false, errors: null});
     let prms = {
       page: params.page + 1,
-      ...this.state.filters
+      ...this.state.filters,
     };
 
     contestAPI
@@ -253,56 +297,66 @@ class Participation extends React.Component {
   };
 
   setErrors(errData) {
-    this.setState({ errors: errData })
+    this.setState({errors: errData});
   }
 
   componentDidMount() {
     this.refetch();
   }
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.filters !== this.state.filters) this.refetch()
+    if (prevState.filters !== this.state.filters) this.refetch();
   }
 
   genMessageActOnParticipations(action, params, affected) {
     let stringified = JSON.stringify(affected);
     if (stringified.length > 255) {
-      stringified = stringified.substring(0, 255-4)+"...]"
+      stringified = stringified.substring(0, 255 - 4) + "...]";
     }
-    if (action === 'delete') {
-      return "Bạn đang xóa các lượt tham dự:\n"+
-        `${stringified}`+"\nBạn có muốn tiếp tục?"
-    } else
-    if (action === 'disqualify') {
-      return "Bạn đang hủy tư cách thi đấu (disqualify) của các lượt tham dự:\n"+
-        `${stringified}`+"\nBạn có muốn tiếp tục?"
-    } else 
-    if (action === 'undisqualify') {
-      return "Bạn muốn khôi phục tư cách thi đấu (undisqualify) của các lượt tham dự:\n"+
-        `${stringified}`+"\nBạn có muốn tiếp tục?"
-    } else 
-    if (action === 'set-org') {
-      return `Bạn muốn đặt org='${params.organization}' cho các lượt tham dự sau:`+
-        `${stringified}`+"\nBạn có muốn tiếp tục?"
+    if (action === "delete") {
+      return (
+        "Bạn đang xóa các lượt tham dự:\n" +
+        `${stringified}` +
+        "\nBạn có muốn tiếp tục?"
+      );
+    } else if (action === "disqualify") {
+      return (
+        "Bạn đang hủy tư cách thi đấu (disqualify) của các lượt tham dự:\n" +
+        `${stringified}` +
+        "\nBạn có muốn tiếp tục?"
+      );
+    } else if (action === "undisqualify") {
+      return (
+        "Bạn muốn khôi phục tư cách thi đấu (undisqualify) của các lượt tham dự:\n" +
+        `${stringified}` +
+        "\nBạn có muốn tiếp tục?"
+      );
+    } else if (action === "set-org") {
+      return (
+        `Bạn muốn đặt org='${params.organization}' cho các lượt tham dự sau:` +
+        `${stringified}` +
+        "\nBạn có muốn tiếp tục?"
+      );
     }
-    return `Unrecognized action '${action}'`
+    return `Unrecognized action '${action}'`;
   }
 
   actOnParticipations(action, params) {
-    let partIds = [], partUsers = []
-    this.state.participations.map( (p, i) => {
+    let partIds = [],
+      partUsers = [];
+    this.state.participations.map((p, i) => {
       if (this.state.selectChk[i]) {
         partIds.push(p.id);
-        partUsers.push(p.user.username)
+        partUsers.push(p.user.username);
       }
-    })
-    
+    });
+
     if (partIds.length === 0) {
-      alert("Không có lượt đăng ký nào đang được chọn.")
+      alert("Không có lượt đăng ký nào đang được chọn.");
       return;
     }
-    const conf = window.confirm(this.genMessageActOnParticipations(
-      action, params, partUsers,
-    ))
+    const conf = window.confirm(
+      this.genMessageActOnParticipations(action, params, partUsers)
+    );
     if (!conf) return;
 
     const data = {
@@ -310,20 +364,26 @@ class Participation extends React.Component {
       data: {
         participations: partIds,
         ...params,
-      }
-    }
+      },
+    };
 
-    const apiCall =  contestAPI.actContestParticipation({
-      key: this.ckey, data,
+    const apiCall = contestAPI.actContestParticipation({
+      key: this.ckey,
+      data,
     });
     const parent = this;
 
     toast.promise(apiCall, {
       pending: {
-        render() { return "Processing..."; },
+        render() {
+          return "Processing...";
+        },
       },
       success: {
-        render() { parent.refetch(); return "Success."; },
+        render() {
+          parent.refetch();
+          return "Success.";
+        },
       },
       error: {
         render({data}) {
@@ -331,7 +391,7 @@ class Participation extends React.Component {
           return "Update Failed.";
         },
       },
-    })
+    });
   }
 
   render() {
@@ -339,38 +399,56 @@ class Participation extends React.Component {
     return (
       <div className="contest-participation-wrapper">
         <div className="table-wrapper m-2">
-          <Filters 
+          <Filters
             value={this.state.filters}
-            onChange={data => this.setState({ filters: data })} 
+            onChange={data => this.setState({filters: data})}
             setFilters={filters => this.setState({filters})}
             disabled={!this.state.loaded}
           />
 
           <div className="contest-participation-options-wrapper border p-1 mb-1 mt-1">
-           <strong>Actions</strong>
-            {qmClarify("Actions sẽ tác động những lượt tham dự được select. Select chúng bằng checkbox bên phải ở table bên dưới.")}
+            <strong>Actions</strong>
+            {qmClarify(
+              "Actions sẽ tác động những lượt tham dự được select. Select chúng bằng checkbox bên phải ở table bên dưới."
+            )}
             <div className="contest-participation-options">
               <span className="ml-1 mr-1">
-                <Button size="sm" variant="warning"
-                  onClick={()=>this.openSetOrganizationModal()}
-                >Change Org</Button>
+                <Button
+                  size="sm"
+                  variant="warning"
+                  onClick={() => this.openSetOrganizationModal()}
+                >
+                  Change Org
+                </Button>
               </span>
               <span className="ml-1 mr-1">
-                <Button size="sm" variant="warning"
-                  onClick={()=>this.actOnParticipations('disqualify')}
-                >Disqualify</Button>
-                <Button size="sm" variant="success"
-                  onClick={()=>this.actOnParticipations('undisqualify')}
-                >Undisqualify</Button>
+                <Button
+                  size="sm"
+                  variant="warning"
+                  onClick={() => this.actOnParticipations("disqualify")}
+                >
+                  Disqualify
+                </Button>
+                <Button
+                  size="sm"
+                  variant="success"
+                  onClick={() => this.actOnParticipations("undisqualify")}
+                >
+                  Undisqualify
+                </Button>
               </span>
               <span className="ml-1 mr-1">
-                <Button size="sm" variant="danger"
-                  onClick={()=>this.actOnParticipations('delete')}
-                >Delete</Button>
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() => this.actOnParticipations("delete")}
+                >
+                  Delete
+                </Button>
               </span>
             </div>
 
-            <ErrorBox errors={this.state.errors}/>
+            <ErrorBox errors={this.state.errors} />
 
             <div className="admin-table contest-participation-table mt-1">
               <h4 className="contest-participation-lbl m-0">Participations</h4>
@@ -406,9 +484,7 @@ class Participation extends React.Component {
                           "thức, sau khi contest đã kết thúc."
                       )}
                     </th>
-                    <th>
-                      Org
-                    </th>
+                    <th>Org</th>
                     <th>
                       Disqualified
                       {qmClarify(
@@ -417,25 +493,30 @@ class Participation extends React.Component {
                       )}
                     </th>
                     <th>
-                      <input type="checkbox"
+                      <input
+                        type="checkbox"
                         onChange={e => {
-                          const arrLeng = this.state.selectChk.length
+                          const arrLeng = this.state.selectChk.length;
                           this.setState({
-                            selectChk: Array(arrLeng).fill(e.target.checked)
-                          })
+                            selectChk: Array(arrLeng).fill(e.target.checked),
+                          });
                         }}
                       ></input>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {participations.length === 0 &&
-                    <tr><td colSpan={99}><span><em>
-                      No participations
-                    </em></span></td></tr>
-                  }
+                  {participations.length === 0 && (
+                    <tr>
+                      <td colSpan={99}>
+                        <span>
+                          <em>No participations</em>
+                        </span>
+                      </td>
+                    </tr>
+                  )}
                   {participations.map((part, ridx) => {
-                    let name = `${part.user.first_name} ${part.user.last_name}`
+                    let name = `${part.user.first_name} ${part.user.last_name}`;
                     if (name.length === 1) name = null;
 
                     return (
@@ -443,48 +524,69 @@ class Participation extends React.Component {
                         <td>{part.id}</td>
                         <td>
                           <div className="flex-center justify-content-start">
-                            <img src={part.user.avatar} className="d-flex border" height={40} 
-                              style={{ width: "auto" }}
-                            /> 
+                            <img
+                              src={part.user.avatar}
+                              className="d-flex border"
+                              height={40}
+                              style={{width: "auto"}}
+                            />
                             <div className="ml-1 d-block text-left">
-                              <div><strong>{part.user.username}</strong></div>
-                              <em className="d-block" style={{fontSize: 10}}>{part.user.display_name || "**no display name"}</em>
-                              <em className="d-block" style={{fontSize: 10}}>{name || "**no name"}</em>
+                              <div>
+                                <strong>{part.user.username}</strong>
+                              </div>
+                              <em className="d-block" style={{fontSize: 10}}>
+                                {part.user.display_name || "**no display name"}
+                              </em>
+                              <em className="d-block" style={{fontSize: 10}}>
+                                {name || "**no name"}
+                              </em>
                             </div>
                           </div>
                         </td>
                         <td>{getLocalDateWithTimezone(part.real_start)}</td>
                         <td>{part.virtual}</td>
-                        <td>{
-                          !part.organization ? "None" : 
-                          <div className="flex-center">
-                            {
-                              part.organization.logo_url ? 
-                              <img src={part.organization.logo_url||""} className="d-flex border" height={40} 
-                                  style={{ width: "auto" }}
-                              /> : <FaUniversity size={34}/>
-                            }
-                            <div className="ml-1 d-block text-left">
-                              <div><strong>{part.organization.slug}</strong></div>
-                              <div>{part.organization.name}</div>
+                        <td>
+                          {!part.organization ? (
+                            "None"
+                          ) : (
+                            <div className="flex-center">
+                              {part.organization.logo_url ? (
+                                <img
+                                  src={part.organization.logo_url || ""}
+                                  className="d-flex border"
+                                  height={40}
+                                  style={{width: "auto"}}
+                                />
+                              ) : (
+                                <FaUniversity size={34} />
+                              )}
+                              <div className="ml-1 d-block text-left">
+                                <div>
+                                  <strong>{part.organization.slug}</strong>
+                                </div>
+                                <div>{part.organization.name}</div>
+                              </div>
                             </div>
-                          </div>
-                        }</td>
+                          )}
+                        </td>
                         <td>{part.is_disqualified ? "Yes" : "No"}</td>
                         <td>
-                          <input type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={this.state.selectChk[ridx]}
                             onChange={() => {
                               const selectChk = this.state.selectChk;
                               this.setState({
-                                selectChk: selectChk.map((v, i) => i === ridx ? !v : v)
-                              })
+                                selectChk: selectChk.map((v, i) =>
+                                  i === ridx ? !v : v
+                                ),
+                              });
                             }}
                           />
                         </td>
                       </tr>
-                  )})
-                }
+                    );
+                  })}
                 </tbody>
               </Table>
               {this.state.loaded === false ? (
@@ -512,7 +614,9 @@ class Participation extends React.Component {
           ckey={this.ckey}
           modalShow={this.state.setOrganizationModalShow}
           closeModalHandler={() => this.closeSetOrganizationModal()}
-          actOnParticipations={(act, data)=>this.actOnParticipations(act, data)}
+          actOnParticipations={(act, data) =>
+            this.actOnParticipations(act, data)
+          }
           refetch={() => this.refetch()}
         />
         <AddParticipationModal
@@ -531,7 +635,7 @@ class SetOrganizationModal extends React.Component {
     super(props);
     this.state = {
       selectedOrg: null,
-    }
+    };
   }
 
   closeModalHandler() {
@@ -556,31 +660,30 @@ class SetOrganizationModal extends React.Component {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button 
+          <Button
             size="sm"
-            variant="secondary" 
+            variant="secondary"
             className="btn-svg"
             onClick={() => this.closeModalHandler()}
           >
-            <FaTimes/> Đóng
+            <FaTimes /> Đóng
           </Button>
           <Button
             size="sm"
             variant="danger"
             className="btn-svg"
             onClick={() => {
-              this.props.actOnParticipations(
-                'set-org', 
-                {organization: this.state.selectedOrg.slug}
-              );
+              this.props.actOnParticipations("set-org", {
+                organization: this.state.selectedOrg.slug,
+              });
               this.closeModalHandler();
             }}
           >
-            <FaRegSave/> Lưu 
+            <FaRegSave /> Lưu
           </Button>
         </Modal.Footer>
       </Modal>
-    )
+    );
   }
 }
 
@@ -615,7 +718,7 @@ class AddParticipationModal extends React.Component {
     this.setState({submitting: true, errors: null});
 
     let data = {
-      users, 
+      users,
       participation_type: addPartType,
       set_org_auto: setOrgAuto,
     };
@@ -658,7 +761,9 @@ class AddParticipationModal extends React.Component {
             id="contest-participation-add-form"
             onSubmit={e => this.submitHanlder(e)}
           >
-            <div className=""><strong>* Thêm họ với tư cách tham dự:</strong></div>
+            <div className="">
+              <strong>* Thêm họ với tư cách tham dự:</strong>
+            </div>
             <div className="flex-center">
               {VIRTUAL_TYPE.map(type => (
                 <div key={`part-${type}`} className="flex-center">
@@ -675,7 +780,9 @@ class AddParticipationModal extends React.Component {
               ))}
             </div>
 
-            <div className="mt-1"><strong>* Thêm các tài khoản có username sau:</strong></div>
+            <div className="mt-1">
+              <strong>* Thêm các tài khoản có username sau:</strong>
+            </div>
             <Form.Control
               as="textarea"
               style={{height: "100px"}}
@@ -684,24 +791,28 @@ class AddParticipationModal extends React.Component {
               onChange={e => this.setState({users: e.target.value})}
             />
 
-            <div className="mt-1"><strong>* Gán tổ chức cho các lượt đăng ký:</strong></div>
+            <div className="mt-1">
+              <strong>* Gán tổ chức cho các lượt đăng ký:</strong>
+            </div>
             <div className="">
-              <input type="checkbox" 
-                      id="add-participation-set-org-auto-chkbox"
-                      checked={this.state.setOrgAuto}
-                      onChange={e => this.setState({ setOrgAuto: e.target.checked })}
+              <input
+                type="checkbox"
+                id="add-participation-set-org-auto-chkbox"
+                checked={this.state.setOrgAuto}
+                onChange={e => this.setState({setOrgAuto: e.target.checked})}
               />
-              <label htmlFor="add-participation-set-org-auto-chkbox"
-                      className="ml-1">
+              <label
+                htmlFor="add-participation-set-org-auto-chkbox"
+                className="ml-1"
+              >
                 Tự động set tổ chức từ Tổ chức đại diện ở Profile
               </label>
-            <OrgSingleSelect
-              disabled={this.state.setOrgAuto}
-              onChange={sel => this.setState({selectedOrg: sel})}
-              value={this.state.selectedOrg}
-            />
+              <OrgSingleSelect
+                disabled={this.state.setOrgAuto}
+                onChange={sel => this.setState({selectedOrg: sel})}
+                value={this.state.selectedOrg}
+              />
             </div>
-
 
             <div className="flex-center">
               <em style={{fontSize: "12px"}}>

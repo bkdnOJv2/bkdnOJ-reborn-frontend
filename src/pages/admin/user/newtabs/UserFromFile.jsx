@@ -122,19 +122,21 @@ team005,team005@mail.com,uni.fictional,uni`}</pre>
                       Giá trị này sẽ được hiển thị lên Standing.
                     </p>
                     <p>
-                      Hệ thống có thể nhận thêm một cột <code>organization</code>
-                      là mã slug của tổ chức. Nếu tìm thấy tổ chức có slug, tài khoản
-                      được tạo sẽ có profile được set tổ chức đại diện là organization đó. 
-                      Mục đích chính là dành cho option tự động set org khi Add Participation trong Contest.
-                      Nếu không tìm thấy org với slug này, hệ thống sẽ để trống.
+                      Hệ thống có thể nhận thêm một cột{" "}
+                      <code>organization</code>
+                      là mã slug của tổ chức. Nếu tìm thấy tổ chức có slug, tài
+                      khoản được tạo sẽ có profile được set tổ chức đại diện là
+                      organization đó. Mục đích chính là dành cho option tự động
+                      set org khi Add Participation trong Contest. Nếu không tìm
+                      thấy org với slug này, hệ thống sẽ để trống.
                     </p>
                     <p>
-                      Vậy tốt nhất nên tạo sẵn các organization trước khi generate tài khoản
-                      dùng cho cuộc thi.
+                      Vậy tốt nhất nên tạo sẵn các organization trước khi
+                      generate tài khoản dùng cho cuộc thi.
                     </p>
                     <p>
-                      Hệ thống sẽ trả lại file CSV để bạn check nếu có tài khoản gán org không thành công,
-                      khi có giá trị blank tại row đó.
+                      Hệ thống sẽ trả lại file CSV để bạn check nếu có tài khoản
+                      gán org không thành công, khi có giá trị blank tại row đó.
                     </p>
                   </div>
                 </Col>

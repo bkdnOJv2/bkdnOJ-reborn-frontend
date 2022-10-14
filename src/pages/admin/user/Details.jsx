@@ -15,13 +15,13 @@ import {setTitle} from "helpers/setTitle";
 import {randomString} from "helpers/random";
 
 import "./Details.scss";
-import { qmClarify } from "helpers/components";
+import {qmClarify} from "helpers/components";
 
 class AdminJudgeDetails extends React.Component {
   constructor(props) {
     super(props);
     const {username} = this.props.params;
-    this.username = username
+    this.username = username;
     this.state = {
       loaded: false,
       errors: null,
@@ -143,9 +143,7 @@ class AdminJudgeDetails extends React.Component {
       <div className="admin user-panel wrapper-vanilla">
         <h4 className="user-title">
           <div className="panel-header">
-            <span className="title-text">
-              {`User | ${this.username}`}
-            </span>
+            <span className="title-text">{`User | ${this.username}`}</span>
             {loaded && (
               <span className="d-flex">
                 <Button
@@ -165,7 +163,10 @@ class AdminJudgeDetails extends React.Component {
         <div className="user-details">
           {!loaded ? (
             <div style={{minHeight: "100px"}} className="flex-center">
-              <span> <SpinLoader /> Loading... </span>
+              <span>
+                {" "}
+                <SpinLoader /> Loading...{" "}
+              </span>
             </div>
           ) : (
             <>
@@ -183,7 +184,9 @@ class AdminJudgeDetails extends React.Component {
                         <Form.Control
                           size="sm"
                           type="text"
-                          onChange={e => this.setState({password: e.target.value})}
+                          onChange={e =>
+                            this.setState({password: e.target.value})
+                          }
                           value={this.state.password}
                         />
                         <Button
@@ -191,7 +194,9 @@ class AdminJudgeDetails extends React.Component {
                           variant="dark"
                           className="btn-svg ml-1 mr-1"
                           style={{flexShrink: 10, minWidth: "100px"}}
-                          onClick={() => this.setState({password: randomString()})}
+                          onClick={() =>
+                            this.setState({password: randomString()})
+                          }
                         >
                           <VscRefresh />
                           <span>Gen</span>
@@ -212,7 +217,10 @@ class AdminJudgeDetails extends React.Component {
 
                     <hr className="m-2"></hr>
 
-                    <Form id="user-general" onSubmit={e => this.formSubmitHandler(e)}>
+                    <Form
+                      id="user-general"
+                      onSubmit={e => this.formSubmitHandler(e)}
+                    >
                       <Row>
                         <Form.Label column="sm" lg={1}>
                           {" "}
@@ -367,8 +375,13 @@ class AdminJudgeDetails extends React.Component {
                           {/* <sub>**Các thiết lập khác sẽ được thêm sau.</sub> */}
                         </Col>
                         <Col lg={4}>
-                          <Button variant="dark" size="sm" type="submit" className="btn-svg">
-                            <FaSave/> Save Account Settings
+                          <Button
+                            variant="dark"
+                            size="sm"
+                            type="submit"
+                            className="btn-svg"
+                          >
+                            <FaSave /> Save Account Settings
                           </Button>
                         </Col>
                       </Row>
@@ -378,7 +391,10 @@ class AdminJudgeDetails extends React.Component {
               </div>
               <div className="border p-1 m-1">
                 <strong>Profile Settings</strong>
-                <UserProfileSection username={this.username} parentFetch={()=>this.fetch()}/>
+                <UserProfileSection
+                  username={this.username}
+                  parentFetch={() => this.fetch()}
+                />
               </div>
             </>
           )}
@@ -391,54 +407,67 @@ class AdminJudgeDetails extends React.Component {
 class UserProfileSection extends React.Component {
   constructor(props) {
     super(props);
-    this.username = this.props.username
+    this.username = this.props.username;
     this.state = {
       loaded: false,
       errors: null,
       data: null,
-    }
+    };
   }
 
-  fetch(){
-    this.setState({loaded: false, errors: null})
-    profileAPI.adminGetProfile({ username: this.username })
-    .then(res => {
-      this.setState({
-        loaded: true, data: res.data,
-      }) 
-    })
-    .catch(err => {
-      this.setState({
-        loaded: true, errors: err.response.data,
-      }) 
-      console.log(err)
-    })
+  fetch() {
+    this.setState({loaded: false, errors: null});
+    profileAPI
+      .adminGetProfile({username: this.username})
+      .then(res => {
+        this.setState({
+          loaded: true,
+          data: res.data,
+        });
+      })
+      .catch(err => {
+        this.setState({
+          loaded: true,
+          errors: err.response.data,
+        });
+        console.log(err);
+      });
   }
 
   componentDidMount() {
-    this.fetch()
+    this.fetch();
   }
 
   formSubmitHandler(e) {
     e.preventDefault();
     const data = this.state.data;
-    const apiCall = profileAPI.adminEditProfile({ username: this.username, data: data })
+    const apiCall = profileAPI.adminEditProfile({
+      username: this.username,
+      data: data,
+    });
 
     const parent = this;
     toast.promise(apiCall, {
-      pending: { render() { return "Processing..."; }, },
-      success: { render() { 
-        parent.fetch(); 
-        return "Success."; 
-      }, },
-      error: { render({data}) { 
+      pending: {
+        render() {
+          return "Processing...";
+        },
+      },
+      success: {
+        render() {
+          parent.fetch();
+          return "Success.";
+        },
+      },
+      error: {
+        render({data}) {
           parent.setState({
             errors: data.response.data,
-          }); 
-          return "Update Failed."; 
-        }, 
+          });
+          return "Update Failed.";
+        },
       },
-    })
+    });
   }
 
   inputChangeHandler(event, params = {isCheckbox: null}) {
@@ -456,14 +485,16 @@ class UserProfileSection extends React.Component {
     const {loaded, data, errors} = this.state;
     return (
       <>
-        <ErrorBox errors={errors}/>
-        {
-          loaded === false && 
-          <div className="flex-center" style={{minHeight: "100px"}} >
-            <span><SpinLoader/>Loading</span>
+        <ErrorBox errors={errors} />
+        {loaded === false && (
+          <div className="flex-center" style={{minHeight: "100px"}}>
+            <span>
+              <SpinLoader />
+              Loading
+            </span>
           </div>
-        }{
-          loaded &&
+        )}
+        {loaded && (
           <div>
             <Form id="user-profile" onSubmit={e => this.formSubmitHandler(e)}>
               <Row>
@@ -497,9 +528,13 @@ class UserProfileSection extends React.Component {
 
               <Row>
                 <Col xl={12}>
-                  <Form.Label column="sm"> Display Name{qmClarify(
-                    "Display Name (Tên hiển thị) sẽ được hiển thị thay cho username nếu được set (vd. trên Standing)"
-                  )}</Form.Label>
+                  <Form.Label column="sm">
+                    {" "}
+                    Display Name
+                    {qmClarify(
+                      "Display Name (Tên hiển thị) sẽ được hiển thị thay cho username nếu được set (vd. trên Standing)"
+                    )}
+                  </Form.Label>
                 </Col>
                 <Col>
                   <Form.Control
@@ -515,7 +550,7 @@ class UserProfileSection extends React.Component {
                   <Form.Label column="sm"> About </Form.Label>
                 </Col>
                 <Col>
-                  <Form.Control 
+                  <Form.Control
                     as="textarea"
                     size="sm"
                     id="about"
@@ -528,7 +563,8 @@ class UserProfileSection extends React.Component {
 
               <Row>
                 <Form.Label column="sm" lg={3}>
-                  Performance Point {qmClarify("Điểm đặc biệt, chưa được sử dụng.")}
+                  Performance Point{" "}
+                  {qmClarify("Điểm đặc biệt, chưa được sử dụng.")}
                 </Form.Label>
                 <Col>
                   <Form.Control
@@ -573,9 +609,7 @@ class UserProfileSection extends React.Component {
                   />
                 </Col>
 
-                <Form.Label column="sm" >
-                  Rating
-                </Form.Label>
+                <Form.Label column="sm">Rating</Form.Label>
                 <Col>
                   <Form.Control
                     size="sm"
@@ -592,16 +626,21 @@ class UserProfileSection extends React.Component {
                   {/* <sub>**Các thiết lập khác sẽ được thêm sau.</sub> */}
                 </Col>
                 <Col lg={4}>
-                  <Button variant="dark" size="sm" type="submit" className="btn-svg">
-                    <FaSave/> Save Profile
+                  <Button
+                    variant="dark"
+                    size="sm"
+                    type="submit"
+                    className="btn-svg"
+                  >
+                    <FaSave /> Save Profile
                   </Button>
                 </Col>
               </Row>
             </Form>
           </div>
-        }
+        )}
       </>
-    )
+    );
   }
 }
 
