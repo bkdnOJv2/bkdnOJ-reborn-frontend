@@ -25,3 +25,10 @@ div#problem-filter {
     }
   }
 }
+
+div.unset-css-select-menu{
+  div, span {
+    width: unset !important;
+    flex: unset !important;
+  }
+}
