@@ -20,10 +20,9 @@ const ProblemTagMultiSelect = (props) => {
       try {
         const response = await problemTagAPI.getProblemTags()
         setTags(response.data.results);
-        setLoading(false);
       } catch (error) {
-        console.log(error)
         toast.error("Couldn't retrieve problem tags", {toastId: "problem-filter-sidebar-tags"})
+      } finally {
         setLoading(false);
       }
     }
