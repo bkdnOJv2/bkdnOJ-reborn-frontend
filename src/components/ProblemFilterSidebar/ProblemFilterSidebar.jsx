@@ -4,12 +4,10 @@ import Select from 'react-select';
 
 // Redux
 import {connect} from "react-redux";
-// import {
-//   setContestParams,
-//   clearContestParams,
-//   setPublicParams,
-//   clearPublicParams,
-// } from "redux/SubFilter/actions";
+import {
+  clearProblemTags,
+  updateProblemTags,
+} from "redux/ProblemFilter/actions";
 
 import {Button, Row, Col} from "react-bootstrap";
 import problemTagAPI from "api/problem-tag";
@@ -19,24 +17,10 @@ import {FaTimes, FaFilter} from "react-icons/fa";
 import "./ProblemFilterSidebar.scss";
 import { toast } from "react-toastify";
 
-const DATA = [
-  {
-    value: 1,
-    label: "dp",
-  },
-  {
-    value: 2,
-    label: "math",
-  },
-  {
-    value: 3,
-    label: "geometry",
-  },
-]
-
 const ProblemFilterSidebar = (props) => {
   const [isLoading, setLoading] = useState(true)
   const [tags, setTags] = useState([])
+  const [selectedTags, setSelectedTags] = useState([])
 
   const tag2Option = (tag) => {
     return {value: tag.id, label: tag.name}
@@ -50,12 +34,15 @@ const ProblemFilterSidebar = (props) => {
         setLoading(false);
       } catch (error) {
         toast.error("Couldn't retrieve problem tags", {toastId: "problem-filter-sidebar-tags"})
-        console.log(error)
         setLoading(false);
       }
     }
     fetch();
   }, []);
+
+  useEffect(() => {
+    if (selectedTags.length === 0) props.clearProblemTags();
+  }, [selectedTags])
 
   return (
     <div className="wrapper-vanilla" id="sub-filter">
@@ -70,16 +57,19 @@ const ProblemFilterSidebar = (props) => {
               <div className="unset-css-select-menu">
                 <Select isMulti isLoading={isLoading} 
                   closeMenuOnSelect={false} options={tags.map((tag) => tag2Option(tag))} 
-                  placeholder="Select.." />
+                  placeholder="Select.." 
+                  onChange={sel => setSelectedTags(sel)}
+                />
               </div>
             </Row>
           </div>
 
           <div className="p-1 text-right d-flex flex-row-reverse" style={{ columnGap: "5px", }}>
-            <Button size="sm" variant="light" className="btn-svg">
-              <FaTimes /> Clear
-            </Button>
-            <Button size="sm" variant="secondary" className="btn-svg">
+            <Button size="sm" variant="secondary" className="btn-svg"
+              onClick={() => {
+                props.updateProblemTags(selectedTags.map(sel => sel.value))
+              }}
+            >
               <FaFilter /> Filter
             </Button>
           </div>
@@ -89,4 +79,16 @@ const ProblemFilterSidebar = (props) => {
   )
 }
 
-export default ProblemFilterSidebar;
+const mapStateToProps = state => {
+  return {
+    problemTags: state.problemFilter.problemTags,
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+    updateProblemTags: (tagArray) => dispatch(updateProblemTags({problemTags: tagArray})),
+    clearProblemTags: () => dispatch(clearProblemTags()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProblemFilterSidebar);
