@@ -51,7 +51,6 @@ const AdminProblemTagList = (props) => {
   const [tags, setTags] = useState([])
 
   const [selectedIds, setSelectedIds] = useState([])
-  console.log(selectedIds)
 
   async function fetch() {
     try {
